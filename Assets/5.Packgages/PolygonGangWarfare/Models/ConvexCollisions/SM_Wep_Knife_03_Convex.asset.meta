@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 908da697ee91aa84daf159b0bd698f4d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Wep_Knife_03_Convex.asset
+  uploadId: 710010

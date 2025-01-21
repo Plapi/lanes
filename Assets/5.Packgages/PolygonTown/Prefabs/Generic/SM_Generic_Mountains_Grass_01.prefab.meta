@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f30a5bd91583adf48916412bd723155b
+timeCreated: 1532572783
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Generic/SM_Generic_Mountains_Grass_01.prefab
+  uploadId: 714862

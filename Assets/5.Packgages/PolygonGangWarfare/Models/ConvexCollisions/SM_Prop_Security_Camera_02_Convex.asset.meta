@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5885e1dceaf5b3e48a93a149df9f9bbb
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Prop_Security_Camera_02_Convex.asset
+  uploadId: 710010

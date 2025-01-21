@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 31c0548dbfc3ef344ba61ffd783b81e2
+timeCreated: 1597028392
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Item_Onion_01_Convex.asset
+  uploadId: 714862

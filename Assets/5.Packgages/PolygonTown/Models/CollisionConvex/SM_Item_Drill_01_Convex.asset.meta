@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e3bb5d8dbb25b5c42b5072a6e55ff543
+timeCreated: 1597028271
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Item_Drill_01_Convex.asset
+  uploadId: 714862

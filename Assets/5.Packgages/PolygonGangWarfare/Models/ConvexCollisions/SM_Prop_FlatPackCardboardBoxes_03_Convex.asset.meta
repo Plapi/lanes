@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 82226d972e45c1a4eaa50d641b66b896
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Prop_FlatPackCardboardBoxes_03_Convex.asset
+  uploadId: 710010

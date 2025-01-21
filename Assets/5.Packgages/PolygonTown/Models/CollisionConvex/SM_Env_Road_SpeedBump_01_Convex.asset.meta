@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 85247d14544b3ba4592c4130418731b1
+timeCreated: 1597028283
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Env_Road_SpeedBump_01_Convex.asset
+  uploadId: 714862

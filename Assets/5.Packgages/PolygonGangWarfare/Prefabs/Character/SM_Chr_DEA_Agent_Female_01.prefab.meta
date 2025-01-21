@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4c37448c94f16ed4b975f083dc1d472e
+timeCreated: 1562900081
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Prefabs/Character/SM_Chr_DEA_Agent_Female_01.prefab
+  uploadId: 710010

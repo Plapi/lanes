@@ -1,0 +1,136 @@
+using UnityEngine;
+
+public static class TransformExtensions {
+	
+	public static void SetX(this GameObject obj, float x) {
+		obj.transform.SetX(x);
+	}
+	
+	public static void SetY(this GameObject obj, float y) {
+		obj.transform.SetY(y);
+	}
+	
+	public static void SetZ(this GameObject obj, float z) {
+		obj.transform.SetZ(z);
+	}
+	
+	public static void SetX(this Transform transform, float x) {
+		transform.position = new Vector3(x, transform.position.y, transform.position.z);
+	}
+	
+	public static void SetY(this Transform transform, float y) {
+		transform.position = new Vector3(transform.position.x, y, transform.position.z);
+	}
+	
+	public static void SetZ(this Transform transform, float z) {
+		transform.position = new Vector3(transform.position.x, transform.position.y, z);
+	}
+	
+	public static void SetXY(this Transform transform, float x, float y) {
+		transform.position = new Vector3(x, y, transform.position.z);
+	}
+	
+	public static void SetXZ(this Transform transform, float x, float z) {
+		transform.position = new Vector3(x, transform.position.y, z);
+	}
+	
+	public static void SetYZ(this Transform transform, float y, float z) {
+		transform.position = new Vector3(transform.position.z, y, z);
+	}
+	
+	public static void SetXYZ(this Transform transform, float x, float y, float z) {
+		transform.position = new Vector3(x, y, z);
+	}
+	
+	public static void SetLocalX(this GameObject obj, float x) {
+		obj.transform.SetLocalX(x);
+	}
+	
+	public static void SetLocalX(this Transform transform, float x) {
+		transform.localPosition = new Vector3(x, transform.localPosition.y, transform.localPosition.z);
+	}
+	
+	public static void SetLocalY(this GameObject obj, float y) {
+		obj.transform.SetLocalY(y);
+	}
+	
+	public static void SetLocalY(this Transform transform, float y) {
+		transform.localPosition = new Vector3(transform.localPosition.x, y, transform.localPosition.z);
+	}
+	
+	public static void SetLocalZ(this GameObject obj, float z) {
+		obj.transform.SetLocalZ(z);
+	}
+	
+	public static void SetLocalZ(this Transform transform, float z) {
+		transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, z);
+	}
+	
+	public static void SetLocalXY(this Transform transform, float x, float y) {
+		transform.localPosition = new Vector3(x, y, transform.localPosition.z);
+	}
+	
+	public static void SetLocalXZ(this Transform transform, float x, float z) {
+		transform.localPosition = new Vector3(x, transform.localPosition.y, z);
+	}
+	
+	public static void SetLocalYZ(this Transform transform, float y, float z) {
+		transform.localPosition = new Vector3(transform.localPosition.x, y, z);
+	}
+	
+	public static void SetLocalXYZ(this Transform transform, float x, float y, float z) {
+		transform.localPosition = new Vector3(x, y, z);
+	}
+	
+	public static void SetScaleX(this Transform transform, float x) {
+		transform.localScale = new Vector3(x, transform.localScale.y, transform.localScale.z);
+	}
+	
+	public static void SetScaleY(this Transform transform, float y) {
+		transform.localScale = new Vector3(transform.localScale.x, y, transform.localScale.z);
+	}
+	
+	public static void SetScaleZ(this Transform transform, float z) {
+		transform.localScale = new Vector3(transform.localScale.x, transform.localScale.y, z);
+	}
+	
+	public static void SetScale(this Transform transform, float scale) {
+		transform.localScale = Vector3.one * scale;
+	}
+	
+	public static void SetAngleX(this Transform transform, float x) {
+		transform.eulerAngles = new Vector3(x, transform.eulerAngles.y, transform.eulerAngles.z);
+	}
+	
+	public static void SetAngleY(this Transform transform, float y) {
+		transform.eulerAngles = new Vector3(transform.eulerAngles.x, y, transform.eulerAngles.z);
+	}
+	
+	public static void SetAngleZ(this Transform transform, float z) {
+		transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, z);
+	}
+
+	public static void SetLocalAngleX(this Transform transform, float x) {
+		transform.localEulerAngles = new Vector3(x, transform.localEulerAngles.y, transform.localEulerAngles.z);
+	}
+	
+	public static void SetLocalAngleY(this Transform transform, float y) {
+		transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, y, transform.localEulerAngles.z);
+	}
+	
+	public static void SetLocalAngleZ(this Transform transform, float z) {
+		transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, z);
+	}
+	
+	public static void SetLocalAngleXY(this Transform transform, float x, float y) {
+		transform.localEulerAngles = new Vector3(x, y, transform.localEulerAngles.z);
+	}
+	
+	public static void SetLocalAngleXZ(this Transform transform, float x, float z) {
+		transform.localEulerAngles = new Vector3(x, transform.localEulerAngles.y, z);
+	}
+	
+	public static void SetLocalAngleYZ(this Transform transform, float y, float z) {
+		transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, y, z);
+	}
+}

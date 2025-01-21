@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 672b72c698c29a44a8bb71f6a318bc45
+timeCreated: 1532649359
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Items/SM_Item_Pizza_Box_01.prefab
+  uploadId: 714862

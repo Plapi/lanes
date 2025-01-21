@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fcfd21fdfffd2254ebce3feb9f3f6ab4
+timeCreated: 1597028123
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Prop_Outdoor_Heater_01_Convex.asset
+  uploadId: 714862

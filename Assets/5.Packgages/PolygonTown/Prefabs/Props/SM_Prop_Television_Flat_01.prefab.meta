@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8d10ac7344d281a4688d5b5cea6b576a
+timeCreated: 1531887314
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Props/SM_Prop_Television_Flat_01.prefab
+  uploadId: 714862

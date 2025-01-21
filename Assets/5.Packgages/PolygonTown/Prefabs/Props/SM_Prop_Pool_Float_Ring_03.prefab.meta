@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 45894ac8f819c924cada460357b598cc
+timeCreated: 1531887304
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Props/SM_Prop_Pool_Float_Ring_03.prefab
+  uploadId: 714862

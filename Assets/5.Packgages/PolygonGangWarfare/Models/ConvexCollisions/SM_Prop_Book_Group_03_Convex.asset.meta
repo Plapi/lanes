@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b36be58e0d4848d4f999eb758cc81c44
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Prop_Book_Group_03_Convex.asset
+  uploadId: 710010

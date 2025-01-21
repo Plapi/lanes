@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bde2d7b2c5d9fff45a04dea917327330
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Prop_Propane_01_Convex.asset
+  uploadId: 710010

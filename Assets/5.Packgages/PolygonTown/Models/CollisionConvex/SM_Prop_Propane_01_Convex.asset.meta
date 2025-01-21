@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5a9c0217b6ab4804c8402f0fab67143f
+timeCreated: 1597028499
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Prop_Propane_01_Convex.asset
+  uploadId: 714862

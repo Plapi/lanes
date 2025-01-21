@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1483cae5230049048a75f92f530f1516
+timeCreated: 1531952197
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Buildings/SM_Bld_House_Roof_Angled_Gutter_01.prefab
+  uploadId: 714862

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cb4d7a54f6fb3924982e06dc88444078
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Wep_SubMachineGun_01_Convex.asset
+  uploadId: 710010

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1abaa47a35349454aadee26606895c6c
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Prop_Warehouse_Venting_Corner_01_Convex.asset
+  uploadId: 710010

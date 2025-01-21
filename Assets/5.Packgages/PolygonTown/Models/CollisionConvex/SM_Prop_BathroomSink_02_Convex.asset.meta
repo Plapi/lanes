@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ad3c1701480acd145b796d7f887c14dc
+timeCreated: 1597028424
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Prop_BathroomSink_02_Convex.asset
+  uploadId: 714862

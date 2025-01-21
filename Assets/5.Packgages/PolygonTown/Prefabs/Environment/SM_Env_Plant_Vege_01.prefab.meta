@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 345bd6ce213408741a8f7d77ac738f0d
+timeCreated: 1531887256
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Environment/SM_Env_Plant_Vege_01.prefab
+  uploadId: 714862

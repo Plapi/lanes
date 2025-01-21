@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 98dcb6b844d52dc41997b7aab2e30a75
+timeCreated: 1597028663
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Prop_FruitBowl_01_Convex.asset
+  uploadId: 714862

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 9870a1d1b22074f4fb19500305391ef7
+timeCreated: 1597029307
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Bld_House_Deck_Roof_InnerCorner_01_Convex
+    1.asset
+  uploadId: 714862

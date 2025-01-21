@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ef75f29ff3a962c45abf91f245f12d65
+timeCreated: 1531887271
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Props/SM_Prop_Bed_Single_03.prefab
+  uploadId: 714862

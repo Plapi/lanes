@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 82284595e879c4848a4287b73720d892
+timeCreated: 1597028583
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Bld_House_Roof_Angled_Cap_02_Convex.asset
+  uploadId: 714862

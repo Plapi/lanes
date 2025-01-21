@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1a9e7ec47ae4dc24ca1e747ebc9405c6
+timeCreated: 1597028111
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Prop_ToyTrain_01_Convex.asset
+  uploadId: 714862

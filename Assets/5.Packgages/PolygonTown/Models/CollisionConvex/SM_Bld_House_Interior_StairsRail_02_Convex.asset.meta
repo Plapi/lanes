@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c12691fc6d3c39c4a8686449ab3a2ca9
+timeCreated: 1597028496
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Bld_House_Interior_StairsRail_02_Convex.asset
+  uploadId: 714862

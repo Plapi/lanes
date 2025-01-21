@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e8939000b8bc72f4aa21b4c261d794db
+timeCreated: 1531708104
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Materials/Misc/Window_Glass_Opaque.mat
+  uploadId: 714862

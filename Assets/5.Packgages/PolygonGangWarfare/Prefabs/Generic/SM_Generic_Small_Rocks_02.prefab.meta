@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: df51a0377631ee94dbe769d39e10cf3d
+timeCreated: 1562644925
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Prefabs/Generic/SM_Generic_Small_Rocks_02.prefab
+  uploadId: 710010

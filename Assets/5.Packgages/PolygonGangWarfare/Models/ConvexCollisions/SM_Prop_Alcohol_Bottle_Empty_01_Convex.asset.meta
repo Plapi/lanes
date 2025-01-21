@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: aae6603690f77d54a8641fe089102318
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Prop_Alcohol_Bottle_Empty_01_Convex.asset
+  uploadId: 710010

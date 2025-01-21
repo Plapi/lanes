@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d9e9c4988d5e10c4a929c2c081a968f2
+timeCreated: 1532300681
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Buildings/SM_Bld_House_Roof_Angled_Cap_02.prefab
+  uploadId: 714862

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 97691fc9686b3b44d9a369629f526bd2
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Bld_Wall_Metal_Window_01_Convex.asset
+  uploadId: 710010

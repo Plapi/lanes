@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 407790dd1c3280640a785d19f9c4c7b1
+timeCreated: 1532050025
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Props/SM_Prop_Streetlamp_01.prefab
+  uploadId: 714862

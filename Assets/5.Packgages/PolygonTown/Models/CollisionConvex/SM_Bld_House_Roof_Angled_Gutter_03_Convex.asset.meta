@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 930d2793420395a428134b435bdcfa09
+timeCreated: 1597028225
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Bld_House_Roof_Angled_Gutter_03_Convex.asset
+  uploadId: 714862

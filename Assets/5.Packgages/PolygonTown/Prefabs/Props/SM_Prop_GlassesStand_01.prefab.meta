@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 26b3c15355a5d744f8f897e7bd8da2ce
+timeCreated: 1531887289
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Props/SM_Prop_GlassesStand_01.prefab
+  uploadId: 714862

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8ed01fcd1041a2f4786e8f659d55bb33
+timeCreated: 1531954394
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Vehicles/SM_Veh_Bus_01.prefab
+  uploadId: 714862

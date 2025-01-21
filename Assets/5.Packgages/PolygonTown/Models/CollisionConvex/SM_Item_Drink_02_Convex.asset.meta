@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a3d7be36962195344bdc0588e137a745
+timeCreated: 1597028463
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Item_Drink_02_Convex.asset
+  uploadId: 714862

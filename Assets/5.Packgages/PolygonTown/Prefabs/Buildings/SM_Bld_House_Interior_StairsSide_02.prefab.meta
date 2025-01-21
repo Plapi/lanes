@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 95a2f8439682b6c48a1852631f68cfc3
+timeCreated: 1531966574
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Buildings/SM_Bld_House_Interior_StairsSide_02.prefab
+  uploadId: 714862

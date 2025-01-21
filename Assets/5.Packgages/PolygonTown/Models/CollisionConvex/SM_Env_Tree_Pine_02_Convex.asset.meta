@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0962d51d614965d4ca380a4ec9cb5b0a
+timeCreated: 1597028134
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Env_Tree_Pine_02_Convex.asset
+  uploadId: 714862

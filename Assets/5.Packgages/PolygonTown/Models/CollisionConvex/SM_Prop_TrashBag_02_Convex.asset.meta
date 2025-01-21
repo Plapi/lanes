@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5f97f8bb16d7f914296f1f9a15c72a5a
+timeCreated: 1597028677
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Prop_TrashBag_02_Convex.asset
+  uploadId: 714862

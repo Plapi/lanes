@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 046eef5c5a544114e97d298643b10a6b
+timeCreated: 1597028443
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Prop_Kitchen_Extractor_01_Convex.asset
+  uploadId: 714862

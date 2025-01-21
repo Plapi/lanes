@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7f5ef3957498bed4aa751ed10bf80f56
+timeCreated: 1597028329
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Item_Pizza_Box_01_Convex.asset
+  uploadId: 714862

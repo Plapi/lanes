@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ed256fdb89522f6479511055c41e9ed5
+timeCreated: 1597028656
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Prop_Flowers_02_Convex.asset
+  uploadId: 714862

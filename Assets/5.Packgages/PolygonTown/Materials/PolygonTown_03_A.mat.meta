@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 8f568d2330fd6a44b9007af8d0d0331e
+timeCreated: 1531708030
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Materials/PolygonTown_03_A.mat
+  uploadId: 714862

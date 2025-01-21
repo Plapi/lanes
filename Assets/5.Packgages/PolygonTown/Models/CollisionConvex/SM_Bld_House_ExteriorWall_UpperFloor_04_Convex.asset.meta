@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1d7f85d6407109742b5f19a48a005b4b
+timeCreated: 1597028306
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Bld_House_ExteriorWall_UpperFloor_04_Convex.asset
+  uploadId: 714862

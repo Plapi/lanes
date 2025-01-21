@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: e620207881d604f47b89f2dc0c95b098
+timeCreated: 1597028576
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Prop_Television_Remote_01_Convex.asset
+  uploadId: 714862

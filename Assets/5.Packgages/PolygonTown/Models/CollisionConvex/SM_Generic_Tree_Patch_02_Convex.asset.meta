@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1e590baef1172d341857a0257098e82c
+timeCreated: 1597028513
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Generic_Tree_Patch_02_Convex.asset
+  uploadId: 714862

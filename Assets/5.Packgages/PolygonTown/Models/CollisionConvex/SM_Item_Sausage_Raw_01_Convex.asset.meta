@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c9f30024b7a83054f9e001b3ef84de31
+timeCreated: 1597028396
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Item_Sausage_Raw_01_Convex.asset
+  uploadId: 714862

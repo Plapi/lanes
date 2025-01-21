@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: edcc9437d18da5f4799d691834617715
+timeCreated: 1562641611
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Materials/Alternate/PolygonGangWarfare_Vehicle_04.mat
+  uploadId: 710010

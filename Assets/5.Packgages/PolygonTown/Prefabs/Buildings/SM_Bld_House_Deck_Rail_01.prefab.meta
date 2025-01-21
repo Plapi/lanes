@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6fadf1c26c589ec49b775c37b4974968
+timeCreated: 1532406970
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Prefabs/Buildings/SM_Bld_House_Deck_Rail_01.prefab
+  uploadId: 714862

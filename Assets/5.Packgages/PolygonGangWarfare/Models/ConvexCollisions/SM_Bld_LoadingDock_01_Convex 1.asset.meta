@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4da2c972961ec1249bffe29f3ed205a4
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 150589
+  packageName: POLYGON Gang Warfare - Low Poly 3D Art by Synty
+  packageVersion: 1.6.1
+  assetPath: Assets/PolygonGangWarfare/Models/ConvexCollisions/SM_Bld_LoadingDock_01_Convex
+    1.asset
+  uploadId: 710010

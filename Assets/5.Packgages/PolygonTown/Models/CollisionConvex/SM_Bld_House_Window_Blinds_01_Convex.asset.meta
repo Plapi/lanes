@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5ed25cb6aa2cc4846b64705ef00840a4
+timeCreated: 1597028503
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 121115
+  packageName: POLYGON Town Pack - Low Poly 3D Art by Synty
+  packageVersion: 1.8.3
+  assetPath: Assets/PolygonTown/Models/CollisionConvex/SM_Bld_House_Window_Blinds_01_Convex.asset
+  uploadId: 714862
