@@ -18,9 +18,10 @@ public class Segment : MonoBehaviour {
 		SetBoxCollider(length);
 	}
 
-	private void ClearLanes() {
+	public void ClearLanes() {
 		foreach (var lane in lanes) {
 			if (Application.isPlaying) {
+				lane.ClearElements();
 				Destroy(lane.gameObject);	
 			} else {
 				DestroyImmediate(lane.gameObject);

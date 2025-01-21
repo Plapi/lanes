@@ -29,7 +29,8 @@ public class PathController : MonoBehaviour {
 
 	private void LateUpdate() {
 		if (GetCarSpawnBackPos().z > segments[0].transform.localPosition.z + segmentLength) {
-			Destroy(segments[0].GameObject());
+			segments[0].ClearLanes();
+			Destroy(segments[0].gameObject);
 			segments.RemoveAt(0);
 		}
 		if (GetCarSpawnFrontPos().z > currentLength) {

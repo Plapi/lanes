@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -14,29 +15,30 @@ public abstract class Lane : MonoBehaviour {
 		if (elements == null || elements.Length == 0) {
 			return;
 		}
+
+		for (int i = 0; i < elements.Length; i++) {
+			elements[i].Id = elements[i].GetInstanceID().ToString();
+			ObjectPoolManager.CreatePool(elements[i]);
+		}
 		ClearElements();
 		
 		instantiatedElements ??= new List<Element>();
 
 		int elementsCount = length / Settings.Instance.laneSize;
 		for (int i = 0; i < elementsCount; i++) {
-			Element element = Instantiate(GetElement(), transform);
+			Element element = ObjectPoolManager.Get(GetElement(), transform);
 			element.name = element.name.Replace("(Clone)", "");
 			element.transform.SetLocalZ(i * Settings.Instance.laneSize);
 			instantiatedElements.Add(element);
 		}
 	}
 
-	private void ClearElements() {
+	public void ClearElements() {
 		if (instantiatedElements == null || instantiatedElements.Count == 0) {
 			return;
 		}
 		foreach (var element in instantiatedElements) {
-			if (Application.isPlaying) {
-				Destroy(element.gameObject);
-			} else {
-				DestroyImmediate(element.gameObject);
-			}
+			ObjectPoolManager.Release(element);
 		}
 		instantiatedElements.Clear();
 	}
