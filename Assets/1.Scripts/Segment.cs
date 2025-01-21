@@ -6,12 +6,12 @@ public class Segment : MonoBehaviour {
 	[SerializeField] private List<Lane> lanes = new();
 	[SerializeField] private BoxCollider boxCollider;
 	
-	private void SetLanes(LaneType[] laneTypes, int length) {
+	public void SetLanes(LaneType[] laneTypes, int length) {
 		ClearLanes();
 		for (int i = 0; i < laneTypes.Length; i++) {
 			Lane lane = Instantiate(Resources.Load<Lane>("Lanes/" + laneTypes[i]), transform);
 			lane.name = lane.name.Replace("(Clone)", "");
-			lane.transform.SetLocalX(i * Settings.Instance.lineWidth);
+			lane.transform.SetLocalX(i * Settings.Instance.laneSize);
 			lane.SetElements(length);
 			lanes.Add(lane);
 		}
@@ -36,7 +36,7 @@ public class Segment : MonoBehaviour {
 			boxCollider.transform.localPosition = Vector3.zero;
 		}
 		boxCollider.gameObject.layer = LayerMask.NameToLayer("drivable");
-		boxCollider.size = new Vector3(Settings.Instance.lineWidth * lanes.Count, 1f, length);
+		boxCollider.size = new Vector3(Settings.Instance.laneSize * lanes.Count, 1f, length);
 		boxCollider.center = new Vector3(boxCollider.size.x / 2f, -0.5f, length / 2f);
 	}
 	
@@ -49,15 +49,15 @@ public class Segment : MonoBehaviour {
 		SetLanes(debugLaneTypes, debugLength);
 	}
 #endif
-	
-	private enum LaneType {
-		RoadLaneSingleLeft,
-		RoadLaneSingleRight,
-		RoadLaneMiddle,
-		RoadLaneEdgeLeft,
-		RoadLaneEdgeRight,
-		SideWalkLaneRight,
-		SideWalkLaneLeft
-	}
+}
+
+public enum LaneType {
+	RoadLaneSingleLeft,
+	RoadLaneSingleRight,
+	RoadLaneMiddle,
+	RoadLaneEdgeLeft,
+	RoadLaneEdgeRight,
+	SideWalkLaneRight,
+	SideWalkLaneLeft
 }
 

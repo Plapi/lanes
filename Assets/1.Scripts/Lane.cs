@@ -18,11 +18,11 @@ public abstract class Lane : MonoBehaviour {
 		
 		instantiatedElements ??= new List<Element>();
 
-		int elementsCount = length / Settings.Instance.lineWidth;
+		int elementsCount = length / Settings.Instance.laneSize;
 		for (int i = 0; i < elementsCount; i++) {
 			Element element = Instantiate(GetElement(), transform);
 			element.name = element.name.Replace("(Clone)", "");
-			element.transform.SetLocalZ(i * Settings.Instance.lineWidth);
+			element.transform.SetLocalZ(i * Settings.Instance.laneSize);
 			instantiatedElements.Add(element);
 		}
 	}
