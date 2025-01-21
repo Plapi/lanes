@@ -49,4 +49,4 @@ MonoBehaviour:
   - {fileID: -1806706895814007030, guid: ddb27ffc46d0347e8905c8bdec52df26, type: 3}
   instantiatedElements: []
   currentLength: 0
-  debugLength: 0
+  debugLength: 500

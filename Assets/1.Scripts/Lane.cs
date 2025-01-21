@@ -9,27 +9,21 @@ public abstract class Lane : MonoBehaviour {
 	
 	[Space]
 	[SerializeField] private List<Element> instantiatedElements;
-	[SerializeField] private float currentLength;
 	
-	public void SetElements(float length) {
+	public void SetElements(int length) {
 		if (elements == null || elements.Length == 0) {
 			return;
 		}
+		ClearElements();
 		
 		instantiatedElements ??= new List<Element>();
 
-		float newLength = currentLength;
-		while (true) {
-			Element randomElement = GetElement();
-			newLength += randomElement.Size.z;
-			if (newLength > length) {
-				break;
-			}
-			Element element = Instantiate(randomElement, transform);
+		int elementsCount = length / Settings.Instance.lineWidth;
+		for (int i = 0; i < elementsCount; i++) {
+			Element element = Instantiate(GetElement(), transform);
 			element.name = element.name.Replace("(Clone)", "");
-			element.transform.SetLocalZ(newLength);
+			element.transform.SetLocalZ(i * Settings.Instance.lineWidth);
 			instantiatedElements.Add(element);
-			currentLength = newLength;
 		}
 	}
 
@@ -45,7 +39,6 @@ public abstract class Lane : MonoBehaviour {
 			}
 		}
 		instantiatedElements.Clear();
-		currentLength = 0;
 	}
 
 	private Element GetElement() {
@@ -53,26 +46,11 @@ public abstract class Lane : MonoBehaviour {
 	}
 	
 #if UNITY_EDITOR
-	[SerializeField] [Range(0, 500)] private float debugLength;
-	[SerializeField] private bool drawGizmos;
-	private float prevDebugLength;
-	protected virtual void OnDrawGizmos() {
-		if (!drawGizmos) {
-			return;
-		}
-		Gizmos.color = Color.red;
-		Gizmos.DrawCube(transform.position, Vector3.one * 0.2f);
-		Vector3 endPoint = transform.position + transform.forward * debugLength;
-		Gizmos.color = Color.green;
-		Gizmos.DrawCube(endPoint, Vector3.one * 0.2f);
-		if (Mathf.Abs(prevDebugLength - debugLength) > Mathf.Epsilon) {
-			if (debugLength > 0) {
-				SetElements(debugLength);
-			} else {
-				ClearElements();
-			}
-			prevDebugLength = debugLength;
-		}
+	[Space]
+	[SerializeField] [Range(0, 500)] private int debugLength = 500;
+	[ContextMenu("Set Debug Elements")]
+	private void SetDebugElements() {
+		SetElements(debugLength);
 	}
 #endif
 
