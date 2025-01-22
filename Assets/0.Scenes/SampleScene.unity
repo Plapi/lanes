@@ -75654,7 +75654,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
+  MinDistance: 3
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
@@ -75751,7 +75751,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
+  MinDistance: 3
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
@@ -76040,9 +76040,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  smoothSteering: 10
+  maxSteeringAngle: 30
   defaultSpeed: 40
   accelerateSpeed: 80
-  breakSpeed: 10
+  breakSpeed: 20
 --- !u!1 &1388445846
 GameObject:
   m_ObjectHideFlags: 0

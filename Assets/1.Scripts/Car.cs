@@ -8,6 +8,8 @@ public class Car : MonoBehaviour {
 	[Space]
 	[SerializeField] private ArcadeVehicleController avc;
 	[SerializeField] private AnimationCurve steeringCurve;
+	[SerializeField] private float smoothSteering;
+	[SerializeField] private float maxSteeringAngle;
 	
 	[Space]
 	[SerializeField] private float defaultSpeed;
@@ -31,7 +33,7 @@ public class Car : MonoBehaviour {
 		
 		float steering = 0f;
 		if (angle > Mathf.Epsilon) {
-			float angleP = Mathf.InverseLerp(0, 45f, angle);
+			float angleP = Mathf.InverseLerp(0, 45, angle);
 			steering = steeringCurve.Evaluate(angleP);
 			steering *= -Mathf.Sign(signedAngle);
 		}
@@ -42,14 +44,14 @@ public class Car : MonoBehaviour {
 			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(defaultSpeed, accelerateSpeed, avc.CurrentSpeed));
 			avc.MaxSpeed = accelerateSpeed;
 		} else if (brake) {
-			accelerateInput = 0f;
 			avc.MaxSpeed = breakSpeed;
+			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(0f, breakSpeed, avc.CurrentSpeed));
 			brakeInput = Mathf.InverseLerp(breakSpeed, accelerateSpeed, avc.CurrentSpeed);
 		} else {
 			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(breakSpeed, defaultSpeed, avc.CurrentSpeed));
 			avc.MaxSpeed = defaultSpeed;
 		}
-		
+
 		avc.ProvideInputs(steering, accelerateInput, brakeInput);
 	}
 
