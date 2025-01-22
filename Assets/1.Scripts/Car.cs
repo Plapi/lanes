@@ -8,8 +8,6 @@ public class Car : MonoBehaviour {
 	[Space]
 	[SerializeField] private ArcadeVehicleController avc;
 	[SerializeField] private AnimationCurve steeringCurve;
-	[SerializeField] private float smoothSteering;
-	[SerializeField] private float maxSteeringAngle;
 	
 	[Space]
 	[SerializeField] private float defaultSpeed;
