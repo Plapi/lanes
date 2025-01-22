@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PathController : MonoBehaviour {
 
-	[SerializeField] private Transform car;
+	[SerializeField] private Car car;
 	[SerializeField] private float spawnDistanceFront;
 	[SerializeField] private float spawnDistanceBack;
 	
@@ -22,9 +21,33 @@ public class PathController : MonoBehaviour {
 	};
 	private const int segmentLength = 500;
 	private int currentLength;
+	private int currentLane;
 
 	private void Awake() {
+		currentLane = 4;
 		CreateNewSegment();
+		if (segments[^1].TryGetLane(currentLane, out RoadLane lane)) {
+			car.SetRoadLane(lane);
+		}
+	}
+
+	private void Update() {
+		if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) {
+			TrySwitchLane(-1);
+		} else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) {
+			TrySwitchLane(1);
+		}
+		bool accelerate = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
+		bool brake = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
+		car.UpdateCar(accelerate, brake);
+	}
+
+	private void TrySwitchLane(int add) {
+		int newLane = currentLane + add;
+		if (segments[^1].TryGetLane(newLane, out RoadLane lane)) {
+			currentLane = newLane;
+			car.SetRoadLane(lane);
+		}
 	}
 
 	private void LateUpdate() {
@@ -35,6 +58,9 @@ public class PathController : MonoBehaviour {
 		}
 		if (GetCarSpawnFrontPos().z > currentLength) {
 			CreateNewSegment();
+			if (segments[^1].TryGetLane(currentLane, out RoadLane lane)) {
+				car.SetRoadLane(lane);
+			}
 		}
 	}
 
@@ -52,11 +78,11 @@ public class PathController : MonoBehaviour {
 	}
 
 	private Vector3 GetCarSpawnFrontPos() {
-		return car.localPosition + Vector3.forward * spawnDistanceFront;
+		return car.transform.localPosition + Vector3.forward * spawnDistanceFront;
 	}
 	
 	private Vector3 GetCarSpawnBackPos() {
-		return car.localPosition + Vector3.back * spawnDistanceBack;
+		return car.transform.localPosition + Vector3.back * spawnDistanceBack;
 	}
 
 #if UNITY_EDITOR

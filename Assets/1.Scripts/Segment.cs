@@ -5,6 +5,15 @@ public class Segment : MonoBehaviour {
 
 	[SerializeField] private List<Lane> lanes = new();
 	[SerializeField] private BoxCollider boxCollider;
+
+	public bool TryGetLane<T>(int index, out T lane) where T : Lane {
+		if (index >= 0 && index < lanes.Count && lanes[index] is T laneT) {
+			lane = laneT;
+			return true;
+		}
+		lane = null;
+		return false;
+	}
 	
 	public void SetLanes(LaneType[] laneTypes, int length) {
 		ClearLanes();

@@ -12,6 +12,11 @@ namespace ArcadeVP
         public groundCheck GroundCheck;
         public LayerMask drivableSurface;
 
+        public float CurrentSpeed { get; private set; }
+        
+        [SerializeField] 
+        private string currentSpeedString;
+
         public float MaxSpeed, accelaration, turn, gravity = 7f, downforce = 5f;
         [Tooltip("if true : can turn vehicle in air")]
         public bool AirControl = false;
@@ -175,6 +180,9 @@ namespace ArcadeVP
                 rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, rb.linearVelocity + Vector3.down * gravity, Time.deltaTime * gravity);
             }
 
+            float speedInMetersPerSecond = carVelocity.magnitude;
+            CurrentSpeed = speedInMetersPerSecond * 3.6f;
+            currentSpeedString = $"{CurrentSpeed:F2} km/h";
         }
         public void Visuals()
         {
