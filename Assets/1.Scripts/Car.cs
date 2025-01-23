@@ -1,28 +1,42 @@
+using System;
 using UnityEngine;
 using ArcadeVP;
 
-public class Car : MonoBehaviour {
+public abstract class Car : MonoBehaviour {
 
-	[SerializeField] private RoadLane roadLane;
+	[Space]
+	[SerializeField] protected RoadLane roadLane;
 	
 	[Space]
-	[SerializeField] private ArcadeVehicleController avc;
-	[SerializeField] private AnimationCurve steeringCurve;
+	[SerializeField] private float requireNewLaneOffset = 100;
 	
 	[Space]
-	[SerializeField] private float defaultSpeed;
-	[SerializeField] private float accelerateSpeed;
-	[SerializeField] private float breakSpeed;
+	[SerializeField] protected ArcadeVehicleController avc;
+	
+	[Space]
+	[SerializeField] protected AnimationCurve steeringCurve;
+	[SerializeField] protected float defaultSpeed;
+	
+	public int RoadLaneIndex { get; private set; }
 
+	private Action onRequireNewLane;
+	
 	private void Awake() {
 		avc.MaxSpeed = defaultSpeed;
 	}
 
-	public void SetRoadLane(RoadLane roadLane) {
-		this.roadLane = roadLane;
+	public void Init(Action onRequireNewLane) {
+		this.onRequireNewLane = onRequireNewLane;
 	}
 
-	public void UpdateCar(bool accelerate, bool brake) {
+	public void SetRoadLane(RoadLane roadLane, int roadLaneIndex) {
+		this.roadLane = roadLane;
+		RoadLaneIndex = roadLaneIndex;
+	}
+
+	protected abstract void GetInputs(bool accelerate, bool brake, out float accelerateInput, out float brakeInput);
+
+	private float GetSteering() {
 		Vector3 targetPosition = GetTargetPosition();
 
 		Vector3 targetDir = targetPosition - transform.position;
@@ -36,30 +50,31 @@ public class Car : MonoBehaviour {
 			steering *= -Mathf.Sign(signedAngle);
 		}
 
-		float accelerateInput;
-		float brakeInput = 0f;
-		if (accelerate) {
-			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(defaultSpeed, accelerateSpeed, avc.CurrentSpeed));
-			avc.MaxSpeed = accelerateSpeed;
-		} else if (brake) {
-			avc.MaxSpeed = breakSpeed;
-			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(0f, breakSpeed, avc.CurrentSpeed));
-			brakeInput = Mathf.InverseLerp(breakSpeed, accelerateSpeed, avc.CurrentSpeed);
-		} else {
-			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(breakSpeed, defaultSpeed, avc.CurrentSpeed));
-			avc.MaxSpeed = defaultSpeed;
-		}
+		return steering;
+	}
 
-		avc.ProvideInputs(steering, accelerateInput, brakeInput);
+	public void UpdateCar(bool accelerate, bool brake) {
+		GetInputs(accelerate, brake, out float accelerateInput, out float brakeInput);
+		avc.ProvideInputs(GetSteering(), accelerateInput, brakeInput);
+		if (GetRequireNewLanePos().z > roadLane.transform.position.z + roadLane.Length) {
+			onRequireNewLane?.Invoke();
+		}
 	}
 
 	private Vector3 GetTargetPosition() {
+		if (roadLane == null) {
+			Debug.LogError("No road lane");
+		}
 		float targetX = roadLane != null ? roadLane.transform.position.x : transform.position.x;
 		return new Vector3(targetX + Settings.Instance.laneSize / 2f, transform.position.y, transform.position.z + 10f);
 	}
 	
+	protected Vector3 GetRequireNewLanePos() {
+		return transform.position + Vector3.forward * requireNewLaneOffset;
+	}
+	
 #if UNITY_EDITOR
-	private void OnDrawGizmos() {
+	protected virtual void OnDrawGizmos() {
 		if (roadLane == null) {
 			return;
 		}

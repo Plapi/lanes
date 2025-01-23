@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,7 +10,9 @@ public abstract class Lane : MonoBehaviour {
 	
 	[Space]
 	[SerializeField] private List<Element> instantiatedElements;
-	
+
+	public float Length { get; private set; }
+
 	public void SetElements(int length) {
 		if (elements == null || elements.Length == 0) {
 			return;
@@ -31,6 +33,7 @@ public abstract class Lane : MonoBehaviour {
 			element.transform.SetLocalZ(i * Settings.Instance.laneSize);
 			instantiatedElements.Add(element);
 		}
+		Length = length;
 	}
 
 	public void ClearElements() {
