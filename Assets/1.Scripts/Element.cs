@@ -8,10 +8,6 @@ public abstract class Element : MonoBehaviour, IPoolableObject<Element> {
 	public Vector3 Size => size;
 	
 	public string Id { get; set; }
-	
-	public string GetID() {
-		return Id;
-	}
 
 	public Element GetMonoBehaviour() {
 		return this;

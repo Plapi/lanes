@@ -31,6 +31,7 @@ public abstract class Lane : MonoBehaviour {
 			Element element = ObjectPoolManager.Get(GetElement(), transform);
 			element.name = element.name.Replace("(Clone)", "");
 			element.transform.SetLocalZ(i * Settings.Instance.laneSize);
+			element.gameObject.SetActive(true);
 			instantiatedElements.Add(element);
 		}
 		Length = length;

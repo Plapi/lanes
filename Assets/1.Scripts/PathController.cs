@@ -7,6 +7,8 @@ public class PathController : MonoBehaviour {
 	
 	private readonly List<Segment> segments = new();
 	private readonly List<AICar> aiCars = new();
+
+	private AICar[] aiCarPrefabs;
 	
 	private readonly LaneType[] segmentData = {
 		LaneType.SideWalkLaneLeft,
@@ -33,6 +35,15 @@ public class PathController : MonoBehaviour {
 				userCar.SetRoadLane(roadLane, userCar.RoadLaneIndex);
 			}
 		});
+		InitAICars();
+	}
+
+	private void InitAICars() {
+		aiCarPrefabs = Resources.LoadAll<AICar>("AICars");
+		for (int i = 0; i < aiCarPrefabs.Length; i++) {
+			aiCarPrefabs[i].Id = $"AICar{i}";
+			ObjectPoolManager.CreatePool(aiCarPrefabs[i], 1);
+		}
 	}
 
 	private void Update() {
@@ -46,29 +57,38 @@ public class PathController : MonoBehaviour {
 		userCar.UpdateCar(accelerate, brake);
 
 		if (Input.GetKeyDown(KeyCode.C)) {
-			AICar carPrefab = Resources.Load<AICar>($"AICars/AICar0");
-			AICar aiCar = Instantiate(carPrefab, transform);
-			aiCar.name = $"AICar{aiCars.Count}";
+			AICar carPrefab = aiCarPrefabs[Random.Range(0, aiCarPrefabs.Length)];
+			AICar aiCar = ObjectPoolManager.Get(carPrefab, transform);
+			aiCar.name = carPrefab.name;
 			
 			List<RoadLane> currentRoadLanes = GetCurrentRoadLanes();
 			int randomRoadLaneIndex = Random.Range(0, currentRoadLanes.Count);
 			
 			aiCar.transform.localPosition = new Vector3(
 				currentRoadLanes[randomRoadLaneIndex].transform.localPosition.x + Settings.Instance.laneSize / 2f,
-				carPrefab.transform.localPosition.y, userCar.transform.localPosition.z + 40f);
+				carPrefab.transform.localPosition.y, userCar.transform.localPosition.z + 100f);
 			aiCar.SetRoadLane(currentRoadLanes[randomRoadLaneIndex], randomRoadLaneIndex);
 			aiCar.Init(() => {
 				if (segments[^1].TryGetLane(userCar.RoadLaneIndex, out RoadLane roadLane)) {
 					userCar.SetRoadLane(roadLane, userCar.RoadLaneIndex);
 				}
 			});
+			aiCar.gameObject.SetActive(true);
 			
 			aiCars.Add(aiCar);
 		}
 
+		if (Input.GetKeyDown(KeyCode.X)) {
+			for (int i = 0; i < aiCars.Count; i++) { 
+				ObjectPoolManager.Release(aiCars[i]); 
+				aiCars.RemoveAt(i); 
+				i--;
+			}
+		}
+
 		for (int i = 0; i < aiCars.Count; i++) {
 			if (aiCars[i].RoadLane == null) {
-				Destroy(aiCars[i].gameObject);
+				ObjectPoolManager.Release(aiCars[i]);
 				aiCars.RemoveAt(i);
 				i--;
 				continue;

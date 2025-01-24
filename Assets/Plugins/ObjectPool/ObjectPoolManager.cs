@@ -18,8 +18,8 @@ public class ObjectPoolManager : MonoBehaviourSingleton<ObjectPoolManager> {
 		}
 		Queue<MonoBehaviour> queue = new();
 		for (int i = 0; i < size; i++) {
-			T obj = poolableObject.GetMonoBehaviour();
-			queue.Enqueue(InstantiateObj(poolableObject, transform));
+			T obj = InstantiateObj(poolableObject, transform);
+			queue.Enqueue(obj);
 			obj.gameObject.SetActive(false);
 		}
 		pools.Add(poolableObject.Id, queue);
@@ -40,7 +40,6 @@ public class ObjectPoolManager : MonoBehaviourSingleton<ObjectPoolManager> {
 			queue.Enqueue(InstantiateObj(poolableObject));
 		}
 		T obj = (T)queue.Dequeue();
-		obj.gameObject.SetActive(true);
 		obj.transform.parent = parent;
 		obj.transform.localPosition = Vector3.zero;
 		return obj;
@@ -62,6 +61,7 @@ public class ObjectPoolManager : MonoBehaviourSingleton<ObjectPoolManager> {
 		T obj = poolableObject.GetMonoBehaviour();
 		obj.transform.parent = transform;
 		obj.transform.localPosition = Vector3.zero;
+		obj.transform.localRotation = Quaternion.identity;
 		obj.gameObject.SetActive(false);
 		queue.Enqueue(obj);
 	}

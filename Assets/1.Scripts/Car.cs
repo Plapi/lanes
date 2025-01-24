@@ -25,6 +25,14 @@ public abstract class Car : MonoBehaviour {
 		avc.MaxSpeed = defaultSpeed;
 	}
 
+	private void OnDisable() {
+		avc.carBody.linearVelocity = Vector3.zero;
+		avc.carBody.angularVelocity = Vector3.zero;
+		avc.rb.linearVelocity = Vector3.zero;
+		avc.rb.angularVelocity = Vector3.zero;
+		avc.carVelocity = Vector3.zero;
+	}
+
 	public void Init(Action onRequireNewLane) {
 		this.onRequireNewLane = onRequireNewLane;
 	}

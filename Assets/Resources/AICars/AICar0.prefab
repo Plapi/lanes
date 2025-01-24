@@ -10625,7 +10625,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2919849921655089891
 Transform:
   m_ObjectHideFlags: 0
@@ -10677,6 +10677,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roadLane: {fileID: 0}
+  requireNewLaneOffset: 100
   avc: {fileID: 151452902980444450}
   steeringCurve:
     serializedVersion: 2
