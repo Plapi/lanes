@@ -37,7 +37,7 @@ public class PathController : MonoBehaviour {
 			}
 		}
 	};
-	private const int segmentLength = 500;
+	private const int segmentLength = 200;
 	private int currentLength;
 
 	private void Awake() {
@@ -104,23 +104,23 @@ public class PathController : MonoBehaviour {
 		aiCar.name = carPrefab.name;
 		
 		List<RoadLane> currentRoadLanes = GetCurrentRoadLanes();
-		int randomRoadLaneIndex = Random.Range(0, 3);
+		int randomRoadLaneIndex = Random.Range(0, currentRoadLanes.Count);
 		RoadLane roadLane = currentRoadLanes[randomRoadLaneIndex];
 		
 		aiCar.transform.localPosition = new Vector3(
 			currentRoadLanes[randomRoadLaneIndex].transform.localPosition.x + Settings.Instance.laneSize / 2f,
 			carPrefab.transform.localPosition.y, userCar.transform.localPosition.z + 100f);
-
+		
 		if (!roadLane.Data.hasFrontDirection) {
 			aiCar.transform.SetAngleY(180f);
 		}
 		
 		aiCar.SetRoadLane(roadLane, randomRoadLaneIndex);
-		aiCar.Init(() => {
-			if (segments[^1].TryGetLane(aiCar.RoadLaneIndex, out RoadLane nextRoadLane)) {
-				aiCar.SetRoadLane(nextRoadLane, aiCar.RoadLaneIndex);
-			}
-		});
+		// aiCar.Init(() => {
+		// 	if (segments[^1].TryGetLane(aiCar.RoadLaneIndex, out RoadLane nextRoadLane)) {
+		// 		aiCar.SetRoadLane(nextRoadLane, aiCar.RoadLaneIndex);
+		// 	}
+		// });
 		aiCar.gameObject.SetActive(true);
 		
 		aiCars.Add(aiCar);
