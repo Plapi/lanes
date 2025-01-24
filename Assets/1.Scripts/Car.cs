@@ -74,10 +74,12 @@ public abstract class Car : MonoBehaviour {
 			Debug.LogError("No road lane");
 		}
 		float targetX = roadLane != null ? roadLane.transform.position.x : transform.position.x;
-		return new Vector3(targetX + Settings.Instance.laneSize / 2f, transform.position.y, transform.position.z + 10f);
+		return new Vector3(targetX + Settings.Instance.laneSize / 2f, transform.position.y, GetTargetPositionZ());
 	}
+
+	protected abstract float GetTargetPositionZ();
 	
-	protected Vector3 GetRequireNewLanePos() {
+	private Vector3 GetRequireNewLanePos() {
 		return transform.position + Vector3.forward * requireNewLaneOffset;
 	}
 	

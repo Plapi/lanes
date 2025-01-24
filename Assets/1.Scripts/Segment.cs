@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class Segment : MonoBehaviour {
 
-	[SerializeField] private List<Lane> lanes = new();
+	[SerializeField] private List<LaneBase> lanes = new();
 	[SerializeField] private BoxCollider boxCollider;
 	
-	public bool TryGetLane<T>(int index, out T lane) where T : Lane {
+	public bool TryGetLane<T>(int index, out T lane) where T : LaneBase {
 		if (index >= 0 && index < lanes.Count && lanes[index] is T laneT) {
 			lane = laneT;
 			return true;
@@ -14,21 +14,12 @@ public class Segment : MonoBehaviour {
 		lane = null;
 		return false;
 	}
-
-	public List<T> GetLanes<T>() where T : Lane {
-		List<T> tLanes = new();
-		for (int i = 0; i < lanes.Count; i++) {
-			if (lanes[i] is T tLane) {
-				tLanes.Add(tLane);
-			}
-		}
-		return tLanes;
-	}
 	
-	public void SetLanes(LaneType[] laneTypes, int length) {
+	public void SetLanes(SegmentData segmentData, int length) {
 		ClearLanes();
-		for (int i = 0; i < laneTypes.Length; i++) {
-			Lane lane = Instantiate(Resources.Load<Lane>("Lanes/" + laneTypes[i]), transform);
+		for (int i = 0; i < segmentData.lanes.Length; i++) {
+			LaneBase lane = Instantiate(Resources.Load<LaneBase>("Lanes/" + segmentData.lanes[i].type), transform);
+			lane.Init(segmentData.lanes[i]);
 			lane.name = lane.name.Replace("(Clone)", "");
 			lane.transform.SetLocalX(i * Settings.Instance.laneSize);
 			lane.SetElements(length);
@@ -66,18 +57,13 @@ public class Segment : MonoBehaviour {
 	[SerializeField] private LaneType[] debugLaneTypes;
 	[ContextMenu("Set Debug Lanes")]
 	private void SetDebugLanes() {
-		SetLanes(debugLaneTypes, debugLength);
+		//SetLanes(debugLaneTypes, debugLength);
 	}
 #endif
 }
 
-public enum LaneType {
-	RoadLaneSingleLeft,
-	RoadLaneSingleRight,
-	RoadLaneMiddle,
-	RoadLaneEdgeLeft,
-	RoadLaneEdgeRight,
-	SideWalkLaneRight,
-	SideWalkLaneLeft
+public class SegmentData {
+	public LaneData[] lanes;
 }
+
 

@@ -3,8 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+public abstract class Lane<T> : LaneBase where T : LaneData {
+	
+	public T Data {get; private set;}
+
+	public override void Init(LaneData data) {
+		Data = (T)data;
+	}
+}
+
 [ExecuteInEditMode]
-public abstract class Lane : MonoBehaviour {
+public abstract class LaneBase : MonoBehaviour {
 	
 	[SerializeField] private Element[] elements;
 	
@@ -13,6 +22,8 @@ public abstract class Lane : MonoBehaviour {
 
 	public float Length { get; private set; }
 
+	public abstract void Init(LaneData data);
+	
 	public void SetElements(int length) {
 		if (elements == null || elements.Length == 0) {
 			return;
@@ -60,4 +71,18 @@ public abstract class Lane : MonoBehaviour {
 	}
 #endif
 
+}
+
+public class LaneData {
+	public LaneType type;
+}
+
+public enum LaneType {
+	RoadLaneSingleLeft,
+	RoadLaneSingleRight,
+	RoadLaneMiddle,
+	RoadLaneEdgeLeft,
+	RoadLaneEdgeRight,
+	SideWalkLaneRight,
+	SideWalkLaneLeft
 }

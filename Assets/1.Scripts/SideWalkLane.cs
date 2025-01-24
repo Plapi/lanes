@@ -1,5 +1,5 @@
 using UnityEngine;
 
-public class SideWalkLane : Lane {
+public class SideWalkLane : Lane<LaneData> {
     
 }

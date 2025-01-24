@@ -24,6 +24,10 @@ public class UserCar : Car {
 		}
 	}
 
+	protected override float GetTargetPositionZ() {
+		return transform.position.z + 10f;
+	}
+
 	public Vector3 GetCarReleaseSegmentPos() {
 		return transform.localPosition + Vector3.back * releaseSegmentOffset;
 	}

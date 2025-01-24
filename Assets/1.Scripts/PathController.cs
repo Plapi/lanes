@@ -10,15 +10,32 @@ public class PathController : MonoBehaviour {
 
 	private AICar[] aiCarPrefabs;
 	
-	private readonly LaneType[] segmentData = {
-		LaneType.SideWalkLaneLeft,
-		LaneType.RoadLaneSingleLeft,
-		LaneType.RoadLaneMiddle,
-		LaneType.RoadLaneEdgeLeft,
-		LaneType.RoadLaneEdgeRight,
-		LaneType.RoadLaneMiddle,
-		LaneType.RoadLaneSingleRight,
-		LaneType.SideWalkLaneRight
+	private readonly SegmentData segmentData = new() {
+		lanes = new [] {
+			new LaneData {
+				type = LaneType.SideWalkLaneLeft
+			}, new RoadLaneData {
+				type = LaneType.RoadLaneSingleLeft,
+				hasFrontDirection = false,
+			}, new RoadLaneData {
+				type = LaneType.RoadLaneMiddle,
+				hasFrontDirection = false,
+			}, new RoadLaneData {
+				type = LaneType.RoadLaneEdgeLeft,
+				hasFrontDirection = false,
+			}, new RoadLaneData {
+				type = LaneType.RoadLaneEdgeRight,
+				hasFrontDirection = true,
+			}, new RoadLaneData {
+				type = LaneType.RoadLaneMiddle,
+				hasFrontDirection = true,
+			}, new RoadLaneData {
+				type = LaneType.RoadLaneSingleRight,
+				hasFrontDirection = true,
+			}, new LaneData {
+				type = LaneType.SideWalkLaneRight
+			}
+		}
 	};
 	private const int segmentLength = 500;
 	private int currentLength;
@@ -57,25 +74,7 @@ public class PathController : MonoBehaviour {
 		userCar.UpdateCar(accelerate, brake);
 
 		if (Input.GetKeyDown(KeyCode.C)) {
-			AICar carPrefab = aiCarPrefabs[Random.Range(0, aiCarPrefabs.Length)];
-			AICar aiCar = ObjectPoolManager.Get(carPrefab, transform);
-			aiCar.name = carPrefab.name;
-			
-			List<RoadLane> currentRoadLanes = GetCurrentRoadLanes();
-			int randomRoadLaneIndex = Random.Range(0, currentRoadLanes.Count);
-			
-			aiCar.transform.localPosition = new Vector3(
-				currentRoadLanes[randomRoadLaneIndex].transform.localPosition.x + Settings.Instance.laneSize / 2f,
-				carPrefab.transform.localPosition.y, userCar.transform.localPosition.z + 100f);
-			aiCar.SetRoadLane(currentRoadLanes[randomRoadLaneIndex], randomRoadLaneIndex);
-			aiCar.Init(() => {
-				if (segments[^1].TryGetLane(userCar.RoadLaneIndex, out RoadLane roadLane)) {
-					userCar.SetRoadLane(roadLane, userCar.RoadLaneIndex);
-				}
-			});
-			aiCar.gameObject.SetActive(true);
-			
-			aiCars.Add(aiCar);
+			SpawnAICar();
 		}
 
 		if (Input.GetKeyDown(KeyCode.X)) {
@@ -87,7 +86,9 @@ public class PathController : MonoBehaviour {
 		}
 
 		for (int i = 0; i < aiCars.Count; i++) {
-			if (aiCars[i].RoadLane == null) {
+			if (aiCars[i].RoadLane == null || 
+			    !aiCars[i].RoadLane.Data.hasFrontDirection &&
+			    userCar.transform.position.z - aiCars[i].transform.position.z > 10f) {
 				ObjectPoolManager.Release(aiCars[i]);
 				aiCars.RemoveAt(i);
 				i--;
@@ -97,9 +98,37 @@ public class PathController : MonoBehaviour {
 		}
 	}
 
+	private void SpawnAICar() {
+		AICar carPrefab = aiCarPrefabs[Random.Range(0, aiCarPrefabs.Length)];
+		AICar aiCar = ObjectPoolManager.Get(carPrefab, transform);
+		aiCar.name = carPrefab.name;
+		
+		List<RoadLane> currentRoadLanes = GetCurrentRoadLanes();
+		int randomRoadLaneIndex = Random.Range(0, 3);
+		RoadLane roadLane = currentRoadLanes[randomRoadLaneIndex];
+		
+		aiCar.transform.localPosition = new Vector3(
+			currentRoadLanes[randomRoadLaneIndex].transform.localPosition.x + Settings.Instance.laneSize / 2f,
+			carPrefab.transform.localPosition.y, userCar.transform.localPosition.z + 100f);
+
+		if (!roadLane.Data.hasFrontDirection) {
+			aiCar.transform.SetAngleY(180f);
+		}
+		
+		aiCar.SetRoadLane(roadLane, randomRoadLaneIndex);
+		aiCar.Init(() => {
+			if (segments[^1].TryGetLane(aiCar.RoadLaneIndex, out RoadLane nextRoadLane)) {
+				aiCar.SetRoadLane(nextRoadLane, aiCar.RoadLaneIndex);
+			}
+		});
+		aiCar.gameObject.SetActive(true);
+		
+		aiCars.Add(aiCar);
+	}
+
 	private List<RoadLane> GetCurrentRoadLanes() {
 		List<RoadLane> roadLanes = new();
-		for (int i = 0; i < segmentData.Length; i++) {
+		for (int i = 0; i < segmentData.lanes.Length; i++) {
 			if (segments[^1].TryGetLane(i, out RoadLane roadLane)) {
 				roadLanes.Add(roadLane);
 			}
