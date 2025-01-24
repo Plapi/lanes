@@ -61,8 +61,8 @@ public abstract class Car : MonoBehaviour {
 		return steering;
 	}
 
-	public void UpdateCar(bool accelerate, bool brake) {
-		GetInputs(accelerate, brake, out float accelerateInput, out float brakeInput);
+	public void UpdateCar(float verticalInput) {
+		GetInputs(verticalInput > 0f, verticalInput < 0f, out float accelerateInput, out float brakeInput);
 		avc.ProvideInputs(GetSteering(), accelerateInput, brakeInput);
 		if (GetRequireNewLanePos().z > roadLane.transform.position.z + roadLane.Length) {
 			onRequireNewLane?.Invoke();

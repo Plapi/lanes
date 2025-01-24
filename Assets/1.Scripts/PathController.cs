@@ -1,8 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PathController : MonoBehaviour {
 
+	[SerializeField] private InputManager inputManager;
 	[SerializeField] private UserCar userCar;
 	
 	private readonly List<Segment> segments = new();
@@ -17,7 +19,7 @@ public class PathController : MonoBehaviour {
 			}, new RoadLaneData {
 				type = LaneType.RoadLaneSingleLeft,
 				hasFrontDirection = false,
-			}, new RoadLaneData {
+			},/* new RoadLaneData {
 				type = LaneType.RoadLaneMiddle,
 				hasFrontDirection = false,
 			}, new RoadLaneData {
@@ -29,7 +31,7 @@ public class PathController : MonoBehaviour {
 			}, new RoadLaneData {
 				type = LaneType.RoadLaneMiddle,
 				hasFrontDirection = true,
-			}, new RoadLaneData {
+			},*/ new RoadLaneData {
 				type = LaneType.RoadLaneSingleRight,
 				hasFrontDirection = true,
 			}, new LaneData {
@@ -42,8 +44,9 @@ public class PathController : MonoBehaviour {
 
 	private void Awake() {
 		CreateNewSegment();
-		const int roadLaneIndex = 4;
+		const int roadLaneIndex = 2;
 		if (segments[^1].TryGetLane(roadLaneIndex, out RoadLane lane)) {
+			userCar.transform.SetLocalX(lane.transform.localPosition.x + Settings.Instance.laneSize / 2f);
 			userCar.SetRoadLane(lane, roadLaneIndex);
 		}
 		userCar.Init(() => {
@@ -52,7 +55,14 @@ public class PathController : MonoBehaviour {
 				userCar.SetRoadLane(roadLane, userCar.RoadLaneIndex);
 			}
 		});
+		userCar.gameObject.SetActive(true);
 		InitAICars();
+
+		inputManager.OnHorizontalInput = input => {
+			TrySwitchLane((int)Mathf.Sign(input));
+		};
+		
+		StartCoroutine(SpawnMechanic());
 	}
 
 	private void InitAICars() {
@@ -64,14 +74,7 @@ public class PathController : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) {
-			TrySwitchLane(-1);
-		} else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) {
-			TrySwitchLane(1);
-		}
-		bool accelerate = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
-		bool brake = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
-		userCar.UpdateCar(accelerate, brake);
+		userCar.UpdateCar(inputManager.VerticalInput);
 
 		if (Input.GetKeyDown(KeyCode.C)) {
 			SpawnAICar();
@@ -94,7 +97,14 @@ public class PathController : MonoBehaviour {
 				i--;
 				continue;
 			}
-			aiCars[i].UpdateCar(false, false);
+			aiCars[i].UpdateCar(0f);
+		}
+	}
+
+	private IEnumerator SpawnMechanic() {
+		while (true) {
+			yield return new WaitForSeconds(Random.Range(1f, 2f));
+			SpawnAICar();
 		}
 	}
 
@@ -111,16 +121,15 @@ public class PathController : MonoBehaviour {
 			currentRoadLanes[randomRoadLaneIndex].transform.localPosition.x + Settings.Instance.laneSize / 2f,
 			carPrefab.transform.localPosition.y, userCar.transform.localPosition.z + 100f);
 		
-		if (!roadLane.Data.hasFrontDirection) {
+		if (roadLane.Data.hasFrontDirection) {
+			aiCar.Init(() => {
+				aiCar.SetRoadLane(GetCurrentRoadLanes()[aiCar.RoadLaneIndex], aiCar.RoadLaneIndex);
+			});
+		} else {
 			aiCar.transform.SetAngleY(180f);
 		}
 		
 		aiCar.SetRoadLane(roadLane, randomRoadLaneIndex);
-		// aiCar.Init(() => {
-		// 	if (segments[^1].TryGetLane(aiCar.RoadLaneIndex, out RoadLane nextRoadLane)) {
-		// 		aiCar.SetRoadLane(nextRoadLane, aiCar.RoadLaneIndex);
-		// 	}
-		// });
 		aiCar.gameObject.SetActive(true);
 		
 		aiCars.Add(aiCar);
