@@ -25,13 +25,17 @@ public abstract class Car : MonoBehaviour {
 		avc.rb.linearVelocity = Vector3.zero;
 		avc.rb.angularVelocity = Vector3.zero;
 		avc.carVelocity = Vector3.zero;
+		RoadLaneIndex = 0;
+		CurrentSegment = null;
 	}
 
 	public void SetSegment(Segment segment, int laneIndex) {
 		if (CurrentSegment != null) {
-			laneIndex = Mathf.Min(laneIndex, segment.RoadLanes.Count - 1);
+			int diff = segment.BackRoadLanes.Count - CurrentSegment.BackRoadLanes.Count;
+			laneIndex += diff;
+			laneIndex = Mathf.Clamp(laneIndex, 0, segment.RoadLanes.Count - 1);
 		} else {
-			transform.SetLocalX(segment.RoadLanes[laneIndex].transform.localPosition.x + Settings.Instance.laneSize / 2f);
+			transform.SetX(segment.RoadLanes[laneIndex].transform.position.x + Settings.Instance.laneSize / 2f);
 		}
 		RoadLaneIndex = laneIndex;
 		CurrentSegment = segment;
@@ -69,9 +73,6 @@ public abstract class Car : MonoBehaviour {
 	}
 
 	private Vector3 GetTargetPosition() {
-		if (CurrentRoadLane == null) {
-			Debug.LogError("No road lane");
-		}
 		float targetX = CurrentRoadLane != null ? CurrentRoadLane.transform.position.x : transform.position.x;
 		return new Vector3(targetX + Settings.Instance.laneSize / 2f, transform.position.y, GetTargetPositionZ());
 	}
@@ -80,9 +81,6 @@ public abstract class Car : MonoBehaviour {
 	
 #if UNITY_EDITOR
 	protected virtual void OnDrawGizmos() {
-		if (CurrentRoadLane == null) {
-			return;
-		}
 		Vector3 targetPosition = GetTargetPosition();
 		Gizmos.color = Color.green;
 		Gizmos.DrawCube(targetPosition, Vector3.one);

@@ -93,21 +93,17 @@ public class PathController : MonoBehaviour {
 			
 			if (aiCars[i].CurrentRoadLane.Data.hasFrontDirection) {
 				if (aiCars[i].transform.position.z + 4f > aiCars[i].CurrentRoadLane.transform.position.z + aiCars[i].CurrentRoadLane.Length) {
-					int currentForwardStart = aiCars[i].CurrentSegment.BackRoadLanes.Count;
-					int nextForwardStart = segments[^1].BackRoadLanes.Count;
-					int nextLaneIndex = Mathf.Max(currentForwardStart, nextForwardStart);
-					aiCars[i].SetSegment(segments[^1], nextLaneIndex);
+					aiCars[i].SetSegment(segments[^1], aiCars[i].RoadLaneIndex);
 				}
 			} else {
 				if (aiCars[i].transform.position.z - 4f < aiCars[i].CurrentRoadLane.transform.position.z) {
-					int newLaneIndex = Mathf.Min(aiCars[i].RoadLaneIndex, segments[0].BackRoadLanes.Count - 1);
-					aiCars[i].SetSegment(segments[0], newLaneIndex);
+					aiCars[i].SetSegment(segments[0], aiCars[i].RoadLaneIndex);
 				}
 			}
 		}
 	}
 
-	private void SpawnAICar() {
+	private void SpawnAICar(float distance = 100f) {
 		AICar carPrefab = aiCarPrefabs[Random.Range(0, aiCarPrefabs.Length)];
 		AICar aiCar = ObjectPoolManager.Get(carPrefab, transform);
 		aiCar.name = carPrefab.name;
@@ -119,7 +115,7 @@ public class PathController : MonoBehaviour {
 		//int randomRoadLaneIndex = segments[^1].BackRoadLanes.Count;
 		RoadLane roadLane = currentRoadLanes[randomRoadLaneIndex];
 
-		aiCar.transform.SetLocalZ(userCar.transform.localPosition.z + 100f);
+		aiCar.transform.SetLocalYZ(carPrefab.transform.localPosition.y, userCar.transform.localPosition.z + distance);
 		
 		if (!roadLane.Data.hasFrontDirection) {
 			aiCar.transform.SetAngleY(180f);
@@ -141,6 +137,9 @@ public class PathController : MonoBehaviour {
 		segment.transform.parent = transform;
 		segment.transform.SetLocalZ(currentLength);
 		segment.Init(GetNextSegmentData());
+		if (segments.Count > 0) {
+			segment.AlignWith(segments[^1]);
+		}
 		return segment;
 	}
 
@@ -154,30 +153,27 @@ public class PathController : MonoBehaviour {
 		SegmentInputData segmentInputData = circuit.GetNextSegment();
 		int backLanes = segmentInputData.backLanes;
 		int frontLanes = segmentInputData.frontLanes;
-		
-		lanes.Add(new RoadLaneData {
-			type = LaneType.RoadLaneSingleLeft
-		});
+
 		if (backLanes > 1) {
+			lanes.Add(new RoadLaneData {
+				type = LaneType.RoadLaneSingleLeft
+			});	
 			for (int i = 1; i < backLanes - 1; i++) {
 				lanes.Add(new RoadLaneData {
 					type = LaneType.RoadLaneMiddle
 				});	
 			}
-			lanes.Add(new RoadLaneData {
-				type = LaneType.RoadLaneEdgeLeft
-			});
 		}
+		lanes.Add(new RoadLaneData {
+			type = LaneType.RoadLaneEdgeLeft
+		});
 		
-		if (backLanes > 1) {
-			lanes.Add(new RoadLaneData {
-				type = LaneType.RoadLaneEdgeRight,
-				hasFrontDirection = true,
-			});
-			frontLanes--;
-		}
-		if (frontLanes > 0) {
-			for (int i = 1; i < frontLanes; i++) {
+		lanes.Add(new RoadLaneData {
+			type = LaneType.RoadLaneEdgeRight,
+			hasFrontDirection = true,
+		});
+		if (frontLanes > 1) {
+			for (int i = 1; i < frontLanes - 1; i++) {
 				lanes.Add(new RoadLaneData {
 					type = LaneType.RoadLaneMiddle,
 					hasFrontDirection = true
@@ -188,6 +184,7 @@ public class PathController : MonoBehaviour {
 				hasFrontDirection = true,
 			});
 		}
+		
 		lanes.Add(new LaneData {
 			type = LaneType.SideWalkLaneRight
 		});
@@ -213,7 +210,7 @@ public class PathController : MonoBehaviour {
 	
 	[Serializable]
 	private class SegmentInputData {
-		[Range(2, 4)] public int backLanes = 2;
-		[Range(2, 4)] public int frontLanes = 2;
+		[Range(1, 4)] public int backLanes = 2;
+		[Range(1, 4)] public int frontLanes = 2;
 	}
 }

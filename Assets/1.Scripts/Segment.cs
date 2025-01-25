@@ -37,6 +37,12 @@ public class Segment : MonoBehaviour {
 		SetBoxCollider(segmentData.length);
 	}
 
+	public void AlignWith(Segment other) {
+		int backLanesCount0 = BackRoadLanes.Count;
+		int backLanesCount1 = other.BackRoadLanes.Count;
+		transform.SetLocalX(other.transform.localPosition.x + (backLanesCount1 - backLanesCount0) * Settings.Instance.laneSize);
+	}
+
 	public void ClearLanes() {
 		foreach (var lane in lanes) {
 			if (Application.isPlaying) {
