@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class AICar : Car, IPoolableObject<AICar> {
 	
-	public RoadLane RoadLane => roadLane;
-	
 	public string Id { get; set; }
 	
 	public AICar GetMonoBehaviour() {
@@ -16,6 +14,6 @@ public class AICar : Car, IPoolableObject<AICar> {
 	}
 
 	protected override float GetTargetPositionZ() {
-		return transform.position.z + (roadLane.Data.hasFrontDirection ? 10f : -10f);
+		return transform.position.z + (CurrentRoadLane.Data.hasFrontDirection ? 10f : -10f);
 	}
 }

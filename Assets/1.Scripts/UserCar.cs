@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class UserCar : Car {
@@ -7,6 +8,7 @@ public class UserCar : Car {
 	[SerializeField] private float breakSpeed;
 	
 	[Space]
+	[SerializeField] private float requireNewSegmentOffset = 100;
 	[SerializeField] private float releaseSegmentOffset = 10;
 	
 	protected override void GetInputs(bool accelerate, bool brake, out float accelerateInput, out float brakeInput) {
@@ -23,9 +25,13 @@ public class UserCar : Car {
 			avc.MaxSpeed = defaultSpeed;
 		}
 	}
-
+	
 	protected override float GetTargetPositionZ() {
 		return transform.position.z + 10f;
+	}
+	
+	public Vector3 GetRequireNewSegmentPos() {
+		return transform.position + Vector3.forward * requireNewSegmentOffset;
 	}
 
 	public Vector3 GetCarReleaseSegmentPos() {

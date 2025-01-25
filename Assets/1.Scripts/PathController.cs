@@ -1,65 +1,30 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PathController : MonoBehaviour {
 
 	[SerializeField] private InputManager inputManager;
 	[SerializeField] private UserCar userCar;
+	[SerializeField] private Circuit circuit;
 	
 	private readonly List<Segment> segments = new();
 	private readonly List<AICar> aiCars = new();
 
 	private AICar[] aiCarPrefabs;
 	
-	private readonly SegmentData segmentData = new() {
-		lanes = new [] {
-			new LaneData {
-				type = LaneType.SideWalkLaneLeft
-			}, new RoadLaneData {
-				type = LaneType.RoadLaneSingleLeft,
-				hasFrontDirection = false,
-			},/* new RoadLaneData {
-				type = LaneType.RoadLaneMiddle,
-				hasFrontDirection = false,
-			}, new RoadLaneData {
-				type = LaneType.RoadLaneEdgeLeft,
-				hasFrontDirection = false,
-			}, new RoadLaneData {
-				type = LaneType.RoadLaneEdgeRight,
-				hasFrontDirection = true,
-			}, new RoadLaneData {
-				type = LaneType.RoadLaneMiddle,
-				hasFrontDirection = true,
-			},*/ new RoadLaneData {
-				type = LaneType.RoadLaneSingleRight,
-				hasFrontDirection = true,
-			}, new LaneData {
-				type = LaneType.SideWalkLaneRight
-			}
-		}
-	};
-	private const int segmentLength = 200;
 	private int currentLength;
 
 	private void Awake() {
 		CreateNewSegment();
-		const int roadLaneIndex = 2;
-		if (segments[^1].TryGetLane(roadLaneIndex, out RoadLane lane)) {
-			userCar.transform.SetLocalX(lane.transform.localPosition.x + Settings.Instance.laneSize / 2f);
-			userCar.SetRoadLane(lane, roadLaneIndex);
-		}
-		userCar.Init(() => {
-			CreateNewSegment();
-			if (segments[^1].TryGetLane(userCar.RoadLaneIndex, out RoadLane roadLane)) {
-				userCar.SetRoadLane(roadLane, userCar.RoadLaneIndex);
-			}
-		});
+		userCar.SetSegment(segments[^1], segments[^1].RoadLanes.Count - 1);
 		userCar.gameObject.SetActive(true);
 		InitAICars();
 
 		inputManager.OnHorizontalInput = input => {
-			TrySwitchLane((int)Mathf.Sign(input));
+			userCar.TrySwitchLane((int)Mathf.Sign(input));
 		};
 		
 		StartCoroutine(SpawnMechanic());
@@ -75,29 +40,25 @@ public class PathController : MonoBehaviour {
 
 	private void Update() {
 		userCar.UpdateCar(inputManager.VerticalInput);
-
-		if (Input.GetKeyDown(KeyCode.C)) {
-			SpawnAICar();
-		}
-
-		if (Input.GetKeyDown(KeyCode.X)) {
-			for (int i = 0; i < aiCars.Count; i++) { 
-				ObjectPoolManager.Release(aiCars[i]); 
-				aiCars.RemoveAt(i); 
-				i--;
-			}
-		}
-
 		for (int i = 0; i < aiCars.Count; i++) {
-			if (aiCars[i].RoadLane == null || 
-			    !aiCars[i].RoadLane.Data.hasFrontDirection &&
-			    userCar.transform.position.z - aiCars[i].transform.position.z > 10f) {
+			if (aiCars[i].CurrentRoadLane == null) {
 				ObjectPoolManager.Release(aiCars[i]);
 				aiCars.RemoveAt(i);
 				i--;
 				continue;
 			}
 			aiCars[i].UpdateCar(0f);
+		}
+		
+		if (Input.GetKeyDown(KeyCode.C)) {
+			SpawnAICar();
+		}
+		if (Input.GetKeyDown(KeyCode.X)) {
+			for (int i = 0; i < aiCars.Count; i++) { 
+				ObjectPoolManager.Release(aiCars[i]); 
+				aiCars.RemoveAt(i); 
+				i--;
+			}
 		}
 	}
 
@@ -108,68 +69,151 @@ public class PathController : MonoBehaviour {
 		}
 	}
 
+	private void LateUpdate() {
+		if (userCar.GetRequireNewSegmentPos().z > segments[^1].transform.position.z + segments[^1].SegmentData.length) {
+			CreateNewSegment();
+		}
+		if (userCar.transform.position.z + 4f > userCar.CurrentRoadLane.transform.position.z + userCar.CurrentRoadLane.Length) {
+			userCar.SetSegment(segments[^1], userCar.RoadLaneIndex);
+		}
+		if (segments.Count > 1 && userCar.GetCarReleaseSegmentPos().z > segments[0].transform.localPosition.z + segments[0].SegmentData.length) {
+			segments[0].ClearLanes();
+			Destroy(segments[0].gameObject);
+			segments.RemoveAt(0);
+		}
+
+		for (int i = 0; i < aiCars.Count; i++) {
+			
+			if (!aiCars[i].CurrentRoadLane.Data.hasFrontDirection && userCar.transform.position.z - aiCars[i].transform.position.z > 10f) {
+				ObjectPoolManager.Release(aiCars[i]);
+				aiCars.RemoveAt(i);
+				i--;
+				continue;
+			} 
+			
+			if (aiCars[i].CurrentRoadLane.Data.hasFrontDirection) {
+				if (aiCars[i].transform.position.z + 4f > aiCars[i].CurrentRoadLane.transform.position.z + aiCars[i].CurrentRoadLane.Length) {
+					int currentForwardStart = aiCars[i].CurrentSegment.BackRoadLanes.Count;
+					int nextForwardStart = segments[^1].BackRoadLanes.Count;
+					int nextLaneIndex = Mathf.Max(currentForwardStart, nextForwardStart);
+					aiCars[i].SetSegment(segments[^1], nextLaneIndex);
+				}
+			} else {
+				if (aiCars[i].transform.position.z - 4f < aiCars[i].CurrentRoadLane.transform.position.z) {
+					int newLaneIndex = Mathf.Min(aiCars[i].RoadLaneIndex, segments[0].BackRoadLanes.Count - 1);
+					aiCars[i].SetSegment(segments[0], newLaneIndex);
+				}
+			}
+		}
+	}
+
 	private void SpawnAICar() {
 		AICar carPrefab = aiCarPrefabs[Random.Range(0, aiCarPrefabs.Length)];
 		AICar aiCar = ObjectPoolManager.Get(carPrefab, transform);
 		aiCar.name = carPrefab.name;
 		
-		List<RoadLane> currentRoadLanes = GetCurrentRoadLanes();
+		List<RoadLane> currentRoadLanes = segments[^1].RoadLanes;
 		int randomRoadLaneIndex = Random.Range(0, currentRoadLanes.Count);
+		//int randomRoadLaneIndex = segments[^1].BackRoadLanes.Count - 1;
+		//int randomRoadLaneIndex = segments[^1].RoadLanes.Count - 1;
+		//int randomRoadLaneIndex = segments[^1].BackRoadLanes.Count;
 		RoadLane roadLane = currentRoadLanes[randomRoadLaneIndex];
+
+		aiCar.transform.SetLocalZ(userCar.transform.localPosition.z + 100f);
 		
-		aiCar.transform.localPosition = new Vector3(
-			currentRoadLanes[randomRoadLaneIndex].transform.localPosition.x + Settings.Instance.laneSize / 2f,
-			carPrefab.transform.localPosition.y, userCar.transform.localPosition.z + 100f);
-		
-		if (roadLane.Data.hasFrontDirection) {
-			aiCar.Init(() => {
-				aiCar.SetRoadLane(GetCurrentRoadLanes()[aiCar.RoadLaneIndex], aiCar.RoadLaneIndex);
-			});
-		} else {
+		if (!roadLane.Data.hasFrontDirection) {
 			aiCar.transform.SetAngleY(180f);
 		}
 		
-		aiCar.SetRoadLane(roadLane, randomRoadLaneIndex);
+		aiCar.SetSegment(segments[^1], randomRoadLaneIndex);
 		aiCar.gameObject.SetActive(true);
 		
 		aiCars.Add(aiCar);
 	}
 
-	private List<RoadLane> GetCurrentRoadLanes() {
-		List<RoadLane> roadLanes = new();
-		for (int i = 0; i < segmentData.lanes.Length; i++) {
-			if (segments[^1].TryGetLane(i, out RoadLane roadLane)) {
-				roadLanes.Add(roadLane);
-			}
-		}
-		return roadLanes;
-	}
-	
-	private void TrySwitchLane(int add) {
-		int newLaneIndex = userCar.RoadLaneIndex + add;
-		if (segments[^1].TryGetLane(newLaneIndex, out RoadLane roadLane)) {
-			userCar.SetRoadLane(roadLane, newLaneIndex);
-		}
-	}
-
-	private void LateUpdate() {
-		if (segments.Count > 1 && userCar.GetCarReleaseSegmentPos().z > segments[0].transform.localPosition.z + segmentLength) {
-			segments[0].ClearLanes();
-			Destroy(segments[0].gameObject);
-			segments.RemoveAt(0);
-		}
-	}
-
 	private void CreateNewSegment() {
 		segments.Add(GetSegment());
-		currentLength += segmentLength;
+		currentLength += segments[^1].SegmentData.length;
 	}
 
 	private Segment GetSegment() {
 		Segment segment = new GameObject("Segment").AddComponent<Segment>();
 		segment.transform.parent = transform;
 		segment.transform.SetLocalZ(currentLength);
-		segment.SetLanes(segmentData, segmentLength);
+		segment.Init(GetNextSegmentData());
 		return segment;
+	}
+
+	private SegmentData GetNextSegmentData() {
+		List<LaneData> lanes = new() {
+			new LaneData {
+				type = LaneType.SideWalkLaneLeft
+			}
+		};
+
+		SegmentInputData segmentInputData = circuit.GetNextSegment();
+		int backLanes = segmentInputData.backLanes;
+		int frontLanes = segmentInputData.frontLanes;
+		
+		lanes.Add(new RoadLaneData {
+			type = LaneType.RoadLaneSingleLeft
+		});
+		if (backLanes > 1) {
+			for (int i = 1; i < backLanes - 1; i++) {
+				lanes.Add(new RoadLaneData {
+					type = LaneType.RoadLaneMiddle
+				});	
+			}
+			lanes.Add(new RoadLaneData {
+				type = LaneType.RoadLaneEdgeLeft
+			});
+		}
+		
+		if (backLanes > 1) {
+			lanes.Add(new RoadLaneData {
+				type = LaneType.RoadLaneEdgeRight,
+				hasFrontDirection = true,
+			});
+			frontLanes--;
+		}
+		if (frontLanes > 0) {
+			for (int i = 1; i < frontLanes; i++) {
+				lanes.Add(new RoadLaneData {
+					type = LaneType.RoadLaneMiddle,
+					hasFrontDirection = true
+				});	
+			}
+			lanes.Add(new RoadLaneData {
+				type = LaneType.RoadLaneSingleRight,
+				hasFrontDirection = true,
+			});
+		}
+		lanes.Add(new LaneData {
+			type = LaneType.SideWalkLaneRight
+		});
+		
+		return new SegmentData {
+			lanes = lanes.ToArray(),
+			length = 5 * Random.Range(20, 60)
+		};
+	}
+	
+	[Serializable]
+	private class Circuit {
+		public SegmentInputData[] segments;
+		private int currentSegmentIndex;
+
+		public SegmentInputData GetNextSegment() {
+			if (currentSegmentIndex >= segments.Length) {
+				currentSegmentIndex = 0;
+			}
+			return segments[currentSegmentIndex++];
+		}
+	}
+	
+	[Serializable]
+	private class SegmentInputData {
+		[Range(2, 4)] public int backLanes = 2;
+		[Range(2, 4)] public int frontLanes = 2;
 	}
 }

@@ -6,26 +6,35 @@ public class Segment : MonoBehaviour {
 	[SerializeField] private List<LaneBase> lanes = new();
 	[SerializeField] private BoxCollider boxCollider;
 	
-	public bool TryGetLane<T>(int index, out T lane) where T : LaneBase {
-		if (index >= 0 && index < lanes.Count && lanes[index] is T laneT) {
-			lane = laneT;
-			return true;
-		}
-		lane = null;
-		return false;
-	}
+	public SegmentData SegmentData { get; private set; }
+
+	public List<RoadLane> RoadLanes { get; private set; }
+	public List<RoadLane> ForwardRoadLanes { get; private set;}
+	public List<RoadLane> BackRoadLanes { get; private set;}
 	
-	public void SetLanes(SegmentData segmentData, int length) {
+	public void Init(SegmentData segmentData) {
+		SegmentData = segmentData;
+		RoadLanes = new List<RoadLane>();
+		ForwardRoadLanes = new List<RoadLane>();
+		BackRoadLanes = new List<RoadLane>();
 		ClearLanes();
 		for (int i = 0; i < segmentData.lanes.Length; i++) {
 			LaneBase lane = Instantiate(Resources.Load<LaneBase>("Lanes/" + segmentData.lanes[i].type), transform);
 			lane.Init(segmentData.lanes[i]);
 			lane.name = lane.name.Replace("(Clone)", "");
 			lane.transform.SetLocalX(i * Settings.Instance.laneSize);
-			lane.SetElements(length);
+			lane.SetElements(segmentData.length);
 			lanes.Add(lane);
+			if (lane is RoadLane roadLane) {
+				RoadLanes.Add(roadLane);
+				if (roadLane.Data.hasFrontDirection) {
+					ForwardRoadLanes.Insert(0, roadLane);
+				} else {
+					BackRoadLanes.Add(roadLane);
+				}
+			}
 		}
-		SetBoxCollider(length);
+		SetBoxCollider(segmentData.length);
 	}
 
 	public void ClearLanes() {
@@ -64,6 +73,7 @@ public class Segment : MonoBehaviour {
 
 public class SegmentData {
 	public LaneData[] lanes;
+	public int length;
 }
 
 

@@ -169,6 +169,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputManager: {fileID: 316978740}
   userCar: {fileID: 1775796443}
+  circuit:
+    segments:
+    - backLanes: 2
+      frontLanes: 2
+    - backLanes: 3
+      frontLanes: 3
 --- !u!114 &316978740
 MonoBehaviour:
   m_ObjectHideFlags: 0

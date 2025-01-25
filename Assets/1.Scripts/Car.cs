@@ -1,14 +1,7 @@
-using System;
 using UnityEngine;
 using ArcadeVP;
 
 public abstract class Car : MonoBehaviour {
-
-	[Space]
-	[SerializeField] protected RoadLane roadLane;
-	
-	[Space]
-	[SerializeField] private float requireNewLaneOffset = 100;
 	
 	[Space]
 	[SerializeField] protected ArcadeVehicleController avc;
@@ -18,8 +11,9 @@ public abstract class Car : MonoBehaviour {
 	[SerializeField] protected float defaultSpeed;
 	
 	public int RoadLaneIndex { get; private set; }
-
-	private Action onRequireNewLane;
+	public Segment CurrentSegment { get; private set; }
+	
+	public RoadLane CurrentRoadLane => CurrentSegment.RoadLanes[RoadLaneIndex];
 	
 	private void Awake() {
 		avc.MaxSpeed = defaultSpeed;
@@ -33,13 +27,21 @@ public abstract class Car : MonoBehaviour {
 		avc.carVelocity = Vector3.zero;
 	}
 
-	public void Init(Action onRequireNewLane) {
-		this.onRequireNewLane = onRequireNewLane;
+	public void SetSegment(Segment segment, int laneIndex) {
+		if (CurrentSegment != null) {
+			laneIndex = Mathf.Min(laneIndex, segment.RoadLanes.Count - 1);
+		} else {
+			transform.SetLocalX(segment.RoadLanes[laneIndex].transform.localPosition.x + Settings.Instance.laneSize / 2f);
+		}
+		RoadLaneIndex = laneIndex;
+		CurrentSegment = segment;
 	}
-
-	public void SetRoadLane(RoadLane roadLane, int roadLaneIndex) {
-		this.roadLane = roadLane;
-		RoadLaneIndex = roadLaneIndex;
+	
+	public void TrySwitchLane(int add) {
+		int newLaneIndex = RoadLaneIndex + add;
+		if (newLaneIndex >= 0 && newLaneIndex < CurrentSegment.RoadLanes.Count) {
+			RoadLaneIndex = newLaneIndex;
+		}
 	}
 
 	protected abstract void GetInputs(bool accelerate, bool brake, out float accelerateInput, out float brakeInput);
@@ -64,28 +66,21 @@ public abstract class Car : MonoBehaviour {
 	public void UpdateCar(float verticalInput) {
 		GetInputs(verticalInput > 0f, verticalInput < 0f, out float accelerateInput, out float brakeInput);
 		avc.ProvideInputs(GetSteering(), accelerateInput, brakeInput);
-		if (GetRequireNewLanePos().z > roadLane.transform.position.z + roadLane.Length) {
-			onRequireNewLane?.Invoke();
-		}
 	}
 
 	private Vector3 GetTargetPosition() {
-		if (roadLane == null) {
+		if (CurrentRoadLane == null) {
 			Debug.LogError("No road lane");
 		}
-		float targetX = roadLane != null ? roadLane.transform.position.x : transform.position.x;
+		float targetX = CurrentRoadLane != null ? CurrentRoadLane.transform.position.x : transform.position.x;
 		return new Vector3(targetX + Settings.Instance.laneSize / 2f, transform.position.y, GetTargetPositionZ());
 	}
 
 	protected abstract float GetTargetPositionZ();
 	
-	private Vector3 GetRequireNewLanePos() {
-		return transform.position + Vector3.forward * requireNewLaneOffset;
-	}
-	
 #if UNITY_EDITOR
 	protected virtual void OnDrawGizmos() {
-		if (roadLane == null) {
+		if (CurrentRoadLane == null) {
 			return;
 		}
 		Vector3 targetPosition = GetTargetPosition();
