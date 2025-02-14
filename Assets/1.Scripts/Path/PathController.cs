@@ -50,9 +50,10 @@ public class PathController : MonoBehaviour {
 			segments[i].SetStartAndEndPosForRoadLanes();
 		}
 		intersection.CreateRoadConnections();
-		for (int i = 0; i < segments.Count; i++) {
-			segments[i].SpawnAICars(transform);
-		}
+		// currentSegment.SpawnAICars(transform);
+		// for (int i = 0; i < segments.Count; i++) {
+		// 	segments[i].SpawnAICars(transform);
+		// }
 	}
 
 	private void CreateCurrentSegment() {

@@ -6,8 +6,7 @@ using Random = UnityEngine.Random;
 public class AICar : Car, IPoolableObject<AICar> {
 	
 	[SerializeField] private string id;
-
-	[SerializeField] private AICar nextCar;
+	[SerializeField] private LayerMask raycastLayerMask;
 
 	private const float brakeDistanceMinRange0 = 0.8f;
 	private const float brakeDistanceMinRange1 = 2f;
@@ -23,10 +22,6 @@ public class AICar : Car, IPoolableObject<AICar> {
 	
 	public AICar GetMonoBehaviour() {
 		return this;
-	}
-
-	public void SetNextCar(AICar nextCar) {
-		this.nextCar = nextCar;
 	}
 
 	public void SetTargetPoint(TargetPoint targetPoint) {
@@ -46,29 +41,26 @@ public class AICar : Car, IPoolableObject<AICar> {
 		targetPos = targetPoint.pos;
 		
 		float distToTargetPos = Vector3.Distance(FrontPos, targetPos);
-		if (distToTargetPos < targetPoint.minDistToReach) {
+		if (targetPoint.pass && distToTargetPos < targetPoint.minDistToReach) {
 			TargetPoint tempPoint = targetPoint;
 			targetPoint = null;
 			tempPoint.onReach(this);
 			return;
 		}
+
+		const float rayDistance = 10f;
+		Car frontCar = null;
+		if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, rayDistance, raycastLayerMask)) {
+			frontCar = hit.transform.GetComponent<Car>();
+		}
 		
-		float distToNextCar = nextCar != null ? Vector3.Distance(FrontPos, nextCar.BackPos) : float.MaxValue;
+		float distToNextCar = frontCar != null ? Vector3.Distance(FrontPos, frontCar.BackPos) : float.MaxValue;
 		float distToNearestObstacle = targetPoint.pass ? distToNextCar : Mathf.Min(distToTargetPos, distToNextCar);
 		
 		float accelerateInput = Mathf.InverseLerp(3f, 10f, distToNearestObstacle) / 2f;
 		float breakInput = Mathf.InverseLerp(3f, brakeDistanceMin, distToNearestObstacle) / 2f;
 		avc.ProvideInputs(GetSteering(), accelerateInput, breakInput);
 	}
-
-	/*protected override void GetInputs(bool accelerate, bool brake, out float accelerateInput, out float brakeInput) {
-		accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(0f, defaultSpeed, avc.CurrentSpeed));
-		brakeInput = 0f;
-	}
-
-	protected override float GetTargetPositionZ() {
-		return transform.position.z + (CurrentRoadLane.Data.hasFrontDirection ? 10f : -10f);
-	}*/
 }
 
 public class TargetPoint {

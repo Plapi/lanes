@@ -10,6 +10,8 @@ public class RoadLane : Lane<RoadLaneData> {
 
 	public Vector3 StartPos { get; private set; }
 	public Vector3 EndPos { get; private set; }
+
+	public bool AllowPassing = true;
 	
 	protected override void OnInit() {
 		
@@ -44,13 +46,10 @@ public class RoadLane : Lane<RoadLaneData> {
 			aiCar.transform.position = new Vector3(pos.x, carPrefab.transform.position.y, pos.z);
 			aiCar.transform.LookAt(new Vector3(EndPos.x, aiCar.transform.position.y, EndPos.z));
 			
-			if (aiCars.Count > 0) {
-				aiCars[^1].SetNextCar(aiCar);
-			}
-			
 			aiCar.SetTargetPoint(new TargetPoint {
 				pos = EndPos,
-				onReach = OnAICarReachTargetPoint
+				onReach = OnAICarReachTargetPoint,
+				pass = false
 			});
 			aiCars.Add(aiCar);
 			

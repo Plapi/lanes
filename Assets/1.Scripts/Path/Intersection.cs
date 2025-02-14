@@ -1,9 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Intersection : MonoBehaviour {
 
 	[SerializeField] private Element cornerPrefab;
+	[SerializeField] private TrafficLight trafficLightPrefab;
 	[SerializeField] private Element crossingPrefab;
 	[SerializeField] private Element sideWalkPrefab;
 	[SerializeField] private Element roadBarePrefab;
@@ -15,12 +17,20 @@ public class Intersection : MonoBehaviour {
 	private Segment rightSegment;
 	private Segment topSegment;
 	
+	private TrafficLight bottomTrafficLight;
+	private TrafficLight leftTrafficLight;
+	private TrafficLight rightTrafficLight;
+	private TrafficLight topTrafficLight;
+	
 	private Element bottomLeftCorner;
 	private Element bottomRightCorner;
 	private Element topRightCorner;
 	private Element topLeftCorner;
 
 	private int laneSize;
+
+	private readonly List<RoadLane> verticallyRoadLanes = new();
+	private readonly List<RoadLane> horizontallyRoadLanes = new();
 	
 	public void Init(Segment bottomSegment, Segment leftSegment, Segment rightSegment, Segment topSegment) {
 		this.bottomSegment = bottomSegment;
@@ -30,12 +40,69 @@ public class Intersection : MonoBehaviour {
 		laneSize = Settings.Instance.laneSize;
 		
 		CreateCorners();
+		CreateTrafficLights();
 		CreateCrossings();
 		CreateSideWalks(); 
 		CreateRoadBares();
 		
+		verticallyRoadLanes.AddRange(this.bottomSegment.ForwardRoadLanes);
+		verticallyRoadLanes.AddRange(this.topSegment.BackRoadLanes);
+		
+		horizontallyRoadLanes.AddRange(this.leftSegment.BackRoadLanes);
+		horizontallyRoadLanes.AddRange(this.rightSegment.ForwardRoadLanes);
+		
 		SetBoxCollider(rightSegment.transform.position.x - rightSegment.Length - leftSegment.transform.position.x, 
 			topSegment.transform.position.z - (bottomSegment.transform.position.z + bottomSegment.Length));
+
+		StartCoroutine(SemaphoreSystem());
+	}
+
+	private IEnumerator SemaphoreSystem() {
+
+		void allowPassingRoadLanes(List<RoadLane> lanes, bool allowPassing) {
+			lanes.ForEach(l => l.AllowPassing = allowPassing);
+		}
+
+		void allowPassingVertically() {
+			allowPassingRoadLanes(verticallyRoadLanes, true);
+			allowPassingRoadLanes(horizontallyRoadLanes, false);
+			bottomTrafficLight.SetGreen();
+			topTrafficLight.SetGreen();
+			leftTrafficLight.SetRed();
+			rightTrafficLight.SetRed();
+		}
+
+		void allowPassingHorizontally() {
+			allowPassingRoadLanes(verticallyRoadLanes, false);
+			allowPassingRoadLanes(horizontallyRoadLanes, true);
+			bottomTrafficLight.SetRed();
+			topTrafficLight.SetRed();
+			leftTrafficLight.SetGreen();
+			rightTrafficLight.SetGreen();
+		}
+
+		void disallowPassingAll() {
+			allowPassingRoadLanes(verticallyRoadLanes, false);
+			allowPassingRoadLanes(horizontallyRoadLanes, false);
+			bottomTrafficLight.SetYellow();
+			topTrafficLight.SetYellow();
+			leftTrafficLight.SetYellow();
+			rightTrafficLight.SetYellow();
+		}
+		
+		while (true) {
+			allowPassingVertically();
+			yield return new WaitForSeconds(5f);
+
+			disallowPassingAll();
+			yield return new WaitForSeconds(2f);
+			
+			allowPassingHorizontally();
+			yield return new WaitForSeconds(5f);
+
+			disallowPassingAll();
+			yield return new WaitForSeconds(2f);
+		}
 	}
 	
 	private void CreateCorners() {
@@ -47,6 +114,17 @@ public class Intersection : MonoBehaviour {
 		elements.Add(bottomRightCorner);
 		elements.Add(topRightCorner);
 		elements.Add(topLeftCorner);
+	}
+
+	private void CreateTrafficLights() {
+		bottomTrafficLight = (TrafficLight)trafficLightPrefab.Create("BottomTrafficLight", transform, 180f, bottomRightCorner.transform.position.x - 3f, bottomRightCorner.transform.position.z);
+		leftTrafficLight = (TrafficLight)trafficLightPrefab.Create("LeftTrafficLight", transform, 270f, bottomLeftCorner.transform.position.x, bottomLeftCorner.transform.position.z + 3f);
+		rightTrafficLight = (TrafficLight)trafficLightPrefab.Create("RightTrafficLight", transform, 90f, topRightCorner.transform.position.x, topRightCorner.transform.position.z - 3f);
+		topTrafficLight = (TrafficLight)trafficLightPrefab.Create("TopTrafficLight", transform, 0f, topLeftCorner.transform.position.x + 3f, topLeftCorner.transform.position.z);
+		elements.Add(bottomTrafficLight);
+		elements.Add(leftTrafficLight);
+		elements.Add(rightTrafficLight);
+		elements.Add(topTrafficLight);
 	}
 
 	private void CreateCrossings() {
@@ -202,7 +280,7 @@ public class Intersection : MonoBehaviour {
 		for (int i = 0; i < maxLeftConnections; i++) {
 			RoadLane lane0 = leftSegment.BackRoadLanes[^(i + 1)];
 			RoadLane lane1 = rightSegment.BackRoadLanes[^(i + 1)];
-			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.StartPos, lane1.EndPos });
+			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.EndPos, lane1.StartPos });
 		}
 		for (int i = 0; i < leftSegment.BackRoadLanes.Count; i++) {
 			RoadLane lane0 = leftSegment.BackRoadLanes[i];

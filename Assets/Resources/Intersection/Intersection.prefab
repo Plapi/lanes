@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cornerPrefab: {fileID: 1156679570623455338, guid: 49b57f450eb6648ecada100b259a84a9, type: 3}
+  trafficLightPrefab: {fileID: 4177752031364495649, guid: d99384906c8924b119fecaab6b4c6cac, type: 3}
   crossingPrefab: {fileID: 5229539700009487001, guid: b2ca236cb89c740d69966dd69d7df029, type: 3}
   sideWalkPrefab: {fileID: 4803323746766453670, guid: f326bccc1bc6040dc8f5980d90036ef9, type: 3}
   roadBarePrefab: {fileID: 2101958548519437351, guid: 1bfb612a25d84478db8b18aac9a8b3dd, type: 3}

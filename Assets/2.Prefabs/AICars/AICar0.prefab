@@ -10704,7 +10704,9 @@ MonoBehaviour:
   defaultSpeed: 30
   boxCollider: {fileID: 4700132336086164398}
   id: AICar0
-  nextCar: {fileID: 0}
+  raycastLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &151452902980444450
 MonoBehaviour:
   m_ObjectHideFlags: 0
