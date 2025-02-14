@@ -12,9 +12,9 @@ public class ObjectPoolManager : MonoBehaviourSingleton<ObjectPoolManager> {
 		Instance.CreatePoolPrivate(poolableObject, size);
 	}
 	
-	private void CreatePoolPrivate<T>(IPoolableObject<T> poolableObject, int size) where T : MonoBehaviour {
+	private Queue<MonoBehaviour> CreatePoolPrivate<T>(IPoolableObject<T> poolableObject, int size = 10) where T : MonoBehaviour {
 		if (pools.ContainsKey(poolableObject.Id)) {
-			return;
+			return null;
 		}
 		Queue<MonoBehaviour> queue = new();
 		for (int i = 0; i < size; i++) {
@@ -23,6 +23,7 @@ public class ObjectPoolManager : MonoBehaviourSingleton<ObjectPoolManager> {
 			obj.gameObject.SetActive(false);
 		}
 		pools.Add(poolableObject.Id, queue);
+		return queue;
 	}
 
 	public static T Get<T>(IPoolableObject<T> poolableObject, Transform parent = null) where T : MonoBehaviour {
@@ -33,8 +34,7 @@ public class ObjectPoolManager : MonoBehaviourSingleton<ObjectPoolManager> {
 
 	private T GetPrivate<T>(IPoolableObject<T> poolableObject, Transform parent) where T : MonoBehaviour {
 		if (!pools.TryGetValue(poolableObject.Id, out Queue<MonoBehaviour> queue)) {
-			Debug.LogError($"The pool for {poolableObject.Id} does not exist.");
-			return null;
+			queue = CreatePoolPrivate(poolableObject);
 		}
 		if (queue.Count == 0) {
 			queue.Enqueue(InstantiateObj(poolableObject));

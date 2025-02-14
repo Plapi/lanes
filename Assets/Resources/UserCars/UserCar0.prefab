@@ -10786,7 +10786,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d4c9b289412c4e759b4bf5993197d12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roadLane: {fileID: 0}
   avc: {fileID: 151452902980444450}
   steeringCurve:
     serializedVersion: 2
@@ -10813,8 +10812,11 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   defaultSpeed: 40
+  boxCollider: {fileID: 4700132336086164398}
   accelerateSpeed: 80
   breakSpeed: 20
+  requireNewSegmentOffset: 100
+  releaseSegmentOffset: 10
 --- !u!114 &151452902980444450
 MonoBehaviour:
   m_ObjectHideFlags: 0

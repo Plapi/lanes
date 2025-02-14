@@ -13,3 +13,9 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: 
   laneSize: 5
+  spawnAICarDistanceMin: 20
+  spawnAICarDistanceMax: 40
+  aiCarPrefabs:
+  - {fileID: 6348725123820303943, guid: d723f31d78f94479982ec8262493cec8, type: 3}
+  - {fileID: 3919260214101025884, guid: f4eabeb5c8ad440d390d69c376b9dbcd, type: 3}
+  - {fileID: 2153971167138489945, guid: 218729f00b27549ab885639e6ae7c315, type: 3}
