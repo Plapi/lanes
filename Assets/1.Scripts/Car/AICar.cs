@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -41,7 +40,7 @@ public class AICar : Car, IPoolableObject<AICar> {
 		targetPos = targetPoint.pos;
 		
 		float distToTargetPos = Vector3.Distance(FrontPos, targetPos);
-		if (targetPoint.pass && distToTargetPos < targetPoint.minDistToReach) {
+		if (targetPoint.AllowPassing() && distToTargetPos < targetPoint.minDistToReach) {
 			TargetPoint tempPoint = targetPoint;
 			targetPoint = null;
 			tempPoint.onReach(this);
@@ -54,18 +53,46 @@ public class AICar : Car, IPoolableObject<AICar> {
 			frontCar = hit.transform.GetComponent<Car>();
 		}
 		
-		float distToNextCar = frontCar != null ? Vector3.Distance(FrontPos, frontCar.BackPos) : float.MaxValue;
-		float distToNearestObstacle = targetPoint.pass ? distToNextCar : Mathf.Min(distToTargetPos, distToNextCar);
+		float distToNextCar = frontCar != null ? ClosestDistance(frontCar) : float.MaxValue;
+		float distToNearestObstacle = targetPoint.AllowPassing() ? distToNextCar : Mathf.Min(distToTargetPos, distToNextCar);
 		
 		float accelerateInput = Mathf.InverseLerp(3f, 10f, distToNearestObstacle) / 2f;
 		float breakInput = Mathf.InverseLerp(3f, brakeDistanceMin, distToNearestObstacle) / 2f;
 		avc.ProvideInputs(GetSteering(), accelerateInput, breakInput);
+	}
+
+	private float ClosestDistance(Car other) {
+		Vector3 closestPointOnBox1 = BoxCollider.ClosestPoint(other.transform.position);
+		Vector3 closestPointOnBox2 = other.BoxCollider.ClosestPoint(transform.position);
+		float distance = Vector3.Distance(closestPointOnBox1, closestPointOnBox2);
+		return distance;
+	}
+
+	private void OnCollisionEnter(Collision collision) {
+		if (targetPoint != null && !targetPoint.pass) {
+			return;
+		}
+		
+		if (collision.gameObject.TryGetComponent(out AICar car) && car.targetPoint.pass) {
+			targetPoint.pass = false;
+			this.Wait(2f, () => {
+				targetPoint.pass = true;
+			});
+		}
 	}
 }
 
 public class TargetPoint {
 	public Vector3 pos;
 	public bool pass = true;
+	public Func<bool> allowPassing;
 	public float minDistToReach = 4f;
 	public Action<AICar> onReach;
+
+	public bool AllowPassing() {
+		if (!pass) {
+			return false;
+		}
+		return allowPassing == null || allowPassing();
+	}
 }

@@ -171,18 +171,18 @@ MonoBehaviour:
   userCar: {fileID: 1775796443}
   circuit:
     segments:
-    - backLanes: 1
-      frontLanes: 4
-    - backLanes: 2
-      frontLanes: 2
-    - backLanes: 1
-      frontLanes: 1
     - backLanes: 3
       frontLanes: 2
+    - backLanes: 2
+      frontLanes: 2
+    - backLanes: 2
+      frontLanes: 1
+    - backLanes: 1
+      frontLanes: 1
     - backLanes: 3
       frontLanes: 3
-    - backLanes: 2
-      frontLanes: 1
+    - backLanes: 1
+      frontLanes: 4
 --- !u!114 &316978740
 MonoBehaviour:
   m_ObjectHideFlags: 0

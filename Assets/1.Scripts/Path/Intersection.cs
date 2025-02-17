@@ -298,7 +298,7 @@ public class Intersection : MonoBehaviour {
 		Vector3 projection = Vector3.Dot(vectorToPoint1, dir) * dir;
 		Vector3 perpendicularVector = vectorToPoint1 - projection;
 		Vector3 perpendicularPoint = point0 + perpendicularVector;
-		return Chaikin.SmoothPath(new List<Vector3> { point0, perpendicularPoint, point1 }, 2);
+		return Chaikin.SmoothPath(new List<Vector3> { point0, perpendicularPoint, point1 }, 3);
 	}
 
 	public void ReleaseElements() {
@@ -316,22 +316,4 @@ public class Intersection : MonoBehaviour {
 		boxCollider.size = new Vector3(xSize, 1f, zSize);
 		boxCollider.center = new Vector3(boxCollider.size.x / 2f, -0.5f, boxCollider.size.z / 2f);
 	}
-
-	/*private readonly List<Vector3> polyPoints = new();
-	public Transform debugTransform;
-	private void OnDrawGizmos() {
-		if (polyPoints == null || debugTransform == null) {
-			return;
-		}
-		Gizmos.color = Color.red;
-		for (int i = 0; i < polyPoints.Count; i++) {
-			Gizmos.DrawSphere(polyPoints[i], 1f);
-		}
-		
-		Gizmos.color = GeometryUtils.PointInPolygon(debugTransform.position, polyPoints) ? Color.green : Color.red;
-		for (int i = 0; i < polyPoints.Count - 1; i++) {
-			Gizmos.DrawLine(polyPoints[i], polyPoints[i + 1]);
-		}
-		Gizmos.DrawLine(polyPoints[^1], polyPoints[0]);
-	}*/
 }

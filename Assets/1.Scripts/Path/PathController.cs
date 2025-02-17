@@ -14,11 +14,8 @@ public class PathController : MonoBehaviour {
 	private Segment leftSegment;
 	private Segment rightSegment;
 	private Segment nextSegment;
-	
 	private Intersection intersection;
 	
-	private readonly List<AICar> aiCars = new();
-
 	private AICar[] aiCarPrefabs;
 	
 	private void Awake() {
@@ -50,10 +47,10 @@ public class PathController : MonoBehaviour {
 			segments[i].SetStartAndEndPosForRoadLanes();
 		}
 		intersection.CreateRoadConnections();
-		// currentSegment.SpawnAICars(transform);
-		// for (int i = 0; i < segments.Count; i++) {
-		// 	segments[i].SpawnAICars(transform);
-		// }
+		// currentSegment.SpawnAICars();
+		for (int i = 0; i < segments.Count; i++) {
+			segments[i].SpawnAICars();
+		}
 	}
 
 	private void CreateCurrentSegment() {

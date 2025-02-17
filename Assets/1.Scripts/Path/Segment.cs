@@ -46,14 +46,13 @@ public class Segment : MonoBehaviour {
 		}
 	}
 
-	public void SpawnAICars(Transform parent) {
+	public void SpawnAICars() {
 		for (int i = 0; i < RoadLanes.Count; i++) {
-			RoadLanes[i].SpawnAICars(parent);
+			RoadLanes[i].SpawnAICars();
 		}
 		// for (int i = 0; i < ForwardRoadLanes.Count; i++) {
-		// 	ForwardRoadLanes[i].SpawnAICars(parent);
+		// 	ForwardRoadLanes[i].SpawnAICars();
 		// }
-		//BackRoadLanes[1].SpawnAICars(parent);
 	}
 
 	public void AlignVerticalWith(Segment other) {
@@ -74,6 +73,7 @@ public class Segment : MonoBehaviour {
 			Destroy(lane.gameObject);
 		}
 		lanes.Clear();
+		Destroy(gameObject);
 	}
 
 	private void SetBoxCollider() {

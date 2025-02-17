@@ -12,6 +12,8 @@ public abstract class Car : MonoBehaviour {
 	
 	[SerializeField] private BoxCollider boxCollider;
 	
+	public BoxCollider BoxCollider => boxCollider;
+	
 	public Bounds Bounds => boxCollider.bounds;
 	public Vector3 FrontPos => transform.position + transform.forward * boxCollider.size.z / 2f;
 	public Vector3 BackPos => transform.position - transform.forward * boxCollider.size.z / 2f;
@@ -31,8 +33,12 @@ public abstract class Car : MonoBehaviour {
 	private void OnDisable() {
 		avc.carBody.linearVelocity = Vector3.zero;
 		avc.carBody.angularVelocity = Vector3.zero;
+		avc.carBody.inertiaTensorRotation = Quaternion.identity;
+		avc.carBody.ResetInertiaTensor();
 		avc.rb.linearVelocity = Vector3.zero;
 		avc.rb.angularVelocity = Vector3.zero;
+		avc.rb.inertiaTensorRotation = Quaternion.identity;
+		avc.rb.ResetInertiaTensor();
 		avc.carVelocity = Vector3.zero;
 		RoadLaneIndex = 0;
 		CurrentSegment = null;
@@ -119,7 +125,7 @@ public abstract class Car : MonoBehaviour {
 */
 	protected virtual void OnDrawGizmos() {
 		Gizmos.color = Color.green;
-		Gizmos.DrawCube(targetPos, Vector3.one);
+		Gizmos.DrawSphere(targetPos, 0.25f);
 		Gizmos.DrawLine(FrontPos, targetPos);
 		Gizmos.color = Color.white;
 		Gizmos.DrawCube(FrontPos, Vector3.one * 0.2f);

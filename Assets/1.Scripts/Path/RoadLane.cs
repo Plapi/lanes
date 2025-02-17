@@ -29,32 +29,43 @@ public class RoadLane : Lane<RoadLaneData> {
 		}
 	}
 
-	public void SpawnAICars(Transform parent) {
-
+	public void SpawnAICars() {
 		int randomSpawnDistance() {
 			return Random.Range(Settings.Instance.spawnAICarDistanceMin, Settings.Instance.spawnAICarDistanceMax);
 		}
-		
-		Vector3 dir = (EndPos - StartPos).normalized;
-
 		for (int z = randomSpawnDistance(); z < Length - 4f; z += randomSpawnDistance()) {
-			AICar carPrefab = Settings.Instance.aiCarPrefabs[Random.Range(0, Settings.Instance.aiCarPrefabs.Length)];
-			AICar aiCar = ObjectPoolManager.Get(carPrefab, parent);
-			aiCar.name = carPrefab.name;
-
-			Vector3 pos = StartPos + dir * z;
-			aiCar.transform.position = new Vector3(pos.x, carPrefab.transform.position.y, pos.z);
-			aiCar.transform.LookAt(new Vector3(EndPos.x, aiCar.transform.position.y, EndPos.z));
-			
-			aiCar.SetTargetPoint(new TargetPoint {
-				pos = EndPos,
-				onReach = OnAICarReachTargetPoint,
-				pass = false
-			});
-			aiCars.Add(aiCar);
-			
-			aiCar.gameObject.SetActive(true);
+			SpawnAICar(z);
 		}
+	}
+
+	private void SpawnAICar(float posZ, bool checkAround = false) {
+		AICar carPrefab = Settings.Instance.aiCarPrefabs[Random.Range(0, Settings.Instance.aiCarPrefabs.Length)];
+		Vector3 dir = (EndPos - StartPos).normalized;
+		Vector3 pos = StartPos + dir * posZ;
+		pos.y = carPrefab.transform.position.y;
+
+		if (checkAround) {
+			for (int i = 0; i < aiCars.Count; i++) {
+				if (Vector3.Distance(aiCars[i].transform.position, pos) < 10f) {
+					this.Wait(1f, () => SpawnAICar(posZ, checkAround));
+					return;
+				}
+			}	
+		}
+		
+		AICar aiCar = ObjectPoolManager.Get(carPrefab);
+		aiCar.name = carPrefab.name;
+		aiCar.transform.position = pos;
+		aiCar.transform.LookAt(new Vector3(EndPos.x, aiCar.transform.position.y, EndPos.z));
+			
+		aiCar.SetTargetPoint(new TargetPoint {
+			pos = EndPos,
+			onReach = OnAICarReachTargetPoint,
+			allowPassing = () => AllowPassing
+		});
+		aiCars.Add(aiCar);
+			
+		aiCar.gameObject.SetActive(true);
 	}
 
 	private void Transition(List<Vector3> points, AICar aiCar) {
@@ -63,16 +74,16 @@ public class RoadLane : Lane<RoadLaneData> {
 		for (int i = 0; i < points.Count; i++) {
 			targetPointsTransition.Add(new TargetPoint {
 				pos = points[i],
-				minDistToReach = 1f
+				minDistToReach = 2f
 			});
 		}
-
+		
+		aiCars.Add(aiCar);
 		TravelAICarTargetPoints(aiCar, targetPointsTransition, () => {
 			aiCar.SetTargetPoint(new TargetPoint {
 				pos = EndPos,
 				onReach = OnAICarReachTargetPoint
 			});
-			aiCars.Add(aiCar);
 		});
 	}
 
@@ -94,7 +105,8 @@ public class RoadLane : Lane<RoadLaneData> {
 			ObjectPoolManager.Release(aiCar);
 		} else {
 			NextRoadLane nextRoadLane = nextRoadLanes[Random.Range(0, nextRoadLanes.Count)];
-			nextRoadLane.roadLane.Transition(nextRoadLane.transPoints, aiCar);	
+			nextRoadLane.roadLane.Transition(nextRoadLane.transPoints, aiCar);
+			SpawnAICar(5f, true);
 		}
 	}
 
@@ -106,21 +118,12 @@ public class RoadLane : Lane<RoadLaneData> {
 	}
 
 	public override void Clear() {
-		base.Clear();
 		foreach (AICar aiCar in aiCars) {
 			ObjectPoolManager.Release(aiCar);
 		}
 		aiCars.Clear();
+		base.Clear();
 	}
-
-	/*private List<Vector3> GetTransitionPoints(Vector3 point0, Vector3 point1) {
-		Vector3 dir0 = transform.forward.normalized;
-		Vector3 vectorToPoint1 = point1 - point0;
-		Vector3 projection = Vector3.Dot(vectorToPoint1, dir0) * dir0;
-		Vector3 perpendicularVector = vectorToPoint1 - projection;
-		Vector3 perpendicularPoint = point0 + perpendicularVector;
-		return Chaikin.SmoothPath(new List<Vector3> { point0, perpendicularPoint, point1 }, 2);
-	}*/
 
 	private void OnDrawGizmos() {
 		
