@@ -50,9 +50,6 @@ public class Intersection : MonoBehaviour {
 		
 		horizontallyRoadLanes.AddRange(this.leftSegment.BackRoadLanes);
 		horizontallyRoadLanes.AddRange(this.rightSegment.ForwardRoadLanes);
-		
-		SetBoxCollider(rightSegment.transform.position.x - rightSegment.Length - leftSegment.transform.position.x, 
-			topSegment.transform.position.z - (bottomSegment.transform.position.z + bottomSegment.Length));
 
 		StartCoroutine(SemaphoreSystem());
 	}
@@ -161,7 +158,7 @@ public class Intersection : MonoBehaviour {
 		for (int z = start; z < end; z += laneSize) {
 			elements.Add(sideWalkPrefab.Create("BottomLeftSideWalk", transform, 90f, bottomSegment.transform.position.x, z + laneSize));
 		}
-		start = Mathf.RoundToInt(bottomSegment.transform.position.x + bottomSegment.Length);
+		start = Mathf.RoundToInt(bottomSegment.transform.position.z + bottomSegment.Length);
 		end = Mathf.RoundToInt(bottomRightCorner.transform.position.z);
 		for (int z = start; z < end; z += laneSize) {
 			elements.Add(sideWalkPrefab.Create("BottomRightSideWalk", transform, -90f, bottomSegment.transform.position.x + bottomSegment.Width, z));
@@ -301,19 +298,11 @@ public class Intersection : MonoBehaviour {
 		return Chaikin.SmoothPath(new List<Vector3> { point0, perpendicularPoint, point1 }, 3);
 	}
 
-	public void ReleaseElements() {
+	public void Clear() {
 		for (int i = 0; i < elements.Count; i++) {
 			ObjectPoolManager.Release(elements[i]);
 		}
 		elements.Clear();
-	}
-	
-	private void SetBoxCollider(float xSize, float zSize) {
-		BoxCollider boxCollider = new GameObject("BoxCollider").AddComponent<BoxCollider>();
-		boxCollider.transform.parent = transform;
-		boxCollider.transform.localPosition = Vector3.zero;
-		boxCollider.gameObject.layer = LayerMask.NameToLayer("drivable");
-		boxCollider.size = new Vector3(xSize, 1f, zSize);
-		boxCollider.center = new Vector3(boxCollider.size.x / 2f, -0.5f, boxCollider.size.z / 2f);
+		Destroy(gameObject);
 	}
 }

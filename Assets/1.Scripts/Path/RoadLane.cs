@@ -29,6 +29,11 @@ public class RoadLane : Lane<RoadLaneData> {
 		}
 	}
 
+	public void ClearNextRoadLanes() {
+		nextRoadLanes.Clear();
+		AllowPassing = true;
+	}
+
 	public void SpawnAICars() {
 		int randomSpawnDistance() {
 			return Random.Range(Settings.Instance.spawnAICarDistanceMin, Settings.Instance.spawnAICarDistanceMax);

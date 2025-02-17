@@ -19,6 +19,7 @@ public class PathController : MonoBehaviour {
 	private AICar[] aiCarPrefabs;
 	
 	private void Awake() {
+		CreateCurrentSegment();
 		InitSegments();
 		//ShuffleArray(circuit.segments);
 		// inputManager.OnHorizontalInput = input => {
@@ -27,30 +28,52 @@ public class PathController : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (Input.GetKeyDown(KeyCode.C)) {
+		/*if (Input.GetKeyDown(KeyCode.C)) {
 			for (int i = 0; i < segments.Count; i++) {
 				segments[i].Clear();
 			}
 			segments.Clear();
-			intersection.ReleaseElements();
+			intersection.Clear();
 			
 			ShuffleArray(circuit.segments);
 			InitSegments();
+		}*/
+		if (Input.GetKeyDown(KeyCode.N)) {
+			NextSegments();
 		}
 		//userCar.UpdateCar(inputManager.VerticalInput);
 	}
 
 	private void InitSegments() {
-		CreateCurrentSegment();
 		CreateNextSegments();
 		for (int i = 0; i < segments.Count; i++) {
 			segments[i].SetStartAndEndPosForRoadLanes();
 		}
 		intersection.CreateRoadConnections();
-		// currentSegment.SpawnAICars();
 		for (int i = 0; i < segments.Count; i++) {
 			segments[i].SpawnAICars();
 		}
+	}
+
+	private void NextSegments() {
+		segments.Clear();
+		currentSegment.Clear();
+		leftSegment.Clear();
+		rightSegment.Clear();
+		intersection.Clear();
+		currentSegment = nextSegment;
+		currentSegment.name = "CurrentSegment";
+		currentSegment.ClearNextRoadLanes();
+		segments.Add(currentSegment);
+		
+		CreateNextSegments();
+		for (int i = 0; i < segments.Count; i++) {
+			segments[i].SetStartAndEndPosForRoadLanes();
+		}
+		intersection.CreateRoadConnections();
+		leftSegment.SpawnAICars();
+		rightSegment.SpawnAICars();
+		nextSegment.SpawnAICars();
 	}
 
 	private void CreateCurrentSegment() {

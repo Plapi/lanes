@@ -4,7 +4,6 @@ using UnityEngine;
 public class Segment : MonoBehaviour {
 
 	[SerializeField] private List<LaneBase> lanes = new();
-	[SerializeField] private BoxCollider boxCollider;
 	
 	public SegmentData SegmentData { get; private set; }
 
@@ -37,7 +36,6 @@ public class Segment : MonoBehaviour {
 				}
 			}
 		}
-		SetBoxCollider();
 	}
 
 	public void SetStartAndEndPosForRoadLanes() {
@@ -50,9 +48,12 @@ public class Segment : MonoBehaviour {
 		for (int i = 0; i < RoadLanes.Count; i++) {
 			RoadLanes[i].SpawnAICars();
 		}
-		// for (int i = 0; i < ForwardRoadLanes.Count; i++) {
-		// 	ForwardRoadLanes[i].SpawnAICars();
-		// }
+	}
+
+	public void ClearNextRoadLanes() {
+		for (int i = 0; i < RoadLanes.Count; i++) {
+			RoadLanes[i].ClearNextRoadLanes();
+		}
 	}
 
 	public void AlignVerticalWith(Segment other) {
@@ -74,17 +75,6 @@ public class Segment : MonoBehaviour {
 		}
 		lanes.Clear();
 		Destroy(gameObject);
-	}
-
-	private void SetBoxCollider() {
-		if (boxCollider == null) {
-			boxCollider = new GameObject("BoxCollider").AddComponent<BoxCollider>();
-			boxCollider.transform.parent = transform;
-			boxCollider.transform.localPosition = Vector3.zero;
-		}
-		boxCollider.gameObject.layer = LayerMask.NameToLayer("drivable");
-		boxCollider.size = new Vector3(Width, 1f, Length);
-		boxCollider.center = new Vector3(boxCollider.size.x / 2f, -0.5f, Length / 2f);
 	}
 }
 
