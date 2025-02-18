@@ -24,8 +24,13 @@ public class UserCar : Car {
 	}
 	
 	public void UpdateCar(float verticalInput) {
-		targetPos = new Vector3(CurrentRoadLane.transform.position.x + Settings.Instance.laneSize / 2f, transform.position.y, transform.position.z + 10f);
-		avc.ProvideInputs(GetSteering(), Mathf.Max(verticalInput * 0.5f, 0f), verticalInput < 0f ? 0.5f : 0f);
+		targetPos = new Vector3(CurrentRoadLane.transform.position.x + Settings.Instance.laneSize / 2f, transform.position.y, transform.position.z + 8f);
+		
+		float targetSpeed = verticalInput * avc.MaxSpeed;
+		float accelerationInput = (targetSpeed - avc.CurrentSpeed) / avc.MaxSpeed;	
+		float brakeInput = (avc.CurrentSpeed - targetSpeed) / avc.MaxSpeed;
+		
+		avc.ProvideInputs(GetSteering(), Mathf.Clamp(accelerationInput, 0f, 1f) * 4f, Mathf.Clamp(brakeInput, 0f, 1f));
 	}
 	
 	public void TrySwitchLane(int add) {

@@ -117,8 +117,8 @@ public class RoadLane : Lane<RoadLaneData> {
 			aiCars.Remove(aiCar);
 			NextRoadLane nextRoadLane = nextRoadLanes[Random.Range(0, nextRoadLanes.Count)];
 			nextRoadLane.roadLane.Transition(nextRoadLane.transPoints, aiCar);
-			SpawnAICar(5f, true);
 		}
+		SpawnAICar(5f, true);
 	}
 
 	public void AddNextRoadLane(RoadLane nextRoadLane, List<Vector3> transPoints) {

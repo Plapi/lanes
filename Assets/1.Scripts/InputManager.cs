@@ -16,7 +16,8 @@ public class InputManager : MonoBehaviour {
 	private void Update() {
 		if (Input.GetMouseButton(0)) {
 			float y = Input.mousePosition.y / Screen.height;
-			VerticalInput = y < 0.08f ? -1f : Mathf.InverseLerp(0.1f, 0.3f, y);
+			VerticalInput = Mathf.InverseLerp(0.1f, 0.3f, y);
+			//VerticalInput = y < 0.08f ? -1f : Mathf.InverseLerp(0.1f, 0.3f, y);
 			
 			float x = Input.mousePosition.x / Screen.width - 0.5f;
 			if (!swiped) {

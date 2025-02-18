@@ -24,7 +24,7 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 	protected override void Awake() {
 		base.Awake();
 		
-		ShuffleArray(circuit.segments);
+		Utils.ShuffleArray(circuit.segments);
 		SegmentInputData inputData = circuit.GetNextSegment();
 		CreateCurrentSegment(inputData);
 		CreateStartSegment(inputData);
@@ -41,9 +41,6 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 	}
 
 	private void Update() {
-		if (Input.GetKeyDown(KeyCode.N)) {
-			NextSegments();
-		}
 		UpdateUserCar();
 	}
 
@@ -228,14 +225,5 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		[Range(1, 4)] public int backLanes = 2;
 		[Range(1, 4)] public int frontLanes = 2;
 		public int length;
-	}
-	
-	private static void ShuffleArray<T>(T[] array) {
-		System.Random rng = new System.Random();
-		int n = array.Length;
-		for (int i = n - 1; i > 0; i--) {
-			int j = rng.Next(i + 1);
-			(array[i], array[j]) = (array[j], array[i]);
-		}
 	}
 }

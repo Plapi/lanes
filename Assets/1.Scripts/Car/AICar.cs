@@ -6,6 +6,7 @@ public class AICar : Car, IPoolableObject<AICar> {
 	
 	[SerializeField] private string id;
 	[SerializeField] private LayerMask raycastLayerMask;
+	[SerializeField] private MeshMaterialRandomizer meshMaterialRandomizer;
 
 	private const float brakeDistanceMinRange0 = 0.8f;
 	private const float brakeDistanceMinRange1 = 2f;
@@ -30,6 +31,7 @@ public class AICar : Car, IPoolableObject<AICar> {
 
 	private void Start() {
 		brakeDistanceMin = Random.Range(brakeDistanceMinRange0, brakeDistanceMinRange1);
+		meshMaterialRandomizer.SetRandomMaterial();
 	}
 
 	private void Update() {

@@ -15542,6 +15542,13 @@ MonoBehaviour:
   raycastLayerMask:
     serializedVersion: 2
     m_Bits: 128
+  meshMaterialRandomizer:
+    preset: {fileID: 11400000, guid: 17a393dd8fd1f4926b60b5ba659dd5ae, type: 2}
+    renderers:
+    - {fileID: 1417164461016482508}
+    - {fileID: 4569260721613604565}
+    - {fileID: 8324196335384671805}
+    - {fileID: 618936608582859865}
 --- !u!114 &5370458563235718490
 MonoBehaviour:
   m_ObjectHideFlags: 0
