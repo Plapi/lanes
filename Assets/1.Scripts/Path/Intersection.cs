@@ -89,16 +89,16 @@ public class Intersection : MonoBehaviour {
 		
 		while (true) {
 			allowPassingVertically();
-			yield return new WaitForSeconds(5f);
+			yield return new WaitForSeconds(7f);
 
 			disallowPassingAll();
-			yield return new WaitForSeconds(2f);
+			yield return new WaitForSeconds(4f);
 			
 			allowPassingHorizontally();
-			yield return new WaitForSeconds(5f);
+			yield return new WaitForSeconds(7f);
 
 			disallowPassingAll();
-			yield return new WaitForSeconds(2f);
+			yield return new WaitForSeconds(4f);
 		}
 	}
 	

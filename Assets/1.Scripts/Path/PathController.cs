@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class PathController : MonoBehaviour {
+public class PathController : MonoBehaviourSingleton<PathController> {
 
 	[SerializeField] private InputManager inputManager;
 	[SerializeField] private UserCar userCar;
 	[SerializeField] private Circuit circuit;
 	
 	private readonly List<Segment> segments = new(4);
+	private Segment startSegment;
 	private Segment currentSegment;
 	private Segment leftSegment;
 	private Segment rightSegment;
@@ -18,30 +19,44 @@ public class PathController : MonoBehaviour {
 	
 	private AICar[] aiCarPrefabs;
 	
-	private void Awake() {
-		CreateCurrentSegment();
+	public UserCar UserCar => userCar;
+	
+	protected override void Awake() {
+		base.Awake();
+		
+		ShuffleArray(circuit.segments);
+		SegmentInputData inputData = circuit.GetNextSegment();
+		CreateCurrentSegment(inputData);
+		CreateStartSegment(inputData);
 		InitSegments();
-		//ShuffleArray(circuit.segments);
-		// inputManager.OnHorizontalInput = input => {
-		// 	userCar.TrySwitchLane((int)Mathf.Sign(input));
-		// };
+		ConnectCurrentSegmentWithStartSegment();
+		
+		userCar.transform.SetZ(startSegment.transform.position.z + startSegment.Length * 0.5f);
+		userCar.SetSegment(startSegment, startSegment.RoadLanes.Count - 1);
+		userCar.gameObject.SetActive(true);
+		
+		inputManager.OnHorizontalInput = input => {
+			userCar.TrySwitchLane((int)Mathf.Sign(input));
+		};
 	}
 
 	private void Update() {
-		/*if (Input.GetKeyDown(KeyCode.C)) {
-			for (int i = 0; i < segments.Count; i++) {
-				segments[i].Clear();
-			}
-			segments.Clear();
-			intersection.Clear();
-			
-			ShuffleArray(circuit.segments);
-			InitSegments();
-		}*/
 		if (Input.GetKeyDown(KeyCode.N)) {
 			NextSegments();
 		}
-		//userCar.UpdateCar(inputManager.VerticalInput);
+		UpdateUserCar();
+	}
+
+	private void UpdateUserCar() {
+		float currentSegmentProgress = userCar.GetCurrentSegmentProgress();
+		if (userCar.CurrentSegment == nextSegment) {
+			if (currentSegmentProgress >= 0.5f) {
+				NextSegments();
+			}
+		} else if (currentSegmentProgress > 0.99f) {
+			userCar.SetSegment(userCar.CurrentSegment == startSegment ? currentSegment : nextSegment, userCar.RoadLaneIndex);
+		}
+		userCar.UpdateCar(inputManager.VerticalInput);
 	}
 
 	private void InitSegments() {
@@ -50,9 +65,8 @@ public class PathController : MonoBehaviour {
 			segments[i].SetStartAndEndPosForRoadLanes();
 		}
 		intersection.CreateRoadConnections();
-		for (int i = 0; i < segments.Count; i++) {
-			segments[i].SpawnAICars();
-		}
+		currentSegment.SpawnAICars();
+		SpawnAICars();
 	}
 
 	private void NextSegments() {
@@ -71,20 +85,24 @@ public class PathController : MonoBehaviour {
 			segments[i].SetStartAndEndPosForRoadLanes();
 		}
 		intersection.CreateRoadConnections();
-		leftSegment.SpawnAICars();
-		rightSegment.SpawnAICars();
+		SpawnAICars();
+	}
+
+	private void SpawnAICars() {
+		leftSegment.SpawnAICars(false, true);
+		rightSegment.SpawnAICars(true, false);
 		nextSegment.SpawnAICars();
 	}
 
-	private void CreateCurrentSegment() {
-		currentSegment = NewSegment("CurrentSegment");
+	private void CreateCurrentSegment(SegmentInputData inputData) {
+		currentSegment = NewSegment("CurrentSegment", inputData);
 		segments.Add(currentSegment);
 	}
 	
 	private void CreateNextSegments() {
-		leftSegment = NewSegment("LeftSegment", -90f);
-		rightSegment = NewSegment("RightSegment", -90f);
-		nextSegment = NewSegment("NextSegment");
+		leftSegment = NewSegment("LeftSegment", circuit.GetNextSegment(),-90f);
+		rightSegment = NewSegment("RightSegment", circuit.GetNextSegment(), -90f);
+		nextSegment = NewSegment("NextSegment", circuit.GetNextSegment());
 		
 		segments.Add(leftSegment);
 		segments.Add(rightSegment);
@@ -109,22 +127,44 @@ public class PathController : MonoBehaviour {
 		intersection.Init(currentSegment, leftSegment, rightSegment, nextSegment);
 	}
 
-	private Segment NewSegment(string segmentName, float angle = 0f) {
+	private void CreateStartSegment(SegmentInputData segmentInputData) {
+		startSegment = new GameObject("StartSegment").AddComponent<Segment>();
+		startSegment.transform.parent = transform;
+		const int length = 200;
+		SegmentData segmentData = GetNextSegmentData(segmentInputData);
+		for (int i = 0; i < segmentData.lanes.Length; i++) {
+			segmentData.lanes[i].length = length;
+		}
+		startSegment.Init(segmentData);
+		startSegment.transform.SetLocalZ(-length);
+		startSegment.SetStartAndEndPosForRoadLanes();
+	}
+
+	private Segment NewSegment(string segmentName, SegmentInputData inputData, float angle = 0f) {
 		Segment segment = new GameObject(segmentName).AddComponent<Segment>();
 		segment.transform.parent = transform;
-		segment.Init(GetNextSegmentData());
+		segment.Init(GetNextSegmentData(inputData));
 		segment.transform.SetLocalAngleY(angle);
 		return segment;
 	}
 
-	private SegmentData GetNextSegmentData() {
+	private void ConnectCurrentSegmentWithStartSegment() {
+		for (int i = 0; i < currentSegment.BackRoadLanes.Count; i++) {
+			RoadLane lane0 = currentSegment.BackRoadLanes[i];
+			RoadLane lane1 = startSegment.BackRoadLanes[i];
+			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.EndPos, lane1.StartPos });
+		}
+		Debug.Break();
+	}
+
+	private static SegmentData GetNextSegmentData(SegmentInputData segmentInputData) {
 		List<LaneData> lanes = new() {
 			new LaneData {
 				type = LaneType.SideWalkLaneLeft
 			}
 		};
-
-		SegmentInputData segmentInputData = circuit.GetNextSegment();
+		
+		segmentInputData.length = 5 * Random.Range(30, 80);
 		int backLanes = segmentInputData.backLanes;
 		int frontLanes = segmentInputData.frontLanes;
 
@@ -163,7 +203,7 @@ public class PathController : MonoBehaviour {
 			type = LaneType.SideWalkLaneRight
 		});
 		for (int i = 0; i < lanes.Count; i++) {
-			lanes[i].length = 100; //5 * Random.Range(20, 60);
+			lanes[i].length = segmentInputData.length;
 		}
 		
 		return new SegmentData {
@@ -188,6 +228,7 @@ public class PathController : MonoBehaviour {
 	private class SegmentInputData {
 		[Range(1, 4)] public int backLanes = 2;
 		[Range(1, 4)] public int frontLanes = 2;
+		public int length;
 	}
 	
 	private static void ShuffleArray<T>(T[] array) {

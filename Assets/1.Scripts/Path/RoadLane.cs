@@ -55,10 +55,14 @@ public class RoadLane : Lane<RoadLaneData> {
 					this.Wait(1f, () => SpawnAICar(posZ, checkAround));
 					return;
 				}
-			}	
+			}
+			if (Vector3.Distance(PathController.Instance.UserCar.transform.position, pos) < 80f) {
+				this.Wait(1f, () => SpawnAICar(posZ, checkAround));
+				return;
+			}
 		}
 		
-		AICar aiCar = ObjectPoolManager.Get(carPrefab);
+		AICar aiCar = ObjectPoolManager.Get(carPrefab, PathController.Instance.transform);
 		aiCar.name = carPrefab.name;
 		aiCar.transform.position = pos;
 		aiCar.transform.LookAt(new Vector3(EndPos.x, aiCar.transform.position.y, EndPos.z));
@@ -87,7 +91,8 @@ public class RoadLane : Lane<RoadLaneData> {
 		TravelAICarTargetPoints(aiCar, targetPointsTransition, () => {
 			aiCar.SetTargetPoint(new TargetPoint {
 				pos = EndPos,
-				onReach = OnAICarReachTargetPoint
+				onReach = OnAICarReachTargetPoint,
+				allowPassing = () => AllowPassing
 			});
 		});
 	}
@@ -105,10 +110,11 @@ public class RoadLane : Lane<RoadLaneData> {
 	}
 	
 	private void OnAICarReachTargetPoint(AICar aiCar) {
-		aiCars.Remove(aiCar);
 		if (nextRoadLanes.Count == 0) {
+			aiCars.Remove(aiCar);
 			ObjectPoolManager.Release(aiCar);
 		} else {
+			aiCars.Remove(aiCar);
 			NextRoadLane nextRoadLane = nextRoadLanes[Random.Range(0, nextRoadLanes.Count)];
 			nextRoadLane.roadLane.Transition(nextRoadLane.transPoints, aiCar);
 			SpawnAICar(5f, true);

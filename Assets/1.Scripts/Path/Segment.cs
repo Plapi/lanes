@@ -44,9 +44,19 @@ public class Segment : MonoBehaviour {
 		}
 	}
 
-	public void SpawnAICars() {
-		for (int i = 0; i < RoadLanes.Count; i++) {
-			RoadLanes[i].SpawnAICars();
+	public void SpawnAICars(bool forward = true, bool back = true) {
+		if (forward && back) {
+			for (int i = 0; i < RoadLanes.Count; i++) {
+				RoadLanes[i].SpawnAICars();
+			}	
+		} else if (forward) {
+			for (int i = 0; i < ForwardRoadLanes.Count; i++) {
+				ForwardRoadLanes[i].SpawnAICars();
+			}
+		} else {
+			for (int i = 0; i < BackRoadLanes.Count; i++) {
+				BackRoadLanes[i].SpawnAICars();
+			}
 		}
 	}
 

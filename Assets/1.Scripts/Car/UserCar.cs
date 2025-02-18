@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class UserCar : Car {
@@ -11,7 +10,30 @@ public class UserCar : Car {
 	[SerializeField] private float requireNewSegmentOffset = 100;
 	[SerializeField] private float releaseSegmentOffset = 10;
 	
-	/*protected override void GetInputs(bool accelerate, bool brake, out float accelerateInput, out float brakeInput) {
+	public int RoadLaneIndex { get; private set; }
+	public Segment CurrentSegment { get; private set; }
+	
+	public RoadLane CurrentRoadLane => CurrentSegment.RoadLanes[RoadLaneIndex];
+	
+	public void SetSegment(Segment segment, int laneIndex) {
+		if (CurrentSegment != null) {
+			int diff = segment.BackRoadLanes.Count - CurrentSegment.BackRoadLanes.Count;
+			laneIndex += diff;
+			laneIndex = Mathf.Clamp(laneIndex, 0, segment.RoadLanes.Count - 1);
+		} else {
+			transform.SetX(segment.RoadLanes[laneIndex].transform.position.x + Settings.Instance.laneSize / 2f);
+		}
+		RoadLaneIndex = laneIndex;
+		CurrentSegment = segment;
+	}
+	
+	public void UpdateCar(float verticalInput) {
+		targetPos = new Vector3(CurrentRoadLane.transform.position.x + Settings.Instance.laneSize / 2f, transform.position.y, transform.position.z + 10f);
+		GetInputs(verticalInput > 0f, verticalInput < 0f, out float accelerateInput, out float brakeInput);
+		avc.ProvideInputs(GetSteering(), accelerateInput, brakeInput);
+	}
+	
+	private void GetInputs(bool accelerate, bool brake, out float accelerateInput, out float brakeInput) {
 		brakeInput = 0f;
 		if (accelerate) {
 			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(defaultSpeed, accelerateSpeed, avc.CurrentSpeed));
@@ -26,25 +48,23 @@ public class UserCar : Car {
 		}
 	}
 	
-	protected override float GetTargetPositionZ() {
-		return transform.position.z + 10f;
+	public void TrySwitchLane(int add) {
+		int newLaneIndex = RoadLaneIndex + add;
+		if (newLaneIndex >= 0 && newLaneIndex < CurrentSegment.RoadLanes.Count) {
+			RoadLaneIndex = newLaneIndex;
+		}
 	}
+
+	public float GetCurrentSegmentProgress() {
+		return (transform.position.z - CurrentSegment.transform.position.z) / CurrentSegment.Length;
+	}
+
 	
-	public Vector3 GetRequireNewSegmentPos() {
-		return transform.position + Vector3.forward * requireNewSegmentOffset;
-	}
-
-	public Vector3 GetCarReleaseSegmentPos() {
-		return transform.localPosition + Vector3.back * releaseSegmentOffset;
-	}
-
 #if UNITY_EDITOR
 	protected override void OnDrawGizmos() {
 		Gizmos.color = Color.green;
-		Gizmos.DrawCube(GetRequireNewLanePos(), Vector3.one * 0.5f);
-		Gizmos.color = Color.red;
-		Gizmos.DrawCube(GetCarReleaseSegmentPos(), Vector3.one * 0.5f);
+		Gizmos.DrawCube(targetPos, Vector3.one * 0.5f);
 		base.OnDrawGizmos();
 	}
-#endif*/
+#endif
 }
