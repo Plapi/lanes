@@ -6,20 +6,29 @@ public class InputManager : MonoBehaviour {
 	public Action<float> OnHorizontalInput;
 
 	public float VerticalInput { get; private set; }
+
+	private bool swiped;
 	
+	private void Awake() {
+		VerticalInput = 0.5f;
+	}
+
 	private void Update() {
-		if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) {
-			OnHorizontalInput?.Invoke(-1f);
-		} else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) {
-			OnHorizontalInput?.Invoke(1f);
-		}
-		
-		if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)) {
-			VerticalInput = 1f;
-		} else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)) {
-			VerticalInput = -1f;
+		if (Input.GetMouseButton(0)) {
+			float y = Input.mousePosition.y / Screen.height;
+			VerticalInput = y < 0.08f ? -1f : Mathf.InverseLerp(0.1f, 0.3f, y);
+			
+			float x = Input.mousePosition.x / Screen.width - 0.5f;
+			if (!swiped) {
+				if (x < -0.1f) {
+					OnHorizontalInput?.Invoke(-1f);
+				} else if (x > 0.1f) {
+					OnHorizontalInput?.Invoke(1f);
+				}	
+			}
+			swiped = Mathf.Abs(x) > 0.1f;
 		} else {
-			VerticalInput = 0f;
+			swiped = false;
 		}
 	}
 }

@@ -6,10 +6,6 @@ public class UserCar : Car {
 	[SerializeField] private float accelerateSpeed;
 	[SerializeField] private float breakSpeed;
 	
-	[Space]
-	[SerializeField] private float requireNewSegmentOffset = 100;
-	[SerializeField] private float releaseSegmentOffset = 10;
-	
 	public int RoadLaneIndex { get; private set; }
 	public Segment CurrentSegment { get; private set; }
 	
@@ -29,23 +25,7 @@ public class UserCar : Car {
 	
 	public void UpdateCar(float verticalInput) {
 		targetPos = new Vector3(CurrentRoadLane.transform.position.x + Settings.Instance.laneSize / 2f, transform.position.y, transform.position.z + 10f);
-		GetInputs(verticalInput > 0f, verticalInput < 0f, out float accelerateInput, out float brakeInput);
-		avc.ProvideInputs(GetSteering(), accelerateInput, brakeInput);
-	}
-	
-	private void GetInputs(bool accelerate, bool brake, out float accelerateInput, out float brakeInput) {
-		brakeInput = 0f;
-		if (accelerate) {
-			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(defaultSpeed, accelerateSpeed, avc.CurrentSpeed));
-			avc.MaxSpeed = accelerateSpeed;
-		} else if (brake) {
-			avc.MaxSpeed = breakSpeed;
-			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(0f, breakSpeed, avc.CurrentSpeed));
-			brakeInput = Mathf.InverseLerp(breakSpeed, accelerateSpeed, avc.CurrentSpeed);
-		} else {
-			accelerateInput = Mathf.Lerp(1f, 0.5f, Mathf.InverseLerp(breakSpeed, defaultSpeed, avc.CurrentSpeed));
-			avc.MaxSpeed = defaultSpeed;
-		}
+		avc.ProvideInputs(GetSteering(), Mathf.Max(verticalInput * 0.5f, 0f), verticalInput < 0f ? 0.5f : 0f);
 	}
 	
 	public void TrySwitchLane(int add) {

@@ -154,7 +154,6 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 			RoadLane lane1 = startSegment.BackRoadLanes[i];
 			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.EndPos, lane1.StartPos });
 		}
-		Debug.Break();
 	}
 
 	private static SegmentData GetNextSegmentData(SegmentInputData segmentInputData) {
