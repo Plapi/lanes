@@ -20,6 +20,9 @@ public class MeshMaterialRandomizer {
 	[SerializeField] private Renderer[] renderers;
 
 	public void SetRandomMaterial() {
+		if (preset == null) {
+			return;
+		}
 		Material[] materials = { preset.GetRandomMaterial() };
 		for (int i = 0; i < renderers.Length; i++) {
 			renderers[i].materials = materials;

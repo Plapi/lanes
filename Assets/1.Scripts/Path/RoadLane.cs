@@ -51,12 +51,12 @@ public class RoadLane : Lane<RoadLaneData> {
 
 		if (checkAround) {
 			for (int i = 0; i < aiCars.Count; i++) {
-				if (Vector3.Distance(aiCars[i].transform.position, pos) < 10f) {
+				if (Vector3.Distance(aiCars[i].transform.position, pos) < 20f) {
 					this.Wait(1f, () => SpawnAICar(posZ, checkAround));
 					return;
 				}
 			}
-			if (Vector3.Distance(PathController.Instance.UserCar.transform.position, pos) < 80f) {
+			if (Vector3.Distance(PathController.Instance.UserCar.transform.position, pos) < 100f) {
 				this.Wait(1f, () => SpawnAICar(posZ, checkAround));
 				return;
 			}

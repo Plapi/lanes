@@ -15,8 +15,8 @@ public abstract class Car : MonoBehaviour {
 	public BoxCollider BoxCollider => boxCollider;
 	
 	public Bounds Bounds => boxCollider.bounds;
-	public Vector3 FrontPos => transform.position + transform.forward * boxCollider.size.z / 2f;
-	public Vector3 BackPos => transform.position - transform.forward * boxCollider.size.z / 2f;
+	public Vector3 FrontPos => transform.position + transform.forward * boxCollider.size.z / 2f - transform.up * boxCollider.size.y * 0.3f;
+	public Vector3 BackPos => transform.position - transform.forward * boxCollider.size.z / 2f - transform.up * boxCollider.size.y * 0.3f;
 	
 	protected Vector3 targetPos;
 	private Vector3 steeringTargetPos;

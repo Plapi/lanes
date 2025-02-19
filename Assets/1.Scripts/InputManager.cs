@@ -17,13 +17,12 @@ public class InputManager : MonoBehaviour {
 		if (Input.GetMouseButton(0)) {
 			float y = Input.mousePosition.y / Screen.height;
 			VerticalInput = Mathf.InverseLerp(0.1f, 0.3f, y);
-			//VerticalInput = y < 0.08f ? -1f : Mathf.InverseLerp(0.1f, 0.3f, y);
 			
 			float x = Input.mousePosition.x / Screen.width - 0.5f;
 			if (!swiped) {
-				if (x < -0.1f) {
+				if (x < -0.3f) {
 					OnHorizontalInput?.Invoke(-1f);
-				} else if (x > 0.1f) {
+				} else if (x > 0.3f) {
 					OnHorizontalInput?.Invoke(1f);
 				}	
 			}

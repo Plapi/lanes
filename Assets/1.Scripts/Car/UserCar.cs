@@ -24,7 +24,7 @@ public class UserCar : Car {
 	}
 	
 	public void UpdateCar(float verticalInput) {
-		targetPos = new Vector3(CurrentRoadLane.transform.position.x + Settings.Instance.laneSize / 2f, transform.position.y, transform.position.z + 8f);
+		targetPos = new Vector3(CurrentRoadLane.transform.position.x + Settings.Instance.laneSize / 2f, FrontPos.y, transform.position.z + 8f);
 		
 		float targetSpeed = verticalInput * avc.MaxSpeed;
 		float accelerationInput = (targetSpeed - avc.CurrentSpeed) / avc.MaxSpeed;	

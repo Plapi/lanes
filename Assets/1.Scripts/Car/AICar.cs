@@ -31,7 +31,7 @@ public class AICar : Car, IPoolableObject<AICar> {
 
 	private void Start() {
 		brakeDistanceMin = Random.Range(brakeDistanceMinRange0, brakeDistanceMinRange1);
-		meshMaterialRandomizer.SetRandomMaterial();
+		meshMaterialRandomizer?.SetRandomMaterial();
 	}
 
 	private void Update() {
@@ -40,6 +40,7 @@ public class AICar : Car, IPoolableObject<AICar> {
 		}
 		
 		targetPos = targetPoint.pos;
+		targetPos.y = FrontPos.y;
 		
 		float distToTargetPos = Vector3.Distance(FrontPos, targetPos);
 		if (targetPoint.AllowPassing() && distToTargetPos < targetPoint.minDistToReach) {
@@ -51,7 +52,7 @@ public class AICar : Car, IPoolableObject<AICar> {
 
 		const float rayDistance = 10f;
 		Car frontCar = null;
-		if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, rayDistance, raycastLayerMask)) {
+		if (Physics.Raycast(FrontPos, transform.forward, out RaycastHit hit, rayDistance, raycastLayerMask)) {
 			frontCar = hit.transform.GetComponent<Car>();
 		}
 		
@@ -75,10 +76,12 @@ public class AICar : Car, IPoolableObject<AICar> {
 			return;
 		}
 		
-		if (collision.gameObject.TryGetComponent(out AICar car) && car.targetPoint.pass) {
-			targetPoint.pass = false;
+		if (collision.gameObject.TryGetComponent(out AICar otherCar) && otherCar.targetPoint.pass) {
+			Vector3 dir = otherCar.transform.position - transform.position;
+			TargetPoint stopTargetPoint = Vector3.Dot(transform.forward, dir) > 0 ? targetPoint : otherCar.targetPoint;
+			stopTargetPoint.pass = false;
 			this.Wait(2f, () => {
-				targetPoint.pass = true;
+				stopTargetPoint.pass = true;
 			});
 		}
 	}
