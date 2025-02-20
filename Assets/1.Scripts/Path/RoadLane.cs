@@ -129,11 +129,15 @@ public class RoadLane : Lane<RoadLaneData> {
 	}
 
 	public override void Clear() {
+		ClearAICars();
+		base.Clear();
+	}
+
+	public void ClearAICars() {
 		foreach (AICar aiCar in aiCars) {
 			ObjectPoolManager.Release(aiCar);
 		}
 		aiCars.Clear();
-		base.Clear();
 	}
 
 	private void OnDrawGizmos() {

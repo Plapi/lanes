@@ -122,6 +122,12 @@ public class Segment : MonoBehaviour {
 		return segmentEnvironment;
 	}
 
+	public void ClearAICars() {
+		foreach (var roadLane in RoadLanes) {
+			roadLane.ClearAICars();
+		}
+	}
+	
 	public void Clear() {
 		foreach (var lane in lanes) {
 			lane.Clear();

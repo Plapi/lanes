@@ -8,6 +8,11 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 	[SerializeField] private InputManager inputManager;
 	[SerializeField] private UserCar userCar;
 	[SerializeField] private Circuit circuit;
+	[SerializeField] private Transform skyline;
+
+	[Space]
+	[SerializeField] private bool userCarEnabled;
+	[SerializeField] private bool aiCarsEnabled;
 	
 	private readonly List<Segment> segments = new(4);
 	private Segment startSegment;
@@ -49,13 +54,19 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		if (Input.GetKeyDown(KeyCode.N)) {
 			NextSegments();
 		}
-		UpdateUserCar();
+		if (userCarEnabled) {
+			UpdateUserCar();
+			skyline.transform.position = userCar.transform.position;
+		} else {
+			skyline.gameObject.SetActive(false);
+		}
 	}
 
 	private void UpdateUserCar() {
 		float currentSegmentProgress = userCar.GetCurrentSegmentProgress();
 		if (userCar.CurrentSegment == nextSegment) {
 			if (currentSegmentProgress >= 0.5f) {
+				startSegment.ClearAICars();
 				NextSegments();
 			}
 		} else if (currentSegmentProgress > 0.99f) {
@@ -70,8 +81,10 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 			segments[i].SetStartAndEndPosForRoadLanes();
 		}
 		intersection.CreateRoadConnections();
-		currentSegment.SpawnAICars();
-		SpawnAICars();
+		if (aiCarsEnabled) {
+			currentSegment.SpawnAICars();
+			SpawnAICars();	
+		}
 	}
 
 	private void NextSegments() {
@@ -94,8 +107,10 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		currentSegment.ContinueGenerateEnvIfNeeded(leftSegment, rightSegment);
 		nextSegment.CreteTopLeftEnvironment(leftSegment);
 		nextSegment.CreteTopRightEnvironment(rightSegment);
-		
-		SpawnAICars();
+
+		if (aiCarsEnabled) {
+			SpawnAICars();
+		}
 	}
 
 	private void SpawnAICars() {
