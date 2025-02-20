@@ -21,4 +21,12 @@ public class Element : MonoBehaviour, IPoolableObject<Element> {
 		element.gameObject.SetActive(true);
 		return element;
 	}
+
+	public Element Create(string name, Transform parent, float x, float z) {
+		Element element = ObjectPoolManager.Get(this, parent);
+		element.name = name;
+		element.transform.SetLocalXZ(x, z);
+		element.gameObject.SetActive(true);
+		return element;
+	}
 }

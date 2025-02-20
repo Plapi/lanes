@@ -25,3 +25,21 @@ MonoBehaviour:
   - {fileID: 6611868935804653055, guid: 0f990babbd3fc40bab4046ef52321dfd, type: 3}
   - {fileID: 8765369849170367193, guid: b0000e638d78e468095e3558909178fa, type: 3}
   - {fileID: 7220623832387453876, guid: cbb5fe180cee24cc39f45a974a5ad724, type: 3}
+  environment:
+    sideWalk: {fileID: 160805545671377399, guid: 5c53f31f7233a4c759a2c5ecd79a35f3, type: 3}
+    buildings:
+    - {fileID: 191796031133119885, guid: 036380334ac31432aab2efc31710bc77, type: 3}
+    - {fileID: -8402288112143210305, guid: 6519777e01a0248d4abf6c138903eb5d, type: 3}
+    - {fileID: 1586697211392021712, guid: 3d156a56b0114442c85ffca101ad7732, type: 3}
+    - {fileID: 3600584864773995212, guid: 1138d58b072904d749d28b5065a0307b, type: 3}
+    - {fileID: 8513775307210716370, guid: bf473bd1bfd6640d4bacd1af4389a952, type: 3}
+    - {fileID: 7139921299186303831, guid: bd27e7a1a6bdc4cdaa928082b33681db, type: 3}
+    - {fileID: 5302199893534989657, guid: c1b88b77fcce7450eab3e40e93a0e4fc, type: 3}
+    buildingRandomProbabilities:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 0.1

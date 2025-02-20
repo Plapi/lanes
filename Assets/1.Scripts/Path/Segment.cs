@@ -11,9 +11,12 @@ public class Segment : MonoBehaviour {
 	public List<RoadLane> ForwardRoadLanes { get; private set; }
 	public List<RoadLane> BackRoadLanes { get; private set; }
 	
-	public float Width { get; private set; }
+	public int Width { get; private set; }
 	
-	public float Length => RoadLanes[0].Length;
+	public int Length => RoadLanes[0].Length;
+	
+	private SegmentEnvironment leftEnvironment;
+	private SegmentEnvironment rightEnvironment;
 	
 	public void Init(SegmentData segmentData) {
 		SegmentData = segmentData;
@@ -78,12 +81,59 @@ public class Segment : MonoBehaviour {
 		transform.SetLocalZ(other.transform.localPosition.z + (backLanesCount1 - backLanesCount0) * Settings.Instance.laneSize);
 	}
 
+	public void CreateBottomLeftEnvironment(Segment leftSegment) {
+		SegmentEnvironment segmentEnvironment = CreateEnvironment();
+		segmentEnvironment.Create((int)transform.InverseTransformPoint(leftSegment.transform.position).z, true);
+		leftEnvironment = segmentEnvironment;
+	}
+
+	public void CreateBottomRightEnvironment(Segment rightSegment) {
+		SegmentEnvironment segmentEnvironment = CreateEnvironment();
+		segmentEnvironment.transform.SetLocalX(Width);
+		segmentEnvironment.Create((int)transform.InverseTransformPoint(rightSegment.transform.position).z, false);
+		rightEnvironment = segmentEnvironment;
+	}
+
+	public void CreteTopLeftEnvironment(Segment leftSegment) {
+		SegmentEnvironment segmentEnvironment = CreateEnvironment();
+		segmentEnvironment.transform.SetZ(leftSegment.transform.position.z + leftSegment.Width + Settings.Instance.laneSize);
+		segmentEnvironment.Create((int)((transform.position.z + Length) - (leftSegment.transform.position.z + leftSegment.Width)) - Settings.Instance.laneSize, true);
+		leftEnvironment = segmentEnvironment;
+	}
+
+	public void CreteTopRightEnvironment(Segment rightSegment) {
+		SegmentEnvironment segmentEnvironment = CreateEnvironment();
+		segmentEnvironment.transform.SetLocalX(Width);
+		segmentEnvironment.transform.SetZ(rightSegment.transform.position.z + rightSegment.Width + Settings.Instance.laneSize);
+		segmentEnvironment.Create((int)((transform.position.z + Length) - (rightSegment.transform.position.z + rightSegment.Width)) - Settings.Instance.laneSize, false);
+		rightEnvironment = segmentEnvironment;
+	}
+
+	public void ContinueGenerateEnvIfNeeded(Segment leftSegment, Segment rightSegment) {
+		leftEnvironment.ContinueGenerateIfNeeded((int)(transform.InverseTransformPoint(leftSegment.transform.position).z - leftEnvironment.transform.localPosition.z));
+		rightEnvironment.ContinueGenerateIfNeeded((int)(transform.InverseTransformPoint(rightSegment.transform.position).z - rightEnvironment.transform.localPosition.z));
+	}
+	
+	private SegmentEnvironment CreateEnvironment() {
+		SegmentEnvironment segmentEnvironment = new GameObject().AddComponent<SegmentEnvironment>();
+		segmentEnvironment.name = "SegmentEnvironment";
+		segmentEnvironment.transform.parent = transform;
+		segmentEnvironment.transform.localPosition = Vector3.zero;
+		return segmentEnvironment;
+	}
+
 	public void Clear() {
 		foreach (var lane in lanes) {
 			lane.Clear();
 			Destroy(lane.gameObject);
 		}
 		lanes.Clear();
+		if (leftEnvironment != null) {
+			leftEnvironment.Clear();
+		}
+		if (rightEnvironment != null) {
+			rightEnvironment.Clear();
+		}
 		Destroy(gameObject);
 	}
 }

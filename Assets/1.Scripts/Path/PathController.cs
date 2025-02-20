@@ -31,6 +31,11 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		InitSegments();
 		ConnectCurrentSegmentWithStartSegment();
 		
+		currentSegment.CreateBottomLeftEnvironment(leftSegment);
+		currentSegment.CreateBottomRightEnvironment(rightSegment);
+		nextSegment.CreteTopLeftEnvironment(leftSegment);
+		nextSegment.CreteTopRightEnvironment(rightSegment);
+		
 		userCar.transform.SetZ(startSegment.transform.position.z + startSegment.Length * 0.5f);
 		userCar.SetSegment(startSegment, startSegment.RoadLanes.Count - 1);
 		userCar.gameObject.SetActive(true);
@@ -41,6 +46,9 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 	}
 
 	private void Update() {
+		if (Input.GetKeyDown(KeyCode.N)) {
+			NextSegments();
+		}
 		UpdateUserCar();
 	}
 
@@ -82,6 +90,11 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 			segments[i].SetStartAndEndPosForRoadLanes();
 		}
 		intersection.CreateRoadConnections();
+		
+		currentSegment.ContinueGenerateEnvIfNeeded(leftSegment, rightSegment);
+		nextSegment.CreteTopLeftEnvironment(leftSegment);
+		nextSegment.CreteTopRightEnvironment(rightSegment);
+		
 		SpawnAICars();
 	}
 
