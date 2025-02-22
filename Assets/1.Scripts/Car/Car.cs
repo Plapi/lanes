@@ -19,7 +19,6 @@ public abstract class Car : MonoBehaviour {
 	public Vector3 BackPos => transform.position - transform.forward * boxCollider.size.z / 2f - transform.up * boxCollider.size.y * 0.3f;
 	
 	protected Vector3 targetPos;
-	private Vector3 steeringTargetPos;
 	
 	private void Awake() {
 		avc.MaxSpeed = defaultSpeed;
@@ -53,9 +52,11 @@ public abstract class Car : MonoBehaviour {
 	}
 	
 	protected virtual void OnDrawGizmos() {
-		Gizmos.color = Color.green;
-		Gizmos.DrawSphere(targetPos, 0.25f);
-		Gizmos.DrawLine(FrontPos, targetPos);
+		if (Application.isPlaying) {
+			Gizmos.color = Color.green;
+			Gizmos.DrawSphere(targetPos, 0.25f);
+			Gizmos.DrawLine(FrontPos, targetPos);
+		}
 		Gizmos.color = Color.white;
 		Gizmos.DrawCube(FrontPos, Vector3.one * 0.2f);
 		Gizmos.color = Color.black;

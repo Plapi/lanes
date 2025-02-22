@@ -7,15 +7,14 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 
 	[SerializeField] private InputManager inputManager;
 	[SerializeField] private UserCar userCar;
-	[SerializeField] private Circuit circuit;
 	[SerializeField] private Transform skyline;
-
+	[SerializeField] private StartSegment startSegment;
+	
 	[Space]
 	[SerializeField] private bool userCarEnabled;
 	[SerializeField] private bool aiCarsEnabled;
 	
 	private readonly List<Segment> segments = new(4);
-	private Segment startSegment;
 	private Segment currentSegment;
 	private Segment leftSegment;
 	private Segment rightSegment;
@@ -28,31 +27,13 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 	
 	protected override void Awake() {
 		base.Awake();
-		
-		Utils.ShuffleArray(circuit.segments);
-		SegmentInputData inputData = circuit.GetNextSegment();
-		CreateCurrentSegment(inputData);
-		CreateStartSegment(inputData);
-		InitSegments();
-		ConnectCurrentSegmentWithStartSegment();
-		
-		currentSegment.CreateBottomLeftEnvironment(leftSegment);
-		currentSegment.CreateBottomRightEnvironment(rightSegment);
-		nextSegment.CreteTopLeftEnvironment(leftSegment);
-		nextSegment.CreteTopRightEnvironment(rightSegment);
-		
-		userCar.transform.SetZ(startSegment.transform.position.z + startSegment.Length * 0.5f);
-		userCar.SetSegment(startSegment, startSegment.RoadLanes.Count - 1);
-		userCar.gameObject.SetActive(true);
-		
-		inputManager.OnHorizontalInput = input => {
-			userCar.TrySwitchLane((int)Mathf.Sign(input));
-		};
+		InitFirstSegments();
+		InitUserCar();
 	}
 
 	private void Update() {
 		if (Input.GetKeyDown(KeyCode.N)) {
-			NextSegments();
+			InitNextSegments();
 		}
 		if (userCarEnabled) {
 			UpdateUserCar();
@@ -62,12 +43,26 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		}
 	}
 
+	private void InitUserCar() {
+		if (!userCarEnabled) {
+			return;
+		}
+		userCarEnabled = false;
+		userCar.SetSegment(startSegment, 2, false);
+		userCar.GoToStart(() => {
+			inputManager.OnHorizontalInput = input => {
+				userCar.TrySwitchLane((int)Mathf.Sign(input));
+			};
+			userCarEnabled = true;
+		});
+	}
+
 	private void UpdateUserCar() {
 		float currentSegmentProgress = userCar.GetCurrentSegmentProgress();
 		if (userCar.CurrentSegment == nextSegment) {
 			if (currentSegmentProgress >= 0.5f) {
 				startSegment.ClearAICars();
-				NextSegments();
+				InitNextSegments();
 			}
 		} else if (currentSegmentProgress > 0.99f) {
 			userCar.SetSegment(userCar.CurrentSegment == startSegment ? currentSegment : nextSegment, userCar.RoadLaneIndex);
@@ -75,7 +70,19 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		userCar.UpdateCar(inputManager.VerticalInput);
 	}
 
-	private void InitSegments() {
+	private void InitFirstSegments() {
+		startSegment.Init(GetSegmentData(new SegmentInputData {
+			backLanes = 2,
+			frontLanes = 2,
+			length = 200
+		}));
+		startSegment.SetStartAndEndPosForRoadLanes();
+		currentSegment = NewSegment("CurrentSegment", GetSegmentData(new SegmentInputData {
+			backLanes = 2,
+			frontLanes = 2,
+			length = 50
+		}));
+		segments.Add(currentSegment);
 		CreateNextSegments();
 		for (int i = 0; i < segments.Count; i++) {
 			segments[i].SetStartAndEndPosForRoadLanes();
@@ -85,9 +92,14 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 			currentSegment.SpawnAICars();
 			SpawnAICars();	
 		}
+		ConnectCurrentSegmentWithStartSegment();
+		startSegment.CreateBottomLeftEnvironment(leftSegment);
+		startSegment.CreateRightEnvironment(rightSegment);
+		nextSegment.CreteTopLeftEnvironment(leftSegment);
+		nextSegment.CreteTopRightEnvironment(rightSegment);
 	}
 
-	private void NextSegments() {
+	private void InitNextSegments() {
 		segments.Clear();
 		currentSegment.Clear();
 		leftSegment.Clear();
@@ -118,16 +130,11 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		rightSegment.SpawnAICars(true, false);
 		nextSegment.SpawnAICars();
 	}
-
-	private void CreateCurrentSegment(SegmentInputData inputData) {
-		currentSegment = NewSegment("CurrentSegment", inputData);
-		segments.Add(currentSegment);
-	}
 	
 	private void CreateNextSegments() {
-		leftSegment = NewSegment("LeftSegment", circuit.GetNextSegment(),-90f);
-		rightSegment = NewSegment("RightSegment", circuit.GetNextSegment(), -90f);
-		nextSegment = NewSegment("NextSegment", circuit.GetNextSegment());
+		leftSegment = NewSegment("LeftSegment", GetRandomSegmentData(),-90f);
+		rightSegment = NewSegment("RightSegment", GetRandomSegmentData(), -90f);
+		nextSegment = NewSegment("NextSegment", GetRandomSegmentData());
 		
 		segments.Add(leftSegment);
 		segments.Add(rightSegment);
@@ -152,23 +159,10 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		intersection.Init(currentSegment, leftSegment, rightSegment, nextSegment);
 	}
 
-	private void CreateStartSegment(SegmentInputData segmentInputData) {
-		startSegment = new GameObject("StartSegment").AddComponent<Segment>();
-		startSegment.transform.parent = transform;
-		const int length = 200;
-		SegmentData segmentData = GetNextSegmentData(segmentInputData);
-		for (int i = 0; i < segmentData.lanes.Length; i++) {
-			segmentData.lanes[i].length = length;
-		}
-		startSegment.Init(segmentData);
-		startSegment.transform.SetLocalZ(-length);
-		startSegment.SetStartAndEndPosForRoadLanes();
-	}
-
-	private Segment NewSegment(string segmentName, SegmentInputData inputData, float angle = 0f) {
+	private Segment NewSegment(string segmentName, SegmentData segmentData, float angle = 0f) {
 		Segment segment = new GameObject(segmentName).AddComponent<Segment>();
 		segment.transform.parent = transform;
-		segment.Init(GetNextSegmentData(inputData));
+		segment.Init(segmentData);
 		segment.transform.SetLocalAngleY(angle);
 		return segment;
 	}
@@ -181,14 +175,22 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		}
 	}
 
-	private static SegmentData GetNextSegmentData(SegmentInputData segmentInputData) {
+	private static SegmentData GetRandomSegmentData() {
+		SegmentInputData segmentInputData = new() {
+			backLanes = Random.Range(1, 4),
+			frontLanes = Random.Range(1, 4),
+			length = Settings.Instance.laneSize * Random.Range(30, 80)
+		};
+		return GetSegmentData(segmentInputData);
+	}
+
+	private static SegmentData GetSegmentData(SegmentInputData segmentInputData) {
 		List<LaneData> lanes = new() {
 			new LaneData {
 				type = LaneType.SideWalkLaneLeft
 			}
 		};
 		
-		segmentInputData.length = 5 * Random.Range(30, 80);
 		int backLanes = segmentInputData.backLanes;
 		int frontLanes = segmentInputData.frontLanes;
 
@@ -235,7 +237,7 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 		};
 	}
 	
-	[Serializable]
+	/*[Serializable]
 	private class Circuit {
 		public SegmentInputData[] segments;
 		private int currentSegmentIndex;
@@ -246,7 +248,7 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 			}
 			return segments[currentSegmentIndex++];
 		}
-	}
+	}*/
 	
 	[Serializable]
 	private class SegmentInputData {

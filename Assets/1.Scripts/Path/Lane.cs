@@ -4,12 +4,16 @@ using Random = UnityEngine.Random;
 
 public abstract class Lane<T> : LaneBase where T : LaneData {
 	
-	public T Data {get; private set;}
+	public T Data { get; private set; }
 
 	public override void Init(LaneData data) {
 		base.Init(data);
 		Data = (T)data;
 		OnInit();
+	}
+	
+	public override void SetData(LaneData data) {
+		Data = (T)data;
 	}
 	
 	public int Length => Data.length;
@@ -38,6 +42,7 @@ public abstract class LaneBase : MonoBehaviour {
 			instantiatedElements.Add(element);
 		}
 	}
+	
 	public virtual void Clear() {
 		foreach (var element in instantiatedElements) {
 			ObjectPoolManager.Release(element);
@@ -48,6 +53,8 @@ public abstract class LaneBase : MonoBehaviour {
 	private Element GetElement() {
 		return elements[Random.Range(0, elements.Length)];
 	}
+	
+	public abstract void SetData(LaneData data);
 }
 
 public class LaneData {

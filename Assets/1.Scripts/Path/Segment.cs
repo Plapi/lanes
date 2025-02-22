@@ -3,22 +3,22 @@ using UnityEngine;
 
 public class Segment : MonoBehaviour {
 
-	[SerializeField] private List<LaneBase> lanes = new();
+	[SerializeField] protected List<LaneBase> lanes = new();
 	
-	public SegmentData SegmentData { get; private set; }
+	public SegmentData SegmentData { get; protected set; }
 
-	public List<RoadLane> RoadLanes { get; private set; }
-	public List<RoadLane> ForwardRoadLanes { get; private set; }
-	public List<RoadLane> BackRoadLanes { get; private set; }
+	public List<RoadLane> RoadLanes { get; protected set; }
+	public List<RoadLane> ForwardRoadLanes { get; protected set; }
+	public List<RoadLane> BackRoadLanes { get; protected set; }
 	
-	public int Width { get; private set; }
+	public int Width { get; protected set; }
 	
 	public int Length => RoadLanes[0].Length;
 	
 	private SegmentEnvironment leftEnvironment;
 	private SegmentEnvironment rightEnvironment;
 	
-	public void Init(SegmentData segmentData) {
+	public virtual void Init(SegmentData segmentData) {
 		SegmentData = segmentData;
 		RoadLanes = new List<RoadLane>();
 		ForwardRoadLanes = new List<RoadLane>();
@@ -114,7 +114,7 @@ public class Segment : MonoBehaviour {
 		rightEnvironment.ContinueGenerateIfNeeded((int)(transform.InverseTransformPoint(rightSegment.transform.position).z - rightEnvironment.transform.localPosition.z));
 	}
 	
-	private SegmentEnvironment CreateEnvironment() {
+	protected SegmentEnvironment CreateEnvironment() {
 		SegmentEnvironment segmentEnvironment = new GameObject().AddComponent<SegmentEnvironment>();
 		segmentEnvironment.name = "SegmentEnvironment";
 		segmentEnvironment.transform.parent = transform;

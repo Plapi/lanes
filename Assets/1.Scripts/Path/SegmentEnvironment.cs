@@ -41,7 +41,7 @@ public class SegmentEnvironment : MonoBehaviour {
 	}
 
 	private void CreateSideWalks(int length) {
-		for (int x = 0; x <= unitLength * 5; x += unitLength) {
+		for (int x = isLeftSide ? 0 : unitLength; x <= unitLength * 5; x += unitLength) {
 			for (int z = sideWalksLength; z <= length; z += unitLength) {
 				sideWalks.Add(environmentData.sideWalk.Create("SideWalk", transform, xSign * x, z));
 			}
