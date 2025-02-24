@@ -1,34 +1,24 @@
-using System;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour {
 
-	public Action<float> OnHorizontalInput;
-
 	public float VerticalInput { get; private set; }
+	public float HorizontalInput { get; private set; }
 
-	private bool swiped;
+	private LayerMask layerMask;
 	
 	private void Awake() {
 		VerticalInput = 0.5f;
+		HorizontalInput = 0.5f;
 	}
 
 	private void Update() {
 		if (Input.GetMouseButton(0)) {
 			float y = Input.mousePosition.y / Screen.height;
-			VerticalInput = Mathf.InverseLerp(0.1f, 0.3f, y);
-			
-			float x = Input.mousePosition.x / Screen.width - 0.5f;
-			if (!swiped) {
-				if (x < -0.3f) {
-					OnHorizontalInput?.Invoke(-1f);
-				} else if (x > 0.3f) {
-					OnHorizontalInput?.Invoke(1f);
-				}	
-			}
-			swiped = Mathf.Abs(x) > 0.1f;
+			VerticalInput = Mathf.InverseLerp(0f, 0.2f, y);
+			HorizontalInput = Input.mousePosition.x / Screen.width;
 		} else {
-			swiped = false;
+			HorizontalInput = 0.5f;
 		}
 	}
 }

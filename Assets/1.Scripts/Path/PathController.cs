@@ -24,7 +24,7 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 	private AICar[] aiCarPrefabs;
 	
 	public UserCar UserCar => userCar;
-	
+
 	protected override void Awake() {
 		base.Awake();
 		InitFirstSegments();
@@ -32,11 +32,8 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 	}
 
 	private void Update() {
-		if (Input.GetKeyDown(KeyCode.N)) {
-			InitNextSegments();
-		}
 		if (userCarEnabled) {
-			UpdateUserCar();
+			userCar.UpdateCar(inputManager.VerticalInput, inputManager.HorizontalInput);
 			skyline.transform.position = userCar.transform.position;
 		} else {
 			skyline.gameObject.SetActive(false);
@@ -48,26 +45,18 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 			return;
 		}
 		userCarEnabled = false;
-		userCar.SetSegment(startSegment, 2, false);
+		userCar.SetSegments(startSegment, currentSegment);
+		userCar.SetStartPoints();
 		userCar.GoToStart(() => {
-			inputManager.OnHorizontalInput = input => {
-				userCar.TrySwitchLane((int)Mathf.Sign(input));
-			};
 			userCarEnabled = true;
 		});
-	}
-
-	private void UpdateUserCar() {
-		float currentSegmentProgress = userCar.GetCurrentSegmentProgress();
-		if (userCar.CurrentSegment == nextSegment) {
-			if (currentSegmentProgress >= 0.5f) {
+		userCar.OnRequireNewSegments = () => {
+			if (userCar.CurrentSegment != startSegment) {
 				startSegment.ClearAICars();
 				InitNextSegments();
 			}
-		} else if (currentSegmentProgress > 0.99f) {
-			userCar.SetSegment(userCar.CurrentSegment == startSegment ? currentSegment : nextSegment, userCar.RoadLaneIndex);
-		}
-		userCar.UpdateCar(inputManager.VerticalInput);
+			userCar.SetSegments(currentSegment, nextSegment);
+		};
 	}
 
 	private void InitFirstSegments() {
@@ -236,19 +225,6 @@ public class PathController : MonoBehaviourSingleton<PathController> {
 			lanes = lanes.ToArray()
 		};
 	}
-	
-	/*[Serializable]
-	private class Circuit {
-		public SegmentInputData[] segments;
-		private int currentSegmentIndex;
-
-		public SegmentInputData GetNextSegment() {
-			if (currentSegmentIndex >= segments.Length) {
-				currentSegmentIndex = 0;
-			}
-			return segments[currentSegmentIndex++];
-		}
-	}*/
 	
 	[Serializable]
 	private class SegmentInputData {
