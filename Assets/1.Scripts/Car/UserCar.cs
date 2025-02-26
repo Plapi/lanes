@@ -7,10 +7,22 @@ using DG.Tweening;
 
 public class UserCar : Car {
 
+	[SerializeField] private CinemachineFollow cinemachineFollow;
+	
 	public Action OnRequireNewSegments;
 	
 	public Segment CurrentSegment { get; private set; }
 	private Segment nextSegment;
+
+	public override void DisableCar() {
+		base.DisableCar();
+		cinemachineFollow.gameObject.SetActive(false);
+	}
+
+	public override void EnableCar() {
+		base.EnableCar();
+		cinemachineFollow.gameObject.SetActive(true);
+	}
 	
 	public void SetSegments(Segment currentSegment, Segment nextSegment) {
 		CurrentSegment = currentSegment;
@@ -71,9 +83,9 @@ public class UserCar : Car {
 	
 	public void GoToStart(Action onComplete) {
 		
-		CinemachineFollow cinemachineFollow = GetComponentInChildren<CinemachineFollow>();
 		Vector3 prevOffset = cinemachineFollow.FollowOffset;
 		cinemachineFollow.FollowOffset = new Vector3(0f, 1.6f, -5f);
+		EnableCar();
 		
 		StartCoroutine(TransitStartPoints(() => {
 			float value = 0f;

@@ -10241,10 +10241,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   defaultSpeed: 50
   boxCollider: {fileID: 2021688452620412597}
-  accelerateSpeed: 100
-  breakSpeed: 20
-  requireNewSegmentOffset: 100
-  releaseSegmentOffset: 10
+  cinemachineFollow: {fileID: 5523251035025561910}
 --- !u!114 &3812935757262937016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11053,7 +11050,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1059095633302374431
 Transform:
   m_ObjectHideFlags: 0

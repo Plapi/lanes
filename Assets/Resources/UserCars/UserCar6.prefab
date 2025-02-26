@@ -565,7 +565,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8791831881415515021
 Transform:
   m_ObjectHideFlags: 0
@@ -5807,6 +5807,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   defaultSpeed: 150
   boxCollider: {fileID: 6797708827049591459}
+  cinemachineFollow: {fileID: 1945298792895792019}
 --- !u!114 &5938457492875539028
 MonoBehaviour:
   m_ObjectHideFlags: 0

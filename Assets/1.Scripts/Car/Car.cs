@@ -25,6 +25,10 @@ public abstract class Car : MonoBehaviour {
 	}
 
 	private void OnDisable() {
+		ResetVelocity();
+	}
+
+	private void ResetVelocity() {
 		avc.carBody.linearVelocity = Vector3.zero;
 		avc.carBody.angularVelocity = Vector3.zero;
 		avc.carBody.inertiaTensorRotation = Quaternion.identity;
@@ -34,6 +38,21 @@ public abstract class Car : MonoBehaviour {
 		avc.rb.inertiaTensorRotation = Quaternion.identity;
 		avc.rb.ResetInertiaTensor();
 		avc.carVelocity = Vector3.zero;
+	}
+
+	public virtual void DisableCar() {
+		ResetVelocity();
+		avc.carBody.isKinematic = true;
+		avc.rb.isKinematic = true;
+		avc.engineSound.enabled = false;
+		avc.SkidSound.enabled = false;
+	}
+
+	public virtual void EnableCar() {
+		avc.carBody.isKinematic = false;
+		avc.rb.isKinematic = false;
+		avc.engineSound.enabled = true;
+		avc.SkidSound.enabled = true;
 	}
 
 	protected float GetSteering() {

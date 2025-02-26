@@ -56,13 +56,13 @@ public class RoadLane : Lane<RoadLaneData> {
 					return;
 				}
 			}
-			if (Vector3.Distance(PathController.Instance.UserCar.transform.position, pos) < 100f) {
+			if (Vector3.Distance(GameController.Instance.UserCar.transform.position, pos) < 100f) {
 				this.Wait(1f, () => SpawnAICar(posZ, checkAround));
 				return;
 			}
 		}
 		
-		AICar aiCar = ObjectPoolManager.Get(carPrefab, PathController.Instance.transform);
+		AICar aiCar = ObjectPoolManager.Get(carPrefab, GameController.Instance.transform);
 		aiCar.name = carPrefab.name;
 		aiCar.transform.position = pos;
 		aiCar.transform.LookAt(new Vector3(EndPos.x, aiCar.transform.position.y, EndPos.z));
