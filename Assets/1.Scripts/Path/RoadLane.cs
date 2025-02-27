@@ -56,7 +56,7 @@ public class RoadLane : Lane<RoadLaneData> {
 					return;
 				}
 			}
-			if (Vector3.Distance(GameController.Instance.UserCar.transform.position, pos) < 100f) {
+			if (Vector3.Distance(GameController.Instance.GetUserCar().transform.position, pos) < 100f) {
 				this.Wait(1f, () => SpawnAICar(posZ, checkAround));
 				return;
 			}
@@ -130,6 +130,7 @@ public class RoadLane : Lane<RoadLaneData> {
 
 	public override void Clear() {
 		ClearAICars();
+		StopAllCoroutines();
 		base.Clear();
 	}
 

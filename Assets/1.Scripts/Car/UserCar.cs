@@ -45,9 +45,9 @@ public class UserCar : Car {
 		float maxX = Mathf.Lerp(CurrentSegment.RoadLanes[^1].transform.position.x + Settings.Instance.laneSize / 2f + 1f, 
 			nextSegment.RoadLanes[^1].transform.position.x + Settings.Instance.laneSize / 2f + 1f, 
 			progress);
-		targetPos.x = Mathf.Clamp( Mathf.Lerp(transform.position.x - 4f, transform.position.x + 4f, horizontalInput), minX, maxX);
+		targetPos.x = Mathf.Clamp(Mathf.Lerp(transform.position.x - 4f, transform.position.x + 4f, horizontalInput), minX, maxX);
 		targetPos.y = FrontPos.y;
-		targetPos.z = transform.position.z + 5f;
+		targetPos.z = FrontPos.z + 2.5f;
 	}
 	
 	private void UpdateCarInputs(float verticalInput) {
@@ -72,54 +72,99 @@ public class UserCar : Car {
 		Vector3 perpendicularPoint = point0 + perpendicularVector;
 		
 		(point0, point1) = (point1, point0);
-		point0 = perpendicularPoint + (point0 - perpendicularPoint).normalized * 10f;
-		point1 = perpendicularPoint + (point1 - perpendicularPoint).normalized * 10f;
+		
+		point0 = perpendicularPoint + (point0 - perpendicularPoint).normalized * 12f;
+		point1 = perpendicularPoint + (point1 - perpendicularPoint).normalized * 12f;
 
-		startPoints.Clear();
-		startPoints.AddRange(Chaikin.SmoothPath(new List<Vector3> { point0, perpendicularPoint, point1 }, 3));
-		startPoints.RemoveAt(0);
-		startPoints.RemoveAt(startPoints.Count - 1);
+		startPoints.Add(point0);
+		startPoints.Add(perpendicularPoint);
+		startPoints.Add(point1);
 	}
 	
 	public void GoToStart(Action onComplete) {
+
+		float prevMaxSpeed = avc.MaxSpeed;
+		avc.MaxSpeed = 60;
+		EnableCar();
+		StartCoroutine(TransitStartPoints(() => {
+			avc.MaxSpeed = prevMaxSpeed;
+			onComplete();
+		}));
 		
+		cinemachineFollow.gameObject.SetActive(false);
 		Vector3 prevOffset = cinemachineFollow.FollowOffset;
 		cinemachineFollow.FollowOffset = new Vector3(0f, 1.6f, -5f);
-		EnableCar();
-		
-		StartCoroutine(TransitStartPoints(() => {
+		CameraTransition(() => {
 			float value = 0f;
 			Vector3 startOffset = cinemachineFollow.FollowOffset;
 			DOTween.To(() => value, x => value = x, 1f, 2f)
-				.SetEase(Ease.Linear)
+				.SetEase(Ease.OutCubic)
 				.SetDelay(1f)
 				.OnUpdate(() => {
 					cinemachineFollow.FollowOffset = Vector3.Lerp(startOffset, prevOffset, value);
 				});
-		}, onComplete));
+		});
 	}
 
-	private IEnumerator TransitStartPoints(Action onReachFirstPoint, Action onComplete) {
-		int index = 0;
-		while (index < startPoints.Count) {
-			targetPos = new Vector3(startPoints[index].x, FrontPos.y, startPoints[index].z);
+	private void CameraTransition(Action onComplete) {
+		Camera cam = Camera.main;
+		
+		Vector3 camFromPos = cam.transform.position;
+		Quaternion camFromRot = cam.transform.rotation;
+		CinemachineBrain cinemachineBrain = cam.GetComponent<CinemachineBrain>();
+
+		cam.transform.position = camFromPos;
+		cam.transform.rotation = camFromRot;
+		
+		float value = 0f;
+		DOTween.To(() => value, x => value = x, 1f, 1.5f)
+			.SetEase(Ease.OutCubic)
+			.OnUpdate(() => {
+				
+				cinemachineFollow.gameObject.SetActive(true);
+				cinemachineBrain.ManualUpdate();
+				Vector3 camToPos = cam.transform.position;
+				Quaternion camToRot = cam.transform.rotation;
+				cinemachineFollow.gameObject.SetActive(false);
+				
+				cam.transform.position = Vector3.Lerp(camFromPos, camToPos, value);
+				cam.transform.rotation = Quaternion.Lerp(camFromRot, camToRot, value);
+			}).OnComplete(() => {
+				cinemachineFollow.gameObject.SetActive(true);
+				onComplete();
+			});
+	}
+
+	private IEnumerator TransitStartPoints(Action onComplete) {
+		for (float p = 0f; p <= 1f; p += 0.001f) {
+			Vector3 point = Bezier.GetPoint(startPoints[0], startPoints[1], startPoints[2], p);
+			targetPos = new Vector3(point.x, FrontPos.y, point.z);
 			while (Vector3.Distance(targetPos, FrontPos) >= 1f) {
+				targetPos.y = FrontPos.y;
 				UpdateCarInputs(0.5f);
 				yield return null;
 			}
-			index++;
-			if (index == 1) {
-				onReachFirstPoint();
-			}
+		}
+		float time = 1f;
+		while (time > 0f) {
+			targetPos.z = FrontPos.z + 1f;
+			UpdateCarInputs(0.5f);
+			yield return null;
+			time -= Time.deltaTime;
 		}
 		onComplete();
 	}
 	
 	protected override void OnDrawGizmos() {
 		base.OnDrawGizmos();
-		Gizmos.color = Color.red;
-		for (int i = 0; i < startPoints.Count; i++) {
-			Gizmos.DrawSphere(startPoints[i], 0.25f);
+		
+		if (startPoints.Count > 0) {
+			Gizmos.color = Color.red;
+			for (float p = 0f; p < 1f; p += 0.001f) {
+				Vector3 point0 = Bezier.GetPoint(startPoints[0], startPoints[1], startPoints[2], p);
+				Vector3 point1 = Bezier.GetPoint(startPoints[0], startPoints[1], startPoints[2], p + 0.001f);
+				Gizmos.DrawLine(point0, point1);
+			}
 		}
 	}
 }

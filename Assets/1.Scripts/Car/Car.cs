@@ -8,7 +8,6 @@ public abstract class Car : MonoBehaviour {
 	
 	[Space]
 	[SerializeField] protected AnimationCurve steeringCurve;
-	[SerializeField] protected float defaultSpeed;
 	
 	[SerializeField] private BoxCollider boxCollider;
 	
@@ -19,10 +18,6 @@ public abstract class Car : MonoBehaviour {
 	public Vector3 BackPos => transform.position - transform.forward * boxCollider.size.z / 2f - transform.up * boxCollider.size.y * 0.3f;
 	
 	protected Vector3 targetPos;
-	
-	private void Awake() {
-		avc.MaxSpeed = defaultSpeed;
-	}
 
 	private void OnDisable() {
 		ResetVelocity();
@@ -41,6 +36,7 @@ public abstract class Car : MonoBehaviour {
 	}
 
 	public virtual void DisableCar() {
+		avc.enabled = false;
 		ResetVelocity();
 		avc.carBody.isKinematic = true;
 		avc.rb.isKinematic = true;
@@ -53,6 +49,8 @@ public abstract class Car : MonoBehaviour {
 		avc.rb.isKinematic = false;
 		avc.engineSound.enabled = true;
 		avc.SkidSound.enabled = true;
+		ResetVelocity();
+		avc.enabled = true;
 	}
 
 	protected float GetSteering() {

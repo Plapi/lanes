@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviourSingleton<GameController> {
@@ -16,6 +17,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private UserCar[] userCars;
 	[SerializeField] private CarListUI carListUI;
 	
+	[Space]
+	[SerializeField] private Button restartButton;
+	
 	private UserCar userCar;
 	
 	private readonly List<Segment> segments = new(4);
@@ -28,17 +32,51 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private AICar[] aiCarPrefabs;
 	private bool canControlUserCar;
 	
-	public UserCar UserCar => userCar;
-
 	protected override void Awake() {
 		base.Awake();
 		InitFirstSegments();
 
+		Vector3 initPosUserCar = userCars[0].transform.position;
+		Quaternion initRotUserCar = userCars[0].transform.rotation;
 		for (int i = 0; i < userCars.Length; i++) {
 			userCars[i].DisableCar();
 			userCars[i].gameObject.SetActive(false);
 		}
-		
+
+		InitCarListUI();
+		Vector3 initCameraPos = Camera.main.transform.position;
+		Quaternion initCameraRot = Camera.main.transform.rotation;
+		restartButton.onClick.AddListener(() => {
+			restartButton.gameObject.SetActive(false);
+			
+			canControlUserCar = false;
+			userCar.DisableCar();
+			userCar.transform.position = initPosUserCar;
+			userCar.transform.rotation = initRotUserCar;
+			userCar = null;
+
+			for (int i = 0; i < segments.Count; i++) {
+				segments[i].Clear();
+			}
+			segments.Clear();
+			intersection.Clear();
+			startSegment.ClearAICars();
+			InitFirstSegments(true);
+			
+			Camera.main.transform.position = initCameraPos;
+			Camera.main.transform.rotation = initCameraRot;
+			skyline.transform.position = Vector3.zero;
+			
+			carListUI.gameObject.SetActive(true);
+			InitCarListUI();
+		});
+	}
+
+	public UserCar GetUserCar() {
+		return userCar;
+	}
+
+	private void InitCarListUI() {
 		carListUI.Init(userCars.Length, index => {
 			if (this != null) {
 				userCars[index].gameObject.SetActive(true);	
@@ -82,6 +120,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		userCar.SetSegments(startSegment, currentSegment);
 		userCar.SetStartPoints();
 		userCar.GoToStart(() => {
+			restartButton.gameObject.SetActive(true);
 			canControlUserCar = true;
 		});
 		userCar.OnRequireNewSegments = () => {
@@ -93,13 +132,15 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		};
 	}
 
-	private void InitFirstSegments() {
+	private void InitFirstSegments(bool restart = false) {
 		startSegment.Init(GetSegmentData(new SegmentInputData {
 			backLanes = 2,
 			frontLanes = 2,
 			length = 200
 		}));
-		startSegment.SetStartAndEndPosForRoadLanes();
+		if (!restart) {
+			startSegment.SetStartAndEndPosForRoadLanes();	
+		}
 		currentSegment = NewSegment("CurrentSegment", GetSegmentData(new SegmentInputData {
 			backLanes = 2,
 			frontLanes = 2,
@@ -112,8 +153,10 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		}
 		intersection.CreateRoadConnections();
 		ConnectCurrentSegmentWithStartSegment();
-		startSegment.CreateBottomLeftEnvironment(leftSegment);
-		startSegment.CreateRightEnvironment(rightSegment);
+		if (!restart) {
+			startSegment.CreateBottomLeftEnvironment(leftSegment);
+			startSegment.CreateRightEnvironment(rightSegment);	
+		}
 		nextSegment.CreteTopLeftEnvironment(leftSegment);
 		nextSegment.CreteTopRightEnvironment(rightSegment);
 	}

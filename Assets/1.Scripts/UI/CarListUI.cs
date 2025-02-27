@@ -30,6 +30,7 @@ public class CarListUI : OSA<BaseParamsWithPrefab, MyListItemViewsHolder> {
 	public void Release() {
 		onEnableItem = null;
 		onDisableItem = null;
+		goButton.onClick.RemoveAllListeners();
 	}
 
 	public float GetItemPosX(int index) {

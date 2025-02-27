@@ -10728,7 +10728,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   currentSpeedString: 
-  MaxSpeed: 40
+  MaxSpeed: 25
   accelaration: 10
   turn: 40
   gravity: 7

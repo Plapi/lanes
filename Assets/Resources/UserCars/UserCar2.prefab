@@ -10239,7 +10239,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  defaultSpeed: 50
   boxCollider: {fileID: 2021688452620412597}
   cinemachineFollow: {fileID: 5523251035025561910}
 --- !u!114 &3812935757262937016
@@ -10260,9 +10259,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   currentSpeedString: 
-  MaxSpeed: 40
+  MaxSpeed: 70
   accelaration: 10
-  turn: 10
+  turn: 15
   gravity: 7
   downforce: 5
   AirControl: 0

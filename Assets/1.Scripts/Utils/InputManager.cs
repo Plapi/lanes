@@ -15,7 +15,10 @@ public class InputManager : MonoBehaviour {
 	private void Update() {
 		if (Input.GetMouseButton(0)) {
 			float y = Input.mousePosition.y / Screen.height;
-			VerticalInput = Mathf.InverseLerp(0f, 0.2f, y);
+			if (y > 0.7f) {
+				return;
+			}
+			VerticalInput = Mathf.InverseLerp(0.05f, 0.2f, y);
 			HorizontalInput = Input.mousePosition.x / Screen.width;
 		} else {
 			HorizontalInput = 0.5f;
