@@ -24,7 +24,6 @@ public static class Utils {
 		
 		double randomValue = random.NextDouble() * totalWeight;
 		double cumulative = 0;
-		//Debug.LogError(randomValue + " " + totalWeight);
 
 		for (int i = 0; i < items.Length; i++) {
 			cumulative += probabilities[i];

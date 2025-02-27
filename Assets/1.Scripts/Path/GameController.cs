@@ -18,6 +18,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private CarListUI carListUI;
 	
 	[Space]
+	[SerializeField] private Button goButton;
 	[SerializeField] private Button restartButton;
 	
 	private UserCar userCar;
@@ -67,39 +68,38 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			Camera.main.transform.rotation = initCameraRot;
 			skyline.transform.position = Vector3.zero;
 			
+			goButton.gameObject.SetActive(true);
 			carListUI.gameObject.SetActive(true);
 			InitCarListUI();
 		});
+		goButton.onClick.AddListener(() => {
+			goButton.gameObject.SetActive(false);
+			Go();
+		});
+	}
+
+	private void Go() {
+		int carSelection = carListUI.Selection;
+		carSelection = Mathf.Clamp(carSelection, 0, userCars.Length - 1);
+		PlayerPrefsManager.UserData.carSelection = carSelection;
+		PlayerPrefsManager.SaveUserData();
+		Debug.LogError(carSelection);
+		
+		carListUI.Release();
+		for (int i = 0; i < userCars.Length; i++) {
+			userCars[i].gameObject.SetActive(i == carSelection);
+		}
+		userCar = userCars[carSelection];
+		InitUserCar();
+		
+		if (aiCarsEnabled) {
+			currentSegment.SpawnAICars();
+			SpawnAICars();	
+		}
 	}
 
 	public UserCar GetUserCar() {
 		return userCar;
-	}
-
-	private void InitCarListUI() {
-		carListUI.Init(userCars.Length, index => {
-			if (this != null) {
-				userCars[index].gameObject.SetActive(true);	
-			}
-		}, index => {
-			if (this != null) {
-				userCars[index].gameObject.SetActive(false);	
-			}
-		}, index => {
-			carListUI.Release();
-			carListUI.gameObject.SetActive(false);
-			index = Mathf.Clamp(index, 0, userCars.Length - 1);
-			for (int i = 0; i < userCars.Length; i++) {
-				userCars[i].gameObject.SetActive(i == index);
-			}
-			userCar = userCars[index];
-			InitUserCar();
-			
-			if (aiCarsEnabled) {
-				currentSegment.SpawnAICars();
-				SpawnAICars();	
-			}
-		});
 	}
 	
 	private void Update() {
@@ -114,6 +114,18 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			userCar.UpdateCar(inputManager.VerticalInput, inputManager.HorizontalInput);
 			skyline.transform.position = userCar.transform.position;
 		}
+	}
+
+	private void InitCarListUI() {
+		carListUI.Init(userCars.Length, PlayerPrefsManager.UserData.carSelection, index => {
+			if (this != null) {
+				userCars[index].gameObject.SetActive(true);	
+			}
+		}, index => {
+			if (this != null) {
+				userCars[index].gameObject.SetActive(false);	
+			}
+		});
 	}
 
 	private void InitUserCar() {

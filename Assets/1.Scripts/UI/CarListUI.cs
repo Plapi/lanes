@@ -9,28 +9,28 @@ using Com.ForbiddenByte.OSA.DataHelpers;
 public class CarListUI : OSA<BaseParamsWithPrefab, MyListItemViewsHolder> {
 
 	[SerializeField] private Snapper8 snapper;
-	[SerializeField] private Button goButton;
 	
 	private SimpleDataHelper<ClassListModel> data;
 	private Action<int> onEnableItem;
 	private Action<int> onDisableItem;
 
-	public void Init(int count, Action<int> onEnableItem, Action<int> onDisableItem, Action<int> onSelect) {
+	public int Selection => snapper.LastSnappedItemIndex;
+	private int initSelection;
+
+	public void Init(int count, int selection, Action<int> onEnableItem, Action<int> onDisableItem) {
 		data = new SimpleDataHelper<ClassListModel>(this);
 		for (int i = 0; i < count; i++) {
 			data.List.Add(new ClassListModel());
 		}
+		initSelection = selection;
 		this.onEnableItem = onEnableItem;
 		this.onDisableItem = onDisableItem;
-		goButton.onClick.AddListener(() => {
-			onSelect(snapper.LastSnappedItemIndex);
-		});
 	}
 
 	public void Release() {
 		onEnableItem = null;
 		onDisableItem = null;
-		goButton.onClick.RemoveAllListeners();
+		gameObject.SetActive(false);
 	}
 
 	public float GetItemPosX(int index) {
@@ -42,6 +42,7 @@ public class CarListUI : OSA<BaseParamsWithPrefab, MyListItemViewsHolder> {
 		base.Start();
 		_Params.ItemPrefab.gameObject.SetActive(false);
 		data.NotifyListChangedExternally();
+		ScrollTo(initSelection);
 	}
 
 	protected override MyListItemViewsHolder CreateViewsHolder(int itemIndex) {

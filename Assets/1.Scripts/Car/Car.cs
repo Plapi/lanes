@@ -10,7 +10,7 @@ public abstract class Car : MonoBehaviour {
 	[SerializeField] protected AnimationCurve steeringCurve;
 	
 	[SerializeField] private BoxCollider boxCollider;
-	
+
 	public BoxCollider BoxCollider => boxCollider;
 	
 	public Bounds Bounds => boxCollider.bounds;
