@@ -42,11 +42,11 @@ public abstract class UIPanel<T> : UIPanelBase where T: UIPanelBase.Data {
 		if (background != null && content != null) {
 			OnShowAnimBegin?.Invoke();
 			background.SetAlpha(0f);
-			background.DOFade(1f, 0.2f).OnComplete(() => {
+			background.DOFade(1f, UIController.defaultTime).OnComplete(() => {
 				OnShowAnimEnd?.Invoke();
 				onComplete();
 			}).SetUpdate(true);
-			content.transform.DOPunchScale(Vector3.one * 0.2f, 0.2f).SetUpdate(true);
+			content.transform.DOPunchScale(Vector3.one * 0.2f, UIController.defaultTime).SetUpdate(true);
 		} else {
 			onComplete();
 		}
@@ -55,15 +55,15 @@ public abstract class UIPanel<T> : UIPanelBase where T: UIPanelBase.Data {
 	protected virtual void CloseAnim(bool anim, Action onComplete) {
 		if (anim && background != null && content != null) {
 			OnCloseAnimBegin?.Invoke();
-			background.DOFade(0f, 0.2f).OnComplete(() => {
+			background.DOFade(0f, UIController.defaultTime).OnComplete(() => {
 				gameObject.SetActive(false);
 				OnCloseAnimEnd?.Invoke();
 				onComplete();
 			}).SetUpdate(true);
-			content.transform.DOScale(Vector3.one * 0.5f, 0.2f).SetEase(Ease.InQuad).OnComplete(() => {
+			content.transform.DOScale(Vector3.one * 0.5f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
 				content.transform.localScale = Vector3.one;
 			}).SetUpdate(true);
-			content.DOFade(0f, 0.2f).OnComplete(() => {
+			content.DOFade(0f, UIController.defaultTime).OnComplete(() => {
 				content.alpha = 1f;
 			}).SetUpdate(true);
 		} else {

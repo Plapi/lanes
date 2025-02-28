@@ -16,8 +16,6 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 		[Range(0f, 1f)] public float[] buildingRandomProbabilities;
 
 		public bool TryGetRandomBuilding(int maxLength, out Building building) {
-			// building = buildings[4];
-			// return building.Length <= maxLength;
 			List<Building> list = new();
 			List<float> probabilities = new();
 			for (int i = 0; i < buildings.Length; i++) {

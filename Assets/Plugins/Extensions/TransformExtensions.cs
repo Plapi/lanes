@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public static class TransformExtensions {
+public static partial class TransformExtensions {
 	
 	public static void SetX(this GameObject obj, float x) {
 		obj.transform.SetX(x);

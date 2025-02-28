@@ -16,19 +16,19 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 	protected override void ShowAnim(Action onComplete) {
 		gameObject.SetActive(true);
 		RectTransform.SetAnchorPosY(150f);
-		RectTransform.DOAnchorPosY(0f, 0.2f).SetEase(Ease.OutQuad).OnComplete(() => {
+		RectTransform.DOAnchorPosY(0f, UIController.defaultTime).SetEase(Ease.OutQuad).OnComplete(() => {
 			onComplete?.Invoke();
 		});
 	}
 
 	protected override void CloseAnim(bool anim, Action onComplete) {
 		if (anim) {
-			RectTransform.DOAnchorPosY(150f, 0.2f).SetEase(Ease.InQuad).OnComplete(() => {
+			RectTransform.DOAnchorPosY(150f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
 				gameObject.SetActive(false);
 				onComplete?.Invoke();
 			});	
 		} else {
-			gameObject.SetActive(true);
+			gameObject.SetActive(false);
 			onComplete?.Invoke();
 		}
 	}

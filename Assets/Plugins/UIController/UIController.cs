@@ -6,6 +6,8 @@ using DG.Tweening;
 
 public class UIController : MonoBehaviourSingleton<UIController> {
 
+	public const float defaultTime = 0.2f;
+	
 	[SerializeField] private UIPanelBase[] panels;
 	[SerializeField] private GameObject touchBlocker;
 	[SerializeField] private Image fadeToBlackImage;
