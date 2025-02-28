@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviourSingleton<GameController> {
 
+	[SerializeField] private Camera mainCamera;
 	[SerializeField] private InputManager inputManager;
 	[SerializeField] private Transform skyline;
 	[SerializeField] private StartSegment startSegment;
@@ -40,8 +41,8 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		userCar = userCars[currentCarSelection];
 		userCar.gameObject.SetActive(true);
 		
-		Vector3 initCameraPos = Camera.main.transform.position;
-		Quaternion initCameraRot = Camera.main.transform.rotation;
+		Vector3 initCameraPos = mainCamera.transform.position;
+		Quaternion initCameraRot = mainCamera.transform.rotation;
 		Vector3 initPosUserCar = default;
 		Quaternion initRotUserCar = default;
 		
@@ -53,7 +54,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			onLeft = () => currentCarSelection = UpdateUserCarSelection(currentCarSelection - 1),
 			onRight = () => currentCarSelection = UpdateUserCarSelection(currentCarSelection + 1),
 			onGo = () => {
-				garagePanel.Hide();
+				garagePanel.Close();
 			
 				PlayerPrefsManager.UserData.carSelection = currentCarSelection;
 				PlayerPrefsManager.SaveUserData();
@@ -82,26 +83,34 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			onSettings = () => {
 				
 			}, onRestart = () => {
-				pausePanel.Hide();
-				topPanel.Hide();
-				garagePanel.Show();
-			
-				canControlUserCar = false;
-				userCar.DisableCar();
-				userCar.transform.position = initPosUserCar;
-				userCar.transform.rotation = initRotUserCar;
+				Time.timeScale = 0f;
+				UIController.Instance.FadeInToBlack(() => {
+					
+					pausePanel.Close(false);
+					topPanel.Close(false);
+					
+					canControlUserCar = false;
+					userCar.DisableCar();
+					userCar.transform.position = initPosUserCar;
+					userCar.transform.rotation = initRotUserCar;
 
-				for (int i = 0; i < segments.Count; i++) {
-					segments[i].Clear();
-				}
-				segments.Clear();
-				intersection.Clear();
-				startSegment.ClearAICars();
-				InitFirstSegments(true);
+					for (int i = 0; i < segments.Count; i++) {
+						segments[i].Clear();
+					}
+					segments.Clear();
+					intersection.Clear();
+					startSegment.ClearAICars();
+					InitFirstSegments(true);
 			
-				Camera.main.transform.position = initCameraPos;
-				Camera.main.transform.rotation = initCameraRot;
-				skyline.transform.position = Vector3.zero;
+					mainCamera.transform.position = initCameraPos;
+					mainCamera.transform.rotation = initCameraRot;
+					skyline.transform.position = Vector3.zero;
+					
+					garagePanel.Show();
+					UIController.Instance.FadeOutToBlack();
+					Time.timeScale = 1f;
+				});
+				
 			}, onClose = () => {
 				Time.timeScale = 1f;
 			}
