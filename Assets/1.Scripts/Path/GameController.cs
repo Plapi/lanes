@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviourSingleton<GameController> {
@@ -15,11 +14,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	
 	[Space]
 	[SerializeField] private UserCar[] userCars;
-	[SerializeField] private CarListUI carListUI;
-	
-	[Space]
-	[SerializeField] private Button goButton;
-	[SerializeField] private Button restartButton;
 	
 	private UserCar userCar;
 	
@@ -37,65 +31,89 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		base.Awake();
 		InitFirstSegments();
 
-		Vector3 initPosUserCar = userCars[0].transform.position;
-		Quaternion initRotUserCar = userCars[0].transform.rotation;
 		for (int i = 0; i < userCars.Length; i++) {
 			userCars[i].DisableCar();
 			userCars[i].gameObject.SetActive(false);
 		}
-
-		InitCarListUI();
+		
+		int currentCarSelection = Mathf.Clamp(PlayerPrefsManager.UserData.carSelection, 0, userCars.Length - 1);
+		userCar = userCars[currentCarSelection];
+		userCar.gameObject.SetActive(true);
+		
 		Vector3 initCameraPos = Camera.main.transform.position;
 		Quaternion initCameraRot = Camera.main.transform.rotation;
-		restartButton.onClick.AddListener(() => {
-			restartButton.gameObject.SetActive(false);
+		Vector3 initPosUserCar = default;
+		Quaternion initRotUserCar = default;
+		
+		UITopPanel topPanel = UIController.Instance.GetPanel<UITopPanel>();
+		UIGaragePanel garagePanel = UIController.Instance.GetPanel<UIGaragePanel>();
+		UIPausePanel pausePanel = UIController.Instance.GetPanel<UIPausePanel>();
+		
+		garagePanel.Init(new UIGaragePanel.Data {
+			onLeft = () => currentCarSelection = UpdateUserCarSelection(currentCarSelection - 1),
+			onRight = () => currentCarSelection = UpdateUserCarSelection(currentCarSelection + 1),
+			onGo = () => {
+				garagePanel.Hide();
 			
-			canControlUserCar = false;
-			userCar.DisableCar();
-			userCar.transform.position = initPosUserCar;
-			userCar.transform.rotation = initRotUserCar;
-			userCar = null;
-
-			for (int i = 0; i < segments.Count; i++) {
-				segments[i].Clear();
+				PlayerPrefsManager.UserData.carSelection = currentCarSelection;
+				PlayerPrefsManager.SaveUserData();
+		
+				initPosUserCar = userCar.transform.position;
+				initRotUserCar = userCar.transform.rotation;
+				InitUserCar(() => {
+					topPanel.Show();
+				});
+		
+				if (aiCarsEnabled) {
+					currentSegment.SpawnAICars();
+					SpawnAICars();	
+				}
 			}
-			segments.Clear();
-			intersection.Clear();
-			startSegment.ClearAICars();
-			InitFirstSegments(true);
-			
-			Camera.main.transform.position = initCameraPos;
-			Camera.main.transform.rotation = initCameraRot;
-			skyline.transform.position = Vector3.zero;
-			
-			goButton.gameObject.SetActive(true);
-			carListUI.gameObject.SetActive(true);
-			InitCarListUI();
 		});
-		goButton.onClick.AddListener(() => {
-			goButton.gameObject.SetActive(false);
-			Go();
+		
+		topPanel.Init(new UITopPanel.Data {
+			onPause = () => {
+				Time.timeScale = 0f;
+				pausePanel.Show();
+			}
+		});
+		
+		pausePanel.Init(new UIPausePanel.Data {
+			onSettings = () => {
+				
+			}, onRestart = () => {
+				pausePanel.Hide();
+				topPanel.Hide();
+				garagePanel.Show();
+			
+				canControlUserCar = false;
+				userCar.DisableCar();
+				userCar.transform.position = initPosUserCar;
+				userCar.transform.rotation = initRotUserCar;
+
+				for (int i = 0; i < segments.Count; i++) {
+					segments[i].Clear();
+				}
+				segments.Clear();
+				intersection.Clear();
+				startSegment.ClearAICars();
+				InitFirstSegments(true);
+			
+				Camera.main.transform.position = initCameraPos;
+				Camera.main.transform.rotation = initCameraRot;
+				skyline.transform.position = Vector3.zero;
+			}, onClose = () => {
+				Time.timeScale = 1f;
+			}
 		});
 	}
 
-	private void Go() {
-		int carSelection = carListUI.Selection;
-		carSelection = Mathf.Clamp(carSelection, 0, userCars.Length - 1);
-		PlayerPrefsManager.UserData.carSelection = carSelection;
-		PlayerPrefsManager.SaveUserData();
-		Debug.LogError(carSelection);
-		
-		carListUI.Release();
-		for (int i = 0; i < userCars.Length; i++) {
-			userCars[i].gameObject.SetActive(i == carSelection);
-		}
-		userCar = userCars[carSelection];
-		InitUserCar();
-		
-		if (aiCarsEnabled) {
-			currentSegment.SpawnAICars();
-			SpawnAICars();	
-		}
+	private int UpdateUserCarSelection(int selection) {
+		selection = Mathf.Clamp(selection, 0, userCars.Length - 1);
+		userCar.gameObject.SetActive(false);
+		userCar = userCars[selection];
+		userCar.gameObject.SetActive(true);
+		return selection;
 	}
 
 	public UserCar GetUserCar() {
@@ -103,37 +121,18 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	}
 	
 	private void Update() {
-		if (userCar == null) {
-			for (int i = 0; i < userCars.Length; i++) {
-				if (userCars[i].gameObject.activeSelf) {
-					float p = Mathf.InverseLerp(-320f, 960f, carListUI.GetItemPosX(i));
-					userCars[i].transform.SetLocalX(Mathf.Lerp(45f, 25f, p));
-				}
-			}	
-		} else if (canControlUserCar) {
+		if (canControlUserCar) {
 			userCar.UpdateCar(inputManager.VerticalInput, inputManager.HorizontalInput);
 			skyline.transform.position = userCar.transform.position;
 		}
 	}
 
-	private void InitCarListUI() {
-		carListUI.Init(userCars.Length, PlayerPrefsManager.UserData.carSelection, index => {
-			if (this != null) {
-				userCars[index].gameObject.SetActive(true);	
-			}
-		}, index => {
-			if (this != null) {
-				userCars[index].gameObject.SetActive(false);	
-			}
-		});
-	}
-
-	private void InitUserCar() {
+	private void InitUserCar(Action onCanControlCar) {
 		userCar.SetSegments(startSegment, currentSegment);
 		userCar.SetStartPoints();
 		userCar.GoToStart(() => {
-			restartButton.gameObject.SetActive(true);
 			canControlUserCar = true;
+			onCanControlCar();
 		});
 		userCar.OnRequireNewSegments = () => {
 			if (userCar.CurrentSegment != startSegment) {
