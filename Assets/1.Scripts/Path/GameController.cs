@@ -35,26 +35,27 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	
 	private PosAndRot initCameraPosAndRot;
 	private PosAndRot initUserCarPosAndRot;
-	
+
 	protected override void Awake() {
 		base.Awake();
-		
 		for (int i = 0; i < userCars.Length; i++) {
 			userCars[i].DisableCar();
 			userCars[i].gameObject.SetActive(false);
 		}
-		
 		currentCarSelection = Mathf.Clamp(PlayerPrefsManager.UserData.carSelection, 0, userCars.Length - 1);
 		userCar = userCars[currentCarSelection];
 		userCar.gameObject.SetActive(true);
-		
 		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
-		
+	}
+
+	protected void Start() {
 		InitFirstSegments();
 		InitUI();
 	}
 
 	private void InitUI() {
+		UIController.Instance.Init();
+		
 		topPanel = UIController.Instance.GetPanel<UITopPanel>();
 		garagePanel = UIController.Instance.GetPanel<UIGaragePanel>();
 		pausePanel = UIController.Instance.GetPanel<UIPausePanel>();

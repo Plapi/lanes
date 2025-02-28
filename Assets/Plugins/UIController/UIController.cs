@@ -14,8 +14,7 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 	
 	private readonly Dictionary<Type, UIPanelBase> dictPanels = new();
 
-	protected override void Awake() {
-		base.Awake();
+	public void Init() {
 		for (int i = 0; i < panels.Length; i++) {
 			dictPanels.Add(panels[i].GetType(), panels[i]);
 			panels[i].OnShowAnimBegin = () => {
