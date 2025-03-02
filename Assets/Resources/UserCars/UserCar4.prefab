@@ -421,8 +421,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   boxCollider: {fileID: 5991813821704816216}
-  defaultSpeed: 90
   cinemachineFollow: {fileID: 7209026490937960869}
+  maxHealth: 140
 --- !u!114 &8152313046421799679
 MonoBehaviour:
   m_ObjectHideFlags: 0

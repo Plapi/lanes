@@ -38,19 +38,33 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	protected override void Awake() {
 		base.Awake();
-		for (int i = 0; i < userCars.Length; i++) {
-			userCars[i].DisableCar();
-			userCars[i].gameObject.SetActive(false);
-		}
-		currentCarSelection = Mathf.Clamp(PlayerPrefsManager.UserData.carSelection, 0, userCars.Length - 1);
-		userCar = userCars[currentCarSelection];
-		userCar.gameObject.SetActive(true);
+		InitUserCars();
 		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
 	}
 
 	protected void Start() {
 		InitFirstSegments();
 		InitUI();
+	}
+
+	private void InitUserCars() {
+		for (int i = 0; i < userCars.Length; i++) {
+			userCars[i].DisableCar();
+			userCars[i].gameObject.SetActive(false);
+			userCars[i].OnRequireNewSegments = () => {
+				if (userCar.CurrentSegment != startSegment) {
+					startSegment.ClearAICars();
+					InitNextSegments();
+				}
+				userCar.SetSegments(currentSegment, nextSegment);
+			};
+			userCars[i].OnHealthUpdate = healthProgress => {
+				topPanel.UpdateHealthSlider(healthProgress);
+			};
+		}
+		currentCarSelection = Mathf.Clamp(PlayerPrefsManager.UserData.carSelection, 0, userCars.Length - 1);
+		userCar = userCars[currentCarSelection];
+		userCar.gameObject.SetActive(true);
 	}
 
 	private void InitUI() {
@@ -107,9 +121,10 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 					
 			pausePanel.Close(false);
 			topPanel.Close(false);
+			topPanel.ResetHealthSlider();
 					
 			canControlUserCar = false;
-			userCar.DisableCar();
+			userCar.ResetCar();
 			userCar.transform.SetPosAndRot(initUserCarPosAndRot);
 
 			for (int i = 0; i < segments.Count; i++) {
@@ -143,12 +158,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	}
 	
 	private void Update() {
-		if (Input.GetKeyDown(KeyCode.A)) {
-			garagePanel.Close();
-		} 
-		if (Input.GetKeyDown(KeyCode.B)) {
-			garagePanel.Show();
-		}
 		if (canControlUserCar) {
 			userCar.UpdateCar(inputManager.VerticalInput, inputManager.HorizontalInput);
 			skyline.transform.position = userCar.transform.position;
@@ -162,13 +171,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			canControlUserCar = true;
 			onCanControlCar();
 		});
-		userCar.OnRequireNewSegments = () => {
-			if (userCar.CurrentSegment != startSegment) {
-				startSegment.ClearAICars();
-				InitNextSegments();
-			}
-			userCar.SetSegments(currentSegment, nextSegment);
-		};
 	}
 
 	private void InitFirstSegments(bool restart = false) {

@@ -33,7 +33,7 @@ public class DebugWindow : EditorWindow {
 			EditorCollapseAll.CollapseFolders();
 		}
 		
-		if (GUILayout.Button("Clear Player Prefs")) {
+		if (GUILayout.Button("Delete Player Prefs")) {
 			PlayerPrefs.DeleteAll();
 			PlayerPrefs.Save();
 		}

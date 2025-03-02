@@ -4,16 +4,25 @@ using UnityEngine;
 using Unity.Cinemachine;
 using System.Collections.Generic;
 using DG.Tweening;
+using UnityEngine.Serialization;
 
 public class UserCar : Car {
 
 	[SerializeField] private CinemachineFollow cinemachineFollow;
+	[SerializeField] private int maxHealth;
 	
 	public Action OnRequireNewSegments;
+	public Action<float> OnHealthUpdate;
+	
+	private float currentHealth;
 	
 	public Segment CurrentSegment { get; private set; }
 	private Segment nextSegment;
 
+	private void Start() {
+		currentHealth = maxHealth;
+	}
+	
 	public override void DisableCar() {
 		base.DisableCar();
 		cinemachineFollow.gameObject.SetActive(false);
@@ -22,6 +31,11 @@ public class UserCar : Car {
 	public override void EnableCar() {
 		base.EnableCar();
 		cinemachineFollow.gameObject.SetActive(true);
+	}
+
+	public void ResetCar() {
+		currentHealth = maxHealth;
+		DisableCar();
 	}
 	
 	public void SetSegments(Segment currentSegment, Segment nextSegment) {
@@ -58,6 +72,20 @@ public class UserCar : Car {
 
 	private float GetSegmentProgress(Segment segment) {
 		return (transform.position.z - segment.transform.position.z) / segment.Length;
+	}
+
+	private AICar lastHitAICar;
+	private void OnCollisionEnter(Collision collision) {
+		if (collision.gameObject.TryGetComponent(out AICar aiCar) && lastHitAICar != aiCar) {
+			float magnitude = collision.relativeVelocity.magnitude;
+			if (magnitude < 5f) {
+				return;
+			}
+			lastHitAICar = aiCar;
+			currentHealth -= magnitude;
+			currentHealth = Mathf.Max(0, currentHealth);
+			OnHealthUpdate?.Invoke(currentHealth / maxHealth);
+		}
 	}
 
 	private readonly List<Vector3> startPoints = new();
@@ -157,7 +185,6 @@ public class UserCar : Car {
 	
 	protected override void OnDrawGizmos() {
 		base.OnDrawGizmos();
-		
 		if (startPoints.Count > 0) {
 			Gizmos.color = Color.red;
 			for (float p = 0f; p < 1f; p += 0.001f) {

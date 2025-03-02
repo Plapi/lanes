@@ -15646,9 +15646,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  defaultSpeed: 30
   boxCollider: {fileID: 6257591930687371955}
   cinemachineFollow: {fileID: 2176767317052459185}
+  maxHealth: 100
 --- !u!114 &5370458563235718490
 MonoBehaviour:
   m_ObjectHideFlags: 0
