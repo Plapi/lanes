@@ -7,6 +7,7 @@ public class Segment : MonoBehaviour {
 	
 	public SegmentData SegmentData { get; protected set; }
 
+	public List<LaneBase> Lanes => lanes;
 	public List<RoadLane> RoadLanes { get; protected set; }
 	public List<RoadLane> ForwardRoadLanes { get; protected set; }
 	public List<RoadLane> BackRoadLanes { get; protected set; }

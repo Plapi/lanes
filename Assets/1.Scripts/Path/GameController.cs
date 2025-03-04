@@ -11,6 +11,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private Transform skyline;
 	[SerializeField] private StartSegment startSegment;
 	[SerializeField] private GameObject smoke;
+	[SerializeField] private PersonPickupController personPickupController;
 	
 	[Space]
 	[SerializeField] private bool aiCarsEnabled;
@@ -39,6 +40,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private PosAndRot initCameraPosAndRot;
 	private PosAndRot initUserCarPosAndRot;
 
+	private int personPickupSegments;
+	private int personsDropped;
+
 	protected override void Awake() {
 		base.Awake();
 		InitUserCars();
@@ -48,6 +52,12 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	protected void Start() {
 		InitFirstSegments();
 		InitUI();
+		personPickupController.OnPickup = () => {
+			personPickupSegments = Random.Range(1, 2);
+		};
+		personPickupController.OnDrop = () => {
+			personsDropped++;
+		};
 	}
 
 	private void InitUserCars() {
@@ -62,6 +72,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 				userCar.SetSegments(currentSegment, nextSegment);
 			};
 			userCars[i].OnHealthUpdate = healthProgress => {
+				if (!canControlUserCar) {
+					return;
+				}
 				topPanel.UpdateHealthSlider(healthProgress);
 				if (healthProgress < Mathf.Epsilon) {
 					StartCoroutine(OnUserCarEnd());	
@@ -91,13 +104,12 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private void ShowResults() {
 		int distance = Mathf.RoundToInt(userCar.transform.position.z - initUserCarPosAndRot.position.z);
-		int persons = Random.Range(0, 5);
 		bool distanceBest = distance > PlayerPrefsManager.UserData.distanceBest;
-		bool personBest = persons > PlayerPrefsManager.UserData.personsBest;
+		bool personBest = personsDropped > PlayerPrefsManager.UserData.personsBest;
 		Time.timeScale = 0f;
 		resultsPanel.Init(new UIResultsPanel.Data {
 			distance = distance,
-			persons = persons,
+			persons = personsDropped,
 			coins = Random.Range(0, 400),
 			distanceBest = distanceBest,
 			personBest = personBest,
@@ -110,7 +122,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 				PlayerPrefsManager.UserData.distanceBest = distance;
 			}
 			if (personBest) {
-				PlayerPrefsManager.UserData.personsBest = persons;
+				PlayerPrefsManager.UserData.personsBest = personsDropped;
 			}
 			PlayerPrefs.Save();
 		}
@@ -155,14 +167,22 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		PlayerPrefsManager.SaveUserData();
 				
 		initUserCarPosAndRot = new PosAndRot(userCar.transform);
+		personsDropped = 0;
 		InitUserCar(() => {
 			topPanel.Show();
+			SetPickUp();
 		});
 		
 		if (aiCarsEnabled) {
 			currentSegment.SpawnAICars();
 			SpawnAICars();	
 		}
+	}
+
+	private void SetPickUp() {
+		Transform lane = nextSegment.Lanes[^1].transform;
+		float z = lane.position.z + nextSegment.Length / 4f;
+		personPickupController.SetPickUp(new Vector3(lane.position.x + 1.5f, 0f, z), userCar);
 	}
 
 	private void Restart() {
@@ -280,6 +300,17 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		if (aiCarsEnabled) {
 			SpawnAICars();
 		}
+
+		if (personPickupController.State == PickupState.None) {
+			SetPickUp();
+		} else if (personPickupController.State == PickupState.Pickup) {
+			personPickupSegments--;
+			if (personPickupSegments == 0) {
+				Transform lane = nextSegment.Lanes[^1].transform;
+				float z = lane.position.z + nextSegment.Length / 4f;
+				personPickupController.SetEndPin(new Vector3(lane.position.x + 1.5f, 0f, z));
+			}
+		} 
 	}
 
 	private void SpawnAICars() {
@@ -336,7 +367,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		SegmentInputData segmentInputData = new() {
 			backLanes = Random.Range(1, 4),
 			frontLanes = Random.Range(1, 4),
-			length = Settings.Instance.laneSize * Random.Range(30, 80)
+			length = Settings.Instance.laneSize * Random.Range(40, 100)
 		};
 		return GetSegmentData(segmentInputData);
 	}
