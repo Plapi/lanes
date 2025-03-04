@@ -4,7 +4,6 @@ using UnityEngine;
 using Unity.Cinemachine;
 using System.Collections.Generic;
 using DG.Tweening;
-using UnityEngine.Serialization;
 
 public class UserCar : Car {
 
@@ -46,12 +45,18 @@ public class UserCar : Car {
 	public void UpdateCar(float verticalInput, float horizontalInput) {
 		SetTargetPos(horizontalInput);
 		UpdateCarInputs(verticalInput);
-		if (GetSegmentProgress(nextSegment) > 0.5f) {
+		if (nextSegment != null && GetSegmentProgress(nextSegment) > 0.5f) {
 			OnRequireNewSegments();
 		}
 	}
 
 	private void SetTargetPos(float horizontalInput) {
+		if (CurrentSegment == null) {
+			targetPos.x = Mathf.Lerp(transform.position.x - 4f, transform.position.x + 4f, horizontalInput);
+			targetPos.y = FrontPos.y;
+			targetPos.z = FrontPos.z + 2.5f;
+			return;
+		}
 		float progress = Mathf.InverseLerp(CurrentSegment.transform.position.z + CurrentSegment.Length, nextSegment.transform.position.z, transform.position.z);
 		float minX = Mathf.Lerp(CurrentSegment.RoadLanes[0].transform.position.x + Settings.Instance.laneSize / 2f - 1f, 
 			nextSegment.RoadLanes[0].transform.position.x + Settings.Instance.laneSize / 2f - 1f, 

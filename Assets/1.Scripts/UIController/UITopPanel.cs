@@ -3,7 +3,6 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class UITopPanel : UIPanel<UITopPanel.Data> {
 

@@ -10690,7 +10690,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  defaultSpeed: 25
   boxCollider: {fileID: 1334370478187502973}
   id: AICar5
   raycastLayerMask:

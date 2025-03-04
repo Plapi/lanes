@@ -28,4 +28,6 @@ public static class PlayerPrefsManager {
 
 public class UserData {
 	public int carSelection;
+	public int distanceBest = -1;
+	public int personsBest = -1;
 }

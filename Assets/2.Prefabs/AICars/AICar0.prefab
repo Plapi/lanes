@@ -10662,7 +10662,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.3655212, y: 1.6393872, z: 4.968236}
+  m_Size: {x: 1.95, y: 1.6393872, z: 4.6}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6348725123820303943
 MonoBehaviour:
@@ -10701,7 +10701,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  defaultSpeed: 30
   boxCollider: {fileID: 4700132336086164398}
   id: AICar0
   raycastLayerMask:

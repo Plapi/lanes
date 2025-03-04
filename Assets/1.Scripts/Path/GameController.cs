@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -9,6 +10,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private InputManager inputManager;
 	[SerializeField] private Transform skyline;
 	[SerializeField] private StartSegment startSegment;
+	[SerializeField] private GameObject smoke;
 	
 	[Space]
 	[SerializeField] private bool aiCarsEnabled;
@@ -32,6 +34,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private UITopPanel topPanel;
 	private UIGaragePanel garagePanel;
 	private UIPausePanel pausePanel;
+	private UIResultsPanel resultsPanel;
 	
 	private PosAndRot initCameraPosAndRot;
 	private PosAndRot initUserCarPosAndRot;
@@ -60,11 +63,57 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			};
 			userCars[i].OnHealthUpdate = healthProgress => {
 				topPanel.UpdateHealthSlider(healthProgress);
+				if (healthProgress < Mathf.Epsilon) {
+					StartCoroutine(OnUserCarEnd());	
+				}
 			};
 		}
 		currentCarSelection = Mathf.Clamp(PlayerPrefsManager.UserData.carSelection, 0, userCars.Length - 1);
 		userCar = userCars[currentCarSelection];
 		userCar.gameObject.SetActive(true);
+	}
+
+	private IEnumerator OnUserCarEnd() {
+		smoke.transform.parent = userCar.transform;
+		smoke.transform.position = userCar.FrontPos;
+		smoke.gameObject.SetActive(true);
+		userCar.UpdateCar(0f, 0.5f);
+		canControlUserCar = false;
+
+		float time = 4f;
+		while (time > 0f && !Input.GetMouseButtonDown(0)) {
+			yield return null;
+			time -= Time.deltaTime;
+		}
+		
+		ShowResults();
+	}
+
+	private void ShowResults() {
+		int distance = Mathf.RoundToInt(userCar.transform.position.z - initUserCarPosAndRot.position.z);
+		int persons = Random.Range(0, 5);
+		bool distanceBest = distance > PlayerPrefsManager.UserData.distanceBest;
+		bool personBest = persons > PlayerPrefsManager.UserData.personsBest;
+		Time.timeScale = 0f;
+		resultsPanel.Init(new UIResultsPanel.Data {
+			distance = distance,
+			persons = persons,
+			coins = Random.Range(0, 400),
+			distanceBest = distanceBest,
+			personBest = personBest,
+			onAdCollect = Restart,
+			onCollect = Restart
+		});
+		resultsPanel.Show();
+		if (distanceBest || personBest) {
+			if (distanceBest) {
+				PlayerPrefsManager.UserData.distanceBest = distance;
+			}
+			if (personBest) {
+				PlayerPrefsManager.UserData.personsBest = persons;
+			}
+			PlayerPrefs.Save();
+		}
 	}
 
 	private void InitUI() {
@@ -73,6 +122,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		topPanel = UIController.Instance.GetPanel<UITopPanel>();
 		garagePanel = UIController.Instance.GetPanel<UIGaragePanel>();
 		pausePanel = UIController.Instance.GetPanel<UIPausePanel>();
+		resultsPanel = UIController.Instance.GetPanel<UIResultsPanel>();
 		
 		garagePanel.Init(new UIGaragePanel.Data {
 			onLeft = () => UpdateUserCarSelection(currentCarSelection - 1),
@@ -118,14 +168,18 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private void Restart() {
 		Time.timeScale = 0f;
 		UIController.Instance.FadeInToBlack(() => {
-					
+			
 			pausePanel.Close(false);
 			topPanel.Close(false);
+			resultsPanel.Close(false);
 			topPanel.ResetHealthSlider();
 					
 			canControlUserCar = false;
 			userCar.ResetCar();
 			userCar.transform.SetPosAndRot(initUserCarPosAndRot);
+			
+			smoke.gameObject.SetActive(false);
+			smoke.transform.parent = transform;
 
 			for (int i = 0; i < segments.Count; i++) {
 				segments[i].Clear();
