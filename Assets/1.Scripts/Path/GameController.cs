@@ -249,11 +249,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		userCar.transform.SetPosAndRot(initUserCarPosAndRot);
 		userCar.SetSegments(startSegment, currentSegment);
 		userCar.SetStartPoints();
-		this.WaitForFrames(1, () => {
-			userCar.GoToStart(mainCamera, () => {
-				canControlUserCar = true;
-				onCanControlCar();
-			});	
+		userCar.GoToStart(mainCamera, () => {
+			canControlUserCar = true;
+			onCanControlCar();
 		});
 	}
 

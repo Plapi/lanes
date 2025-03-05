@@ -24,12 +24,16 @@ public abstract class Car : MonoBehaviour {
 	}
 
 	private void ResetVelocity() {
-		avc.carBody.linearVelocity = Vector3.zero;
-		avc.carBody.angularVelocity = Vector3.zero;
+		if (!avc.carBody.isKinematic) {
+			avc.carBody.linearVelocity = Vector3.zero;
+			avc.carBody.angularVelocity = Vector3.zero;
+		}
 		avc.carBody.inertiaTensorRotation = Quaternion.identity;
 		avc.carBody.ResetInertiaTensor();
-		avc.rb.linearVelocity = Vector3.zero;
-		avc.rb.angularVelocity = Vector3.zero;
+		if (!avc.rb.isKinematic) {
+			avc.rb.linearVelocity = Vector3.zero;
+			avc.rb.angularVelocity = Vector3.zero;
+		}
 		avc.rb.inertiaTensorRotation = Quaternion.identity;
 		avc.rb.ResetInertiaTensor();
 		avc.carVelocity = Vector3.zero;
