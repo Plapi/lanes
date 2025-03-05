@@ -4,10 +4,8 @@ using UnityEngine;
 
 public static class RoutineExtensions {
 	
-	public static void Wait(this MonoBehaviour behaviour, float delay, Action onComplete) {
-		if (behaviour != null) {
-			behaviour.StartCoroutine(Wait(delay, onComplete));
-		}
+	public static Coroutine Wait(this MonoBehaviour behaviour, float delay, Action onComplete) {
+		return behaviour != null ? behaviour.StartCoroutine(Wait(delay, onComplete)) : null;
 	}
 
 	private static IEnumerator Wait(float delayTime, Action onComplete) {

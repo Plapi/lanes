@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -73,12 +74,14 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         }
         
         yield return Utils.WaitForRealTime(0.2f);
+
+        List<RectTransform> collectRects = new();
+        if (data.coins > 0) {
+            collectRects.Add(adCollectButton.GetComponent<RectTransform>());
+        }
+        collectRects.Add(collectButton.GetComponent<RectTransform>());
         
-        RectTransform[] collectRects = new RectTransform[2] {
-            adCollectButton.GetComponent<RectTransform>(),
-            collectButton.GetComponent<RectTransform>()
-        };
-        for (int i = 0; i < collectRects.Length; i++) {
+        for (int i = 0; i < collectRects.Count; i++) {
             collectRects[i].gameObject.SetActive(true);
             float toY = collectRects[i].anchoredPosition.y;
             collectRects[i].SetAnchorPosY(-300f);

@@ -42,6 +42,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private int personPickupSegments;
 	private int personsDropped;
+	private int coinsEarned;
 
 	protected override void Awake() {
 		base.Awake();
@@ -52,11 +53,30 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	protected void Start() {
 		InitFirstSegments();
 		InitUI();
+		float startZ = 0f;
+		List<int> personPickupSegmentsList = new() { 1, Random.Range(1, 3), Random.Range(2, 4) };
 		personPickupController.OnPickup = () => {
-			personPickupSegments = Random.Range(1, 2);
+			if (personPickupSegmentsList.Count > 0) {
+				personPickupSegments = personPickupSegmentsList[0];
+				personPickupSegmentsList.RemoveAt(0);
+			} else {
+				personPickupSegments = Random.Range(1, 6);	
+			}
+			topPanel.ShowPerson(personPickupSegments);
+			startZ = userCar.transform.position.z;
 		};
 		personPickupController.OnDrop = () => {
 			personsDropped++;
+			float distance = userCar.transform.position.z - startZ;
+			int coins = (int)Mathf.Lerp(50, 500, Mathf.InverseLerp(100f, 2500f, distance));
+			topPanel.HidePerson(coins);
+			coinsEarned += coins;
+		};
+		personPickupController.OnMiss = () => {
+			topPanel.HidePerson(-1);
+		};
+		personPickupController.OnUpdateDistance = distance => {
+			topPanel.ShowDistance(distance);
 		};
 	}
 
@@ -110,7 +130,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		resultsPanel.Init(new UIResultsPanel.Data {
 			distance = distance,
 			persons = personsDropped,
-			coins = Random.Range(0, 400),
+			coins = coinsEarned,
 			distanceBest = distanceBest,
 			personBest = personBest,
 			onAdCollect = Restart,
@@ -168,7 +188,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 				
 		initUserCarPosAndRot = new PosAndRot(userCar.transform);
 		personsDropped = 0;
+		coinsEarned = 0;
 		InitUserCar(() => {
+			topPanel.HideDistance();
 			topPanel.Show();
 			SetPickUp();
 		});

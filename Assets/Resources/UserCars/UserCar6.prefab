@@ -5807,7 +5807,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   boxCollider: {fileID: 6797708827049591459}
   cinemachineFollow: {fileID: 1945298792895792019}
-  maxHealth: 150
+  maxHealth: 500
 --- !u!114 &5938457492875539028
 MonoBehaviour:
   m_ObjectHideFlags: 0

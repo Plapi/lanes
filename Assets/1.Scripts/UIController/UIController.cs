@@ -8,12 +8,15 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 
 	public const float defaultTime = 0.2f;
 	
+	[SerializeField] private CanvasScaler canvasScaler;
 	[SerializeField] private UIPanelBase[] panels;
 	[SerializeField] private GameObject touchBlocker;
 	[SerializeField] private Image fadeToBlackImage;
 	
 	private readonly Dictionary<Type, UIPanelBase> dictPanels = new();
 
+	public Vector2 Size => canvasScaler.referenceResolution;
+	
 	public void Init() {
 		for (int i = 0; i < panels.Length; i++) {
 			dictPanels.Add(panels[i].GetType(), panels[i]);
