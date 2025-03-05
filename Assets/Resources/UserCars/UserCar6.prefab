@@ -5808,6 +5808,7 @@ MonoBehaviour:
   boxCollider: {fileID: 6797708827049591459}
   cinemachineFollow: {fileID: 1945298792895792019}
   maxHealth: 500
+  price: 20000
 --- !u!114 &5938457492875539028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5825,7 +5826,7 @@ MonoBehaviour:
   drivableSurface:
     serializedVersion: 2
     m_Bits: 64
-  currentSpeedString: 
+  currentSpeedString: 20000
   MaxSpeed: 160
   accelaration: 10
   turn: 50

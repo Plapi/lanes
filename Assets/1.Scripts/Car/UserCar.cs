@@ -9,11 +9,13 @@ public class UserCar : Car {
 
 	[SerializeField] private CinemachineFollow cinemachineFollow;
 	[SerializeField] private int maxHealth;
+	[SerializeField] private int price;
 	
 	public Action OnRequireNewSegments;
 	public Action<float> OnHealthUpdate;
 	
 	private float currentHealth;
+	public int Price => price;
 	
 	public Segment CurrentSegment { get; private set; }
 	private Segment nextSegment;

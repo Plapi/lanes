@@ -169,9 +169,25 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			onLeft = () => UpdateUserCarSelection(currentCarSelection - 1),
 			onRight = () => UpdateUserCarSelection(currentCarSelection + 1),
 			onGo = Go,
+			onBuy = () => {
+				int coins = PlayerPrefsManager.UserData.coins;
+				if (coins >= userCars[currentCarSelection].Price) {
+					PlayerPrefsManager.UserData.coins -= userCars[currentCarSelection].Price;
+					PlayerPrefsManager.UserData.unlockedCars.Add(currentCarSelection);
+					PlayerPrefsManager.SaveUserData();
+					garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
+					garagePanel.UpdateBottom(0);
+				} else {
+					UIController.Instance.GetPanel<UIInfoPanel>().Init(new UIInfoPanel.Data {
+						title = "Not Enough Coins!",
+						description = "Not enough coins for this car! Earn more by picking up passengers and completing rides."
+					}).Show();
+				}
+			},
 			coins = PlayerPrefsManager.UserData.coins
 		});
 		garagePanel.SetLeftRightButtonInteractable(currentCarSelection > 0, currentCarSelection < userCars.Length - 1);
+		garagePanel.UpdateBottom(CarIsUnlocked(currentCarSelection) ? -1 : userCar.Price);
 		
 		topPanel.Init(new UITopPanel.Data {
 			onPause = () => {
@@ -183,7 +199,18 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		pausePanel.Init(new UIPausePanel.Data {
 			onSettings = () => {
 				
-			}, onRestart = Restart, 
+			}, onRestart = () => {
+				if (coinsEarned > 0) {
+					ShowResults();
+				} else {
+					int distance = Mathf.RoundToInt(userCar.transform.position.z - initUserCarPosAndRot.position.z);
+					if (distance > PlayerPrefsManager.UserData.distanceBest) {
+						PlayerPrefsManager.UserData.distanceBest = distance;
+						PlayerPrefsManager.SaveUserData();
+					}
+					Restart();
+				}
+			}, 
 			onClose = () => {
 				Time.timeScale = 1f;
 			}
@@ -261,7 +288,12 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		userCar = userCars[selection];
 		userCar.gameObject.SetActive(true);
 		garagePanel.SetLeftRightButtonInteractable(selection > 0, selection < userCars.Length - 1);
+		garagePanel.UpdateBottom(CarIsUnlocked(selection) ? -1 : userCar.Price);
 		currentCarSelection = selection;
+	}
+
+	private static bool CarIsUnlocked(int selection) {
+		return PlayerPrefsManager.UserData.unlockedCars.Contains(selection);
 	}
 
 	public UserCar GetUserCar() {

@@ -37,7 +37,12 @@ public class DebugWindow : EditorWindow {
 			PlayerPrefs.DeleteAll();
 			PlayerPrefs.Save();
 		}
-		
+
+		if (GUILayout.Button("Add Coins")) {
+			PlayerPrefsManager.UserData.coins += 1000;
+			FindAnyObjectByType<UIGaragePanel>().UpdateCoins(PlayerPrefsManager.UserData.coins);
+		}
+
 		if (GUILayout.Button("Test")) {
 			
 		}

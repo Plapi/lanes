@@ -7,21 +7,26 @@ using TMPro;
 
 public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 
-	[Space] 
-	[SerializeField] private RectTransform coinsContainer;
-	[SerializeField] private TextMeshProUGUI coinsText;
+	[SerializeField] private RectTransform topContainer;
+	[SerializeField] private RectTransform bottomContainer;
 	
 	[Space]
+	[SerializeField] private TextMeshProUGUI coinsText;
 	[SerializeField] private Button leftButton;
 	[SerializeField] private Button rightButton;
+
+	[SerializeField] private GameObject lockObj;
 	
 	[Space]
 	[SerializeField] private Button goButton;
+	[SerializeField] private Button buyButton;
+	[SerializeField] private TextMeshProUGUI buyPriceText;
 
 	protected override void OnInit() {
 		leftButton.onClick.AddListener(data.onLeft);
 		rightButton.onClick.AddListener(data.onRight);
 		goButton.onClick.AddListener(data.onGo);
+		buyButton.onClick.AddListener(data.onBuy);
 		UpdateCoins(data.coins);
 	}
 
@@ -33,18 +38,32 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	public void UpdateCoins(int coins) {
 		coinsText.text = coins.ToString("N0");
 		this.EndOfFrame(() => {
-			HorizontalLayoutGroup horizontalLayoutGroup = coinsContainer.GetComponent<HorizontalLayoutGroup>();
+			HorizontalLayoutGroup horizontalLayoutGroup = coinsText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;
 			horizontalLayoutGroup.enabled = true;
 		});
 	}
 
+	public void UpdateBottom(int price) {
+		bool showBuy = price > 0;
+		goButton.gameObject.SetActive(!showBuy);
+		buyButton.gameObject.SetActive(showBuy);
+		lockObj.SetActive(showBuy);
+		if (showBuy) {
+			buyPriceText.text = price.ToString("N0");
+			this.EndOfFrame(() => {
+				HorizontalLayoutGroup horizontalLayoutGroup = buyPriceText.transform.parent.GetComponent<HorizontalLayoutGroup>();
+				horizontalLayoutGroup.enabled = false;
+				horizontalLayoutGroup.enabled = true;
+			});
+		}
+	}
+
 	protected override void CloseAnim(bool anim, Action onComplete) {
 		if (anim) {
-			float initCoinsContainerY = coinsContainer.anchoredPosition.y;
-			coinsContainer.DOAnchorPosY(90f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
+			topContainer.DOAnchorPosY(150f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
 				gameObject.SetActive(false);
-				coinsContainer.SetAnchorPosY(initCoinsContainerY);
+				topContainer.SetAnchorPosY(0f);
 				onComplete?.Invoke();
 			});
 			
@@ -60,10 +79,8 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 				rightButtonRectTransform.SetAnchorPosX(initRightX);
 			});
 			
-			RectTransform goButtonRectTransform = goButton.GetComponent<RectTransform>();
-			float initGoY = goButtonRectTransform.anchoredPosition.y;
-			goButtonRectTransform.DOAnchorPosY(-150f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
-				goButtonRectTransform.SetAnchorPosY(initGoY);
+			bottomContainer.DOAnchorPosY(-250f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
+				bottomContainer.SetAnchorPosY(0f);
 			});
 		} else {
 			gameObject.SetActive(false);
@@ -75,6 +92,7 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 		public UnityAction onLeft;
 		public UnityAction onRight;
 		public UnityAction onGo;
+		public UnityAction onBuy;
 		public int coins;
 	}
 }

@@ -12,7 +12,7 @@ public abstract class UIPanel<T> : UIPanelBase where T: UIPanelBase.Data {
 
 	protected T data { get; private set; }
 	
-	public void Init(T data) {
+	public UIPanel<T> Init(T data) {
 		this.data = data;
 
 		for (int i = 0; i < closeButtons.Length; i++) {
@@ -21,6 +21,8 @@ public abstract class UIPanel<T> : UIPanelBase where T: UIPanelBase.Data {
 		}
 		
 		OnInit();
+
+		return this;
 	}
 
 	protected abstract void OnInit();

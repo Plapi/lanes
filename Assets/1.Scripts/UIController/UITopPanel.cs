@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
-using Random = UnityEngine.Random;
 
 public class UITopPanel : UIPanel<UITopPanel.Data> {
 
@@ -40,6 +39,8 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		DOTween.Kill(healthSlider.transform);
 		healthSlider.transform.localScale = Vector3.one;
 		healthSlider.value = 1f;
+		healthFillGreen.SetAlpha(1f);
+		healthFillRed.SetAlpha(0f);
 	}
 
 	public void UpdateHealthSlider(float value) {
