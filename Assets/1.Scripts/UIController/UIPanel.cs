@@ -27,13 +27,13 @@ public abstract class UIPanel<T> : UIPanelBase where T: UIPanelBase.Data {
 	
 	public void Show() {
 		ShowAnim(() => {
-			data.onShow?.Invoke();
+			data?.onShow?.Invoke();
 		});
 	}
 
 	public void Close(bool anim = true) {
 		CloseAnim(anim, () => {
-			data.onClose?.Invoke();	
+			data?.onClose?.Invoke();	
 		});
 	}
 

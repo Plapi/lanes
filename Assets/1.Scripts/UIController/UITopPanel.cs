@@ -38,29 +38,19 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 	public void ResetHealthSlider() {
 		DOTween.Kill(healthSlider);
 		DOTween.Kill(healthSlider.transform);
+		healthSlider.transform.localScale = Vector3.one;
 		healthSlider.value = 1f;
 	}
 
 	public void UpdateHealthSlider(float value) {
 		DOTween.Kill(healthSlider);
 		DOTween.Kill(healthSlider.transform);
+		healthSlider.transform.localScale = Vector3.one;
 		healthSlider.DOValue(value, UIController.defaultTime).SetEase(Ease.OutCubic).OnUpdate(() => {
 			healthFillGreen.SetAlpha(healthSlider.value);
 			healthFillRed.SetAlpha(1f - healthSlider.value);
 		});
 		healthSlider.transform.DOPunchScale(Vector3.one * 0.2f, UIController.defaultTime).SetUpdate(true);
-	}
-
-	private void Update() {
-		/*if (Input.GetKeyDown(KeyCode.A)) {
-			ShowPerson(Random.Range(1, 5));
-		}
-		if (Input.GetKeyDown(KeyCode.B)) {
-			HidePerson(Random.Range(50, 500));
-		}
-		if (Input.GetKeyDown(KeyCode.C)) {
-			HidePerson(0);
-		}*/
 	}
 
 	public void ShowPerson(int blocks) {

@@ -42,15 +42,15 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 	public void FadeInToBlack(Action onComplete = null) {
 		fadeToBlackImage.SetAlpha(0f);
 		fadeToBlackImage.gameObject.SetActive(true);
-		fadeToBlackImage.DOFade(1f, 0.2f).OnComplete(() => {
+		fadeToBlackImage.DOFade(1f, 0.2f).SetUpdate(true).OnComplete(() => {
 			onComplete?.Invoke();
-		}).SetUpdate(true);
+		});
 	}
 	
 	public void FadeOutToBlack(Action onComplete = null) {
-		fadeToBlackImage.DOFade(0f, 0.2f).OnComplete(() => {
+		fadeToBlackImage.DOFade(0f, 0.2f).SetUpdate(true).OnComplete(() => {
 			fadeToBlackImage.gameObject.SetActive(false);
 			onComplete?.Invoke();
-		}).SetUpdate(true);
+		});
 	}
 }

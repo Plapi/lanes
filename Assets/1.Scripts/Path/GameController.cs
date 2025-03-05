@@ -123,6 +123,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	}
 
 	private void ShowResults() {
+		AddCoins(coinsEarned);
 		int distance = Mathf.RoundToInt(userCar.transform.position.z - initUserCarPosAndRot.position.z);
 		bool distanceBest = distance > PlayerPrefsManager.UserData.distanceBest;
 		bool personBest = personsDropped > PlayerPrefsManager.UserData.personsBest;
@@ -133,7 +134,10 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			coins = coinsEarned,
 			distanceBest = distanceBest,
 			personBest = personBest,
-			onAdCollect = Restart,
+			onAdCollect = () => {
+				AddCoins(coinsEarned);
+				Restart();
+			},
 			onCollect = Restart
 		});
 		resultsPanel.Show();
@@ -148,6 +152,11 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		}
 	}
 
+	private static void AddCoins(int coins) {
+		PlayerPrefsManager.UserData.coins += coins;
+		PlayerPrefsManager.SaveUserData();
+	}
+
 	private void InitUI() {
 		UIController.Instance.Init();
 		
@@ -159,7 +168,8 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		garagePanel.Init(new UIGaragePanel.Data {
 			onLeft = () => UpdateUserCarSelection(currentCarSelection - 1),
 			onRight = () => UpdateUserCarSelection(currentCarSelection + 1),
-			onGo = Go
+			onGo = Go,
+			coins = PlayerPrefsManager.UserData.coins
 		});
 		garagePanel.SetLeftRightButtonInteractable(currentCarSelection > 0, currentCarSelection < userCars.Length - 1);
 		
@@ -210,12 +220,16 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private void Restart() {
 		Time.timeScale = 0f;
 		UIController.Instance.FadeInToBlack(() => {
-			
-			pausePanel.Close(false);
+
+			if (pausePanel.gameObject.activeSelf) {
+				pausePanel.Close(false);	
+			}
 			topPanel.Close(false);
-			resultsPanel.Close(false);
+			if (resultsPanel.gameObject.activeSelf) {
+				resultsPanel.Close(false);	
+			}
 			topPanel.ResetHealthSlider();
-					
+			
 			canControlUserCar = false;
 			userCar.ResetCar();
 			userCar.transform.SetPosAndRot(initUserCarPosAndRot);
@@ -235,6 +249,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			skyline.transform.position = Vector3.zero;
 					
 			garagePanel.Show();
+			garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
 			UIController.Instance.FadeOutToBlack();
 			Time.timeScale = 1f;
 		});
