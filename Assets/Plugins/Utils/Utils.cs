@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Random = System.Random;
 
 public static class Utils {
@@ -40,5 +41,12 @@ public static class Utils {
 			}
 		}
 		return items[^1];
+	}
+	
+	public static bool IsOverUI() {
+		if (EventSystem.current.IsPointerOverGameObject()) {
+			return true;
+		}
+		return Input.touchCount > 0 && EventSystem.current.IsPointerOverGameObject(Input.touches[0].fingerId);
 	}
 }

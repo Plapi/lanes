@@ -116,7 +116,7 @@ public class UserCar : Car {
 		startPoints.Add(point1);
 	}
 	
-	public void GoToStart(Action onComplete) {
+	public void GoToStart(Camera cam, Action onComplete) {
 
 		float prevMaxSpeed = avc.MaxSpeed;
 		avc.MaxSpeed = 60;
@@ -129,7 +129,7 @@ public class UserCar : Car {
 		cinemachineFollow.gameObject.SetActive(false);
 		Vector3 prevOffset = cinemachineFollow.FollowOffset;
 		cinemachineFollow.FollowOffset = new Vector3(0f, 1.6f, -5f);
-		CameraTransition(() => {
+		CameraTransition(cam, () => {
 			float value = 0f;
 			Vector3 startOffset = cinemachineFollow.FollowOffset;
 			DOTween.To(() => value, x => value = x, 1f, 2f)
@@ -141,8 +141,7 @@ public class UserCar : Car {
 		});
 	}
 
-	private void CameraTransition(Action onComplete) {
-		Camera cam = Camera.main;
+	private void CameraTransition(Camera cam, Action onComplete) {
 		
 		Vector3 camFromPos = cam.transform.position;
 		Quaternion camFromRot = cam.transform.rotation;

@@ -12,6 +12,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private StartSegment startSegment;
 	[SerializeField] private GameObject smoke;
 	[SerializeField] private PersonPickupController personPickupController;
+	[SerializeField] private RotateObjController rotateObjController;
 	
 	[Space]
 	[SerializeField] private bool aiCarsEnabled;
@@ -47,12 +48,17 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	protected override void Awake() {
 		base.Awake();
 		InitUserCars();
+		rotateObjController.SetObj(userCars[currentCarSelection].BoxCollider);
 		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
 	}
 
 	protected void Start() {
 		InitFirstSegments();
+		InitPersonPickupController();
 		InitUI();
+	}
+
+	private void InitPersonPickupController() {
 		float startZ = 0f;
 		List<int> personPickupSegmentsList = new() { 1, Random.Range(1, 3), Random.Range(2, 4) };
 		personPickupController.OnPickup = () => {
@@ -104,6 +110,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		currentCarSelection = Mathf.Clamp(PlayerPrefsManager.UserData.carSelection, 0, userCars.Length - 1);
 		userCar = userCars[currentCarSelection];
 		userCar.gameObject.SetActive(true);
+		initUserCarPosAndRot = new PosAndRot(userCar.transform);
 	}
 
 	private IEnumerator OnUserCarEnd() {
@@ -222,8 +229,8 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			
 		PlayerPrefsManager.UserData.carSelection = currentCarSelection;
 		PlayerPrefsManager.SaveUserData();
-				
-		initUserCarPosAndRot = new PosAndRot(userCar.transform);
+
+		rotateObjController.enabled = false;
 		personsDropped = 0;
 		coinsEarned = 0;
 		InitUserCar(() => {
@@ -236,6 +243,18 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			currentSegment.SpawnAICars();
 			SpawnAICars();	
 		}
+	}
+
+	private void InitUserCar(Action onCanControlCar) {
+		userCar.transform.SetPosAndRot(initUserCarPosAndRot);
+		userCar.SetSegments(startSegment, currentSegment);
+		userCar.SetStartPoints();
+		this.WaitForFrames(1, () => {
+			userCar.GoToStart(mainCamera, () => {
+				canControlUserCar = true;
+				onCanControlCar();
+			});	
+		});
 	}
 
 	private void SetPickUp() {
@@ -274,6 +293,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 					
 			mainCamera.transform.SetPosAndRot(initCameraPosAndRot);
 			skyline.transform.position = Vector3.zero;
+			rotateObjController.enabled = true;
 					
 			garagePanel.Show();
 			garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
@@ -284,11 +304,18 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private void UpdateUserCarSelection(int selection) {
 		selection = Mathf.Clamp(selection, 0, userCars.Length - 1);
+		
 		userCar.gameObject.SetActive(false);
+		userCar.transform.SetPosAndRot(initUserCarPosAndRot);
 		userCar = userCars[selection];
+		initUserCarPosAndRot = new PosAndRot(userCar.transform);
 		userCar.gameObject.SetActive(true);
+
+		bool carIsUnlocked = CarIsUnlocked(selection);
 		garagePanel.SetLeftRightButtonInteractable(selection > 0, selection < userCars.Length - 1);
-		garagePanel.UpdateBottom(CarIsUnlocked(selection) ? -1 : userCar.Price);
+		garagePanel.UpdateBottom(carIsUnlocked ? -1 : userCar.Price);
+		rotateObjController.SetObj(carIsUnlocked ? userCars[selection].BoxCollider : null);
+		
 		currentCarSelection = selection;
 	}
 
@@ -305,15 +332,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			userCar.UpdateCar(inputManager.VerticalInput, inputManager.HorizontalInput);
 			skyline.transform.position = userCar.transform.position;
 		}
-	}
-
-	private void InitUserCar(Action onCanControlCar) {
-		userCar.SetSegments(startSegment, currentSegment);
-		userCar.SetStartPoints();
-		userCar.GoToStart(() => {
-			canControlUserCar = true;
-			onCanControlCar();
-		});
 	}
 
 	private void InitFirstSegments(bool restart = false) {

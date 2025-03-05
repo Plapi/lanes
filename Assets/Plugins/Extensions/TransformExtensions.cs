@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public static partial class TransformExtensions {
@@ -132,5 +133,12 @@ public static partial class TransformExtensions {
 	
 	public static void SetLocalAngleYZ(this Transform transform, float y, float z) {
 		transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, y, z);
+	}
+	
+	public static void IterateAllChildren(Transform parent, Action<Transform> action) {
+		action(parent);
+		foreach (Transform child in parent) {
+			IterateAllChildren(child, action);
+		}
 	}
 }

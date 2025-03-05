@@ -6406,6 +6406,7 @@ GameObject:
   - component: {fileID: 316978738}
   - component: {fileID: 316978739}
   - component: {fileID: 316978740}
+  - component: {fileID: 316978741}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -6457,6 +6458,7 @@ MonoBehaviour:
   startSegment: {fileID: 1503946316}
   smoke: {fileID: 8423528448739907122}
   personPickupController: {fileID: 1728458299}
+  rotateObjController: {fileID: 316978741}
   aiCarsEnabled: 1
   userCars:
   - {fileID: 1388190612}
@@ -6477,6 +6479,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d50e50cd80b104450918ff968a36aaa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &316978741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316978737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e6f525d3feeb4ba096500ea71205996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationSpeed: 300
+  cam: {fileID: 1114422679}
 --- !u!1 &320865413
 GameObject:
   m_ObjectHideFlags: 0
