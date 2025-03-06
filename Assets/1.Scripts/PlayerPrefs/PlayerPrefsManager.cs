@@ -30,7 +30,7 @@ public static class PlayerPrefsManager {
 public class UserData {
 	public int coins;
 	public List<int> unlockedCars = new() { 0 };
-	public List<int> carColors = new() { 7, 5, 0, 0, 9, 1 };
+	public List<int> carColors = new() { 7, 4, 0, 0, 9, 1 };
 	public int carSelection;
 	public int distanceBest = -1;
 	public int personsBest = -1;
