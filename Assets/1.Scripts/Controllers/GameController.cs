@@ -10,15 +10,12 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private InputManager inputManager;
 	[SerializeField] private Transform skyline;
 	[SerializeField] private StartSegment startSegment;
+	[SerializeField] private SelectCarController selectCarController;
 	[SerializeField] private GameObject smoke;
 	[SerializeField] private PersonPickupController personPickupController;
-	[SerializeField] private RotateObjController rotateObjController;
 	
 	[Space]
 	[SerializeField] private bool aiCarsEnabled;
-	
-	[Space]
-	[SerializeField] private UserCar[] userCars;
 	
 	private UserCar userCar;
 	
@@ -31,7 +28,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	
 	private AICar[] aiCarPrefabs;
 	private bool canControlUserCar;
-	private int currentCarSelection;
 	
 	private UITopPanel topPanel;
 	private UIGaragePanel garagePanel;
@@ -44,18 +40,13 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private int personPickupSegments;
 	private int personsDropped;
 	private int coinsEarned;
-
-	protected override void Awake() {
-		base.Awake();
-		InitUserCars();
-		rotateObjController.SetObj(userCars[currentCarSelection].BoxCollider);
-		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
-	}
-
+	
 	protected void Start() {
+		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
 		InitFirstSegments();
 		InitPersonPickupController();
 		InitUI();
+		selectCarController.Init();
 	}
 
 	private void InitPersonPickupController() {
@@ -84,33 +75,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		personPickupController.OnUpdateDistance = distance => {
 			topPanel.ShowDistance(distance);
 		};
-	}
-
-	private void InitUserCars() {
-		for (int i = 0; i < userCars.Length; i++) {
-			userCars[i].DisableCar();
-			userCars[i].gameObject.SetActive(false);
-			userCars[i].OnRequireNewSegments = () => {
-				if (userCar.CurrentSegment != startSegment) {
-					startSegment.ClearAICars();
-					InitNextSegments();
-				}
-				userCar.SetSegments(currentSegment, nextSegment);
-			};
-			userCars[i].OnHealthUpdate = healthProgress => {
-				if (!canControlUserCar) {
-					return;
-				}
-				topPanel.UpdateHealthSlider(healthProgress);
-				if (healthProgress < Mathf.Epsilon) {
-					StartCoroutine(OnUserCarEnd());	
-				}
-			};
-		}
-		currentCarSelection = Mathf.Clamp(PlayerPrefsManager.UserData.carSelection, 0, userCars.Length - 1);
-		userCar = userCars[currentCarSelection];
-		userCar.gameObject.SetActive(true);
-		initUserCarPosAndRot = new PosAndRot(userCar.transform);
 	}
 
 	private IEnumerator OnUserCarEnd() {
@@ -173,28 +137,12 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		resultsPanel = UIController.Instance.GetPanel<UIResultsPanel>();
 		
 		garagePanel.Init(new UIGaragePanel.Data {
-			onLeft = () => UpdateUserCarSelection(currentCarSelection - 1),
-			onRight = () => UpdateUserCarSelection(currentCarSelection + 1),
+			onLeft = () => selectCarController.UpdateSelection(-1),
+			onRight = () => selectCarController.UpdateSelection(1),
 			onGo = Go,
-			onBuy = () => {
-				int coins = PlayerPrefsManager.UserData.coins;
-				if (coins >= userCars[currentCarSelection].Price) {
-					PlayerPrefsManager.UserData.coins -= userCars[currentCarSelection].Price;
-					PlayerPrefsManager.UserData.unlockedCars.Add(currentCarSelection);
-					PlayerPrefsManager.SaveUserData();
-					garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
-					garagePanel.UpdateBottom(0);
-				} else {
-					UIController.Instance.GetPanel<UIInfoPanel>().Init(new UIInfoPanel.Data {
-						title = "Not Enough Coins!",
-						description = "Not enough coins for this car! Earn more by picking up passengers and completing rides."
-					}).Show();
-				}
-			},
+			onBuy = selectCarController.BuyCar,
 			coins = PlayerPrefsManager.UserData.coins
 		});
-		garagePanel.SetLeftRightButtonInteractable(currentCarSelection > 0, currentCarSelection < userCars.Length - 1);
-		garagePanel.UpdateBottom(CarIsUnlocked(currentCarSelection) ? -1 : userCar.Price);
 		
 		topPanel.Init(new UITopPanel.Data {
 			onPause = () => {
@@ -226,11 +174,27 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private void Go() {
 		garagePanel.Close();
-			
-		PlayerPrefsManager.UserData.carSelection = currentCarSelection;
-		PlayerPrefsManager.SaveUserData();
 
-		rotateObjController.enabled = false;
+		userCar = selectCarController.GetUserCarAndGo();
+		initUserCarPosAndRot = new PosAndRot(userCar.transform);
+		
+		userCar.OnRequireNewSegments = () => {
+			if (userCar.CurrentSegment != startSegment) {
+				startSegment.ClearAICars();
+				InitNextSegments();
+			}
+			userCar.SetSegments(currentSegment, nextSegment);
+		};
+		userCar.OnHealthUpdate = healthProgress => {
+			if (!canControlUserCar) {
+				return;
+			}
+			topPanel.UpdateHealthSlider(healthProgress);
+			if (healthProgress < Mathf.Epsilon) {
+				StartCoroutine(OnUserCarEnd());	
+			}
+		};
+		
 		personsDropped = 0;
 		coinsEarned = 0;
 		InitUserCar(() => {
@@ -276,7 +240,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			
 			canControlUserCar = false;
 			userCar.ResetCar();
+			userCar.gameObject.SetActive(false);
 			userCar.transform.SetPosAndRot(initUserCarPosAndRot);
+			userCar = null;
 			
 			smoke.gameObject.SetActive(false);
 			smoke.transform.parent = transform;
@@ -291,34 +257,14 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 					
 			mainCamera.transform.SetPosAndRot(initCameraPosAndRot);
 			skyline.transform.position = Vector3.zero;
-			rotateObjController.enabled = true;
+			
+			selectCarController.ReInit();
 					
 			garagePanel.Show();
 			garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
 			UIController.Instance.FadeOutToBlack();
 			Time.timeScale = 1f;
 		});
-	}
-
-	private void UpdateUserCarSelection(int selection) {
-		selection = Mathf.Clamp(selection, 0, userCars.Length - 1);
-		
-		userCar.gameObject.SetActive(false);
-		userCar.transform.SetPosAndRot(initUserCarPosAndRot);
-		userCar = userCars[selection];
-		initUserCarPosAndRot = new PosAndRot(userCar.transform);
-		userCar.gameObject.SetActive(true);
-
-		bool carIsUnlocked = CarIsUnlocked(selection);
-		garagePanel.SetLeftRightButtonInteractable(selection > 0, selection < userCars.Length - 1);
-		garagePanel.UpdateBottom(carIsUnlocked ? -1 : userCar.Price);
-		rotateObjController.SetObj(carIsUnlocked ? userCars[selection].BoxCollider : null);
-		
-		currentCarSelection = selection;
-	}
-
-	private static bool CarIsUnlocked(int selection) {
-		return PlayerPrefsManager.UserData.unlockedCars.Contains(selection);
 	}
 
 	public UserCar GetUserCar() {

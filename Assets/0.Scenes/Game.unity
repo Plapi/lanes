@@ -6406,6 +6406,7 @@ GameObject:
   - component: {fileID: 316978738}
   - component: {fileID: 316978739}
   - component: {fileID: 316978740}
+  - component: {fileID: 316978742}
   - component: {fileID: 316978741}
   m_Layer: 0
   m_Name: GameController
@@ -6456,17 +6457,10 @@ MonoBehaviour:
   inputManager: {fileID: 316978740}
   skyline: {fileID: 1358054057}
   startSegment: {fileID: 1503946316}
+  selectCarController: {fileID: 316978742}
   smoke: {fileID: 8423528448739907122}
   personPickupController: {fileID: 1728458299}
-  rotateObjController: {fileID: 316978741}
   aiCarsEnabled: 1
-  userCars:
-  - {fileID: 1388190612}
-  - {fileID: 1775796447}
-  - {fileID: 1575943019}
-  - {fileID: 1111592307}
-  - {fileID: 662903159}
-  - {fileID: 1231671308}
 --- !u!114 &316978740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6493,6 +6487,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 300
   cam: {fileID: 1114422679}
+--- !u!114 &316978742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316978737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5776ad51271584d1cb2508f64a8e5296, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotateObjController: {fileID: 316978741}
+  userCars:
+  - {fileID: 1388190612}
+  - {fileID: 1775796447}
+  - {fileID: 1575943019}
+  - {fileID: 1111592307}
+  - {fileID: 662903159}
+  - {fileID: 1231671308}
 --- !u!1 &320865413
 GameObject:
   m_ObjectHideFlags: 0
