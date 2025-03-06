@@ -5809,6 +5809,9 @@ MonoBehaviour:
   cinemachineFollow: {fileID: 1945298792895792019}
   maxHealth: 500
   price: 20000
+  materialAndColorPreset: {fileID: 11400000, guid: 0dacadb45d0d24f35a37fd8c3f94e87b, type: 2}
+  meshRenderers:
+  - {fileID: 4217644928052189591}
 --- !u!114 &5938457492875539028
 MonoBehaviour:
   m_ObjectHideFlags: 0

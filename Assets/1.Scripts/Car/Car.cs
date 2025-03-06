@@ -24,6 +24,9 @@ public abstract class Car : MonoBehaviour {
 	}
 
 	private void ResetVelocity() {
+		if (avc == null) {
+			return;
+		}
 		if (!avc.carBody.isKinematic) {
 			avc.carBody.linearVelocity = Vector3.zero;
 			avc.carBody.angularVelocity = Vector3.zero;

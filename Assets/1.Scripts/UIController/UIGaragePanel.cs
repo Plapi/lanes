@@ -9,13 +9,16 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 
 	[SerializeField] private RectTransform topContainer;
 	[SerializeField] private RectTransform bottomContainer;
+	[SerializeField] private CanvasGroup centerContainer;
 	
 	[Space]
 	[SerializeField] private TextMeshProUGUI coinsText;
 	[SerializeField] private Button leftButton;
 	[SerializeField] private Button rightButton;
 
+	[Space]
 	[SerializeField] private GameObject lockObj;
+	[SerializeField] private UIChangeColor changeColor;
 	
 	[Space]
 	[SerializeField] private Button goButton;
@@ -59,6 +62,15 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 		}
 	}
 
+	public void InitChangeColor(Color[] colors, int selection, Action<int> onSelect) {
+		changeColor.gameObject.SetActive(true);
+		changeColor.Init(colors, selection, onSelect);
+	}
+
+	public void HideChangeColor() {
+		changeColor.gameObject.SetActive(false);
+	}
+
 	protected override void CloseAnim(bool anim, Action onComplete) {
 		if (anim) {
 			topContainer.DOAnchorPosY(150f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
@@ -82,6 +94,11 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 			bottomContainer.DOAnchorPosY(-250f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
 				bottomContainer.SetAnchorPosY(0f);
 			});
+			
+			centerContainer.DOFade(0f, UIController.defaultTime).OnComplete(() => {
+				centerContainer.alpha = 1f;
+			});
+			
 		} else {
 			gameObject.SetActive(false);
 			onComplete?.Invoke();

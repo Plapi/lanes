@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class UIObject : MonoBehaviour {
 	private RectTransform rectTransform;
-	protected RectTransform RectTransform {
+	public RectTransform RectTransform {
 		get {
 			if (rectTransform == null) {
 				rectTransform = GetComponent<RectTransform>();

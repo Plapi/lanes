@@ -15649,6 +15649,9 @@ MonoBehaviour:
   boxCollider: {fileID: 6257591930687371955}
   cinemachineFollow: {fileID: 2176767317052459185}
   maxHealth: 100
+  price: 0
+  materialAndColorPreset: {fileID: 11400000, guid: dd40cc87f786b452bbb764d486b891a1, type: 2}
+  meshRenderers: []
 --- !u!114 &5370458563235718490
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,12 +4,17 @@ using UnityEngine;
 using Unity.Cinemachine;
 using System.Collections.Generic;
 using DG.Tweening;
+using UnityEngine.Serialization;
 
 public class UserCar : Car {
 
 	[SerializeField] private CinemachineFollow cinemachineFollow;
 	[SerializeField] private int maxHealth;
 	[SerializeField] private int price;
+	
+	[Space]
+	[SerializeField] private MaterialAndColorPreset materialAndColorPreset;
+	[SerializeField] private MeshRenderer[] meshRenderers;
 	
 	public Action OnRequireNewSegments;
 	public Action<float> OnHealthUpdate;
@@ -19,6 +24,8 @@ public class UserCar : Car {
 	
 	public Segment CurrentSegment { get; private set; }
 	private Segment nextSegment;
+	
+	public MaterialAndColorPreset MaterialAndColorPreset => materialAndColorPreset;
 
 	private void Start() {
 		currentHealth = maxHealth;
@@ -187,6 +194,16 @@ public class UserCar : Car {
 			time -= Time.deltaTime;
 		}
 		onComplete();
+	}
+
+	public void ApplyMaterial(int selection) {
+		if (materialAndColorPreset == null) {
+			return;
+		}
+		MaterialAndColor materialAndColor = materialAndColorPreset.items[Mathf.Clamp(selection, 0, materialAndColorPreset.items.Length - 1)];
+		for (int i = 0; i < meshRenderers.Length; i++) {
+			meshRenderers[i].material = materialAndColor.material;
+		}
 	}
 	
 	protected override void OnDrawGizmos() {
