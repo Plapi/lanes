@@ -19,7 +19,7 @@ public class InputManager : MonoBehaviour {
 	}
 
 	public void ResetValues() {
-		VerticalInput = 0.5f;
+		VerticalInput = 0.9f;
 		HorizontalInput = 0.5f;
 	}
 

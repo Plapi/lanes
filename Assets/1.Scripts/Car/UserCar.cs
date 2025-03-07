@@ -39,11 +39,6 @@ public class UserCar : Car {
 		cinemachineFollow.gameObject.SetActive(false);
 	}
 
-	public override void EnableCar() {
-		base.EnableCar();
-		cinemachineFollow.gameObject.SetActive(true);
-	}
-
 	public void ResetCar() {
 		currentHealth = maxHealth;
 		DisableCar();
@@ -146,27 +141,27 @@ public class UserCar : Car {
 	}
 	
 	public void GoToStart(Camera cam, Action onComplete) {
-
-		float prevMaxSpeed = avc.MaxSpeed;
-		avc.MaxSpeed = 60;
-		EnableCar();
-		StartCoroutine(TransitStartPoints(() => {
-			avc.MaxSpeed = prevMaxSpeed;
-			onComplete();
-		}));
-		
-		cinemachineFollow.gameObject.SetActive(false);
-		Vector3 prevOffset = cinemachineFollow.FollowOffset;
-		cinemachineFollow.FollowOffset = new Vector3(0f, 1.6f, -5f);
-		CameraTransition(cam, () => {
-			float value = 0f;
-			Vector3 startOffset = cinemachineFollow.FollowOffset;
-			DOTween.To(() => value, x => value = x, 1f, 2f)
-				.SetEase(Ease.OutCubic)
-				.SetDelay(1f)
-				.OnUpdate(() => {
-					cinemachineFollow.FollowOffset = Vector3.Lerp(startOffset, prevOffset, value);
-				});
+		this.Wait(0.5f, () => {
+			float prevMaxSpeed = avc.MaxSpeed;
+			avc.MaxSpeed = 60;
+			EnableCar();
+			StartCoroutine(TransitStartPoints(() => {
+				avc.MaxSpeed = prevMaxSpeed;
+				onComplete();
+			}));
+			
+			Vector3 prevOffset = cinemachineFollow.FollowOffset;
+			cinemachineFollow.FollowOffset = new Vector3(0f, 1.6f, -5f);
+			CameraTransition(cam, () => {
+				float value = 0f;
+				Vector3 startOffset = cinemachineFollow.FollowOffset;
+				DOTween.To(() => value, x => value = x, 1f, 2f)
+					.SetEase(Ease.OutCubic)
+					.SetDelay(1f)
+					.OnUpdate(() => {
+						cinemachineFollow.FollowOffset = Vector3.Lerp(startOffset, prevOffset, value);
+					});
+			});
 		});
 	}
 
@@ -204,14 +199,14 @@ public class UserCar : Car {
 			targetPos = new Vector3(point.x, FrontPos.y, point.z);
 			while (Vector3.Distance(targetPos, FrontPos) >= 1f) {
 				targetPos.y = FrontPos.y;
-				UpdateCarInputs(1f);
+				UpdateCarInputs(0.9f);
 				yield return null;
 			}
 		}
 		float time = 1f;
 		while (time > 0f) {
 			targetPos.z = FrontPos.z + 1f;
-			UpdateCarInputs(0.5f);
+			UpdateCarInputs(0.9f);
 			yield return null;
 			time -= Time.deltaTime;
 		}
