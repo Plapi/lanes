@@ -34,13 +34,22 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		pauseButton.onClick.AddListener(data.onPause);
 	}
 
-	public void ResetHealthSlider() {
+	public void ResetItems() {
 		DOTween.Kill(healthSlider);
 		DOTween.Kill(healthSlider.transform);
 		healthSlider.transform.localScale = Vector3.one;
 		healthSlider.value = 1f;
 		healthFillGreen.SetAlpha(1f);
 		healthFillRed.SetAlpha(0f);
+		
+		if (waitCoroutine != null) {
+			StopCoroutine(waitCoroutine);
+			waitCoroutine = null;
+		}
+		personSpeechBubble.gameObject.SetActive(false);
+		personTransform.gameObject.SetActive(false);
+		personSpeechBubble.DOKill();
+		personSpeechBubble.GetComponent<CanvasGroup>().DOKill();
 	}
 
 	public void UpdateHealthSlider(float value) {

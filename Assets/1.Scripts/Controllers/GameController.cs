@@ -147,6 +147,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		topPanel.Init(new UITopPanel.Data {
 			onPause = () => {
 				Time.timeScale = 0f;
+				userCar.SetSoundEnabled(false);
 				pausePanel.Show();
 			}
 		});
@@ -168,6 +169,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			}, 
 			onClose = () => {
 				Time.timeScale = 1f;
+				userCar.SetSoundEnabled(true);
 			}
 		});
 	}
@@ -239,7 +241,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			if (resultsPanel.gameObject.activeSelf) {
 				resultsPanel.Close(false);	
 			}
-			topPanel.ResetHealthSlider();
+			topPanel.ResetItems();
 			
 			canControlUserCar = false;
 			userCar.ResetCar();

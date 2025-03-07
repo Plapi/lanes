@@ -1,5 +1,6 @@
 using UnityEngine;
 using ArcadeVP;
+using Com.ForbiddenByte.OSA.Core;
 
 public abstract class Car : MonoBehaviour {
 	
@@ -49,6 +50,7 @@ public abstract class Car : MonoBehaviour {
 		avc.rb.isKinematic = true;
 		avc.engineSound.enabled = false;
 		avc.SkidSound.enabled = false;
+		SetSoundEnabled(false);
 	}
 
 	public virtual void EnableCar() {
@@ -58,6 +60,12 @@ public abstract class Car : MonoBehaviour {
 		avc.SkidSound.enabled = true;
 		ResetVelocity();
 		avc.enabled = true;
+		SetSoundEnabled(true);
+	}
+
+	public void SetSoundEnabled(bool enabled) {
+		avc.engineSound.enabled = enabled;
+		avc.SkidSound.enabled = enabled;
 	}
 
 	protected float GetSteering() {
