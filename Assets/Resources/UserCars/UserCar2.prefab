@@ -10244,6 +10244,7 @@ MonoBehaviour:
   maxHealth: 80
   healthDamageDivider: 1
   price: 1000
+  coinsMultiplier: 2.5
   materialAndColorPreset: {fileID: 11400000, guid: dd40cc87f786b452bbb764d486b891a1, type: 2}
   meshRenderers:
   - {fileID: 4412871570824676003}
@@ -10397,7 +10398,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: ee1a2242cade2f14ebf6569c68bcf4df, type: 3}
   m_Resource: {fileID: 8300000, guid: ee1a2242cade2f14ebf6569c68bcf4df, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.25
   m_Pitch: 1
   Loop: 1
   Mute: 0

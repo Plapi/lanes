@@ -4,14 +4,14 @@ using UnityEngine;
 using Unity.Cinemachine;
 using System.Collections.Generic;
 using DG.Tweening;
-using UnityEngine.Serialization;
 
 public class UserCar : Car {
 
 	[SerializeField] private CinemachineFollow cinemachineFollow;
 	[SerializeField] private int maxHealth;
-	[SerializeField] private float healthDamageDivider = 1f;
+	[SerializeField] private float healthDamageDivider;
 	[SerializeField] private int price;
+	[SerializeField] private float coinsMultiplier;
 	
 	[Space]
 	[SerializeField] private MaterialAndColorPreset materialAndColorPreset;
@@ -22,6 +22,8 @@ public class UserCar : Car {
 	
 	public Action OnRequireNewSegments;
 	public Action<float> OnHealthUpdate;
+	
+	public float CoinsMultiplier => coinsMultiplier;
 	
 	private float currentHealth;
 	public int Price => price;

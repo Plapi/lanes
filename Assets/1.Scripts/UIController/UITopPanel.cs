@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
+using Random = UnityEngine.Random;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class UITopPanel : UIPanel<UITopPanel.Data> {
 
@@ -24,6 +29,12 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 	[SerializeField] private Color personSpeechBubbleTextFailColor;
 	[SerializeField] private UICoinsAnim coinsAnim;
 
+	[Space]
+	[SerializeField] private AudioClip showPersonSound;
+	[SerializeField] private AudioClip hidePersonSuccessSound;
+	[SerializeField] private AudioClip hidePersonFailSound;
+	[SerializeField] private AudioClip showSpeechBubbleSound;
+	
 	[Space]
 	[SerializeField] private RectTransform distanceTransform;
 	[SerializeField] private TextMeshProUGUI distanceText;
@@ -64,6 +75,8 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 	}
 
 	public void ShowPerson(int blocks) {
+
+		this.PlaySound(showPersonSound);
 		
 		if (waitCoroutine != null) {
 			StopCoroutine(waitCoroutine);
@@ -80,6 +93,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		personTransform.SetAnchorPosY(-UIController.Instance.Size.y * 0.75f);
 		personTransform.DOAnchorPosY(initY, 0.5f).SetEase(Ease.OutQuad);
 		personTransform.DOBlendableRotateBy(new Vector3(0f, 0f, 360f), 0.5f, RotateMode.LocalAxisAdd).OnComplete(() => {
+			this.PlaySound(showSpeechBubbleSound);
 			ShowBubbleSpeech(blocks == 1 ? "Let me off\nnext block!" : $"Let me off\nin {blocks} blocks!",
 				personSpeechBubbleTextNormalColor);
 		});
@@ -93,6 +107,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		}
 		
 		if (coins > 0) {
+			this.PlaySound(hidePersonSuccessSound);
 			string successText = RandomTextsSystem.Get(RandomTextsSystem.SuccessPerson);
 			successText = successText.Replace("#coins#", $"<color=#00D740>{coins}</color>");
 			ShowBubbleSpeech(successText, personSpeechBubbleTextNormalColor, -1f);
@@ -101,6 +116,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 				personIcon.DOFade(0f, 0.2f);
 			});
 		} else {
+			this.PlaySound(hidePersonFailSound);
 			ShowBubbleSpeech(RandomTextsSystem.Get(RandomTextsSystem.FailPerson), personSpeechBubbleTextFailColor, 2f, () => {
 				personIcon.DOFade(0f, 0.2f);
 			});
@@ -173,3 +189,25 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		public UnityAction onPause;
 	}
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(UITopPanel))]
+public class UITopPanelEditor : Editor {
+	public override void OnInspectorGUI() {
+		base.OnInspectorGUI();
+		
+		UITopPanel topPanel = (UITopPanel)target;
+		
+		GUILayout.Space(10f);
+		if (GUILayout.Button("Show Persons")) {
+			topPanel.ShowPerson(Random.Range(1, 6));
+		}
+		if (GUILayout.Button("Hide Persons Success")) {
+			topPanel.HidePerson(Random.Range(50, 500));
+		}
+		if (GUILayout.Button("Hide Persons Fail")) {
+			topPanel.HidePerson(-1);
+		}
+	}
+}
+#endif

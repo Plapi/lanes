@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 using System.Collections.Generic;
@@ -43,12 +44,30 @@ public class DebugWindow : EditorWindow {
 			FindAnyObjectByType<UIGaragePanel>().UpdateCoins(PlayerPrefsManager.UserData.coins);
 		}
 
+		if (GUILayout.Button("Set Buttons Sound")) {
+			SetButtonsSound();
+		}
+
 		if (GUILayout.Button("Test")) {
 			
 		}
 
 		EditorGUILayout.EndScrollView();
 		EditorGUILayout.EndVertical();
+	}
+
+	private static void SetButtonsSound() {
+		const string path = "Assets/Free UI Click Sound Effects Pack/AUDIO/Crispy/SFX_UI_Click_Organic_Crispy_Generic_Select_1.wav";
+		AudioClip audioClip = AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+
+		Button[] buttons = Resources.FindObjectsOfTypeAll<Button>();
+		foreach (Button button in buttons) {
+			if (!button.TryGetComponent(out UIButtonSound buttonSound)) {
+				buttonSound = button.gameObject.AddComponent<UIButtonSound>();
+			}
+			buttonSound.AddButtonEvent(button, audioClip);
+		}
+
 	}
 
 	private void CropTexture(string inPath, string outPath, int startX, int startY) {

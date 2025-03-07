@@ -10816,11 +10816,11 @@ MonoBehaviour:
   maxHealth: 100
   healthDamageDivider: 1
   price: 0
+  coinsMultiplier: 2
   materialAndColorPreset: {fileID: 11400000, guid: dd40cc87f786b452bbb764d486b891a1, type: 2}
   meshRenderers:
   - {fileID: 8041507253397174955}
   startSound: {fileID: 8300000, guid: 5c38d2882be7adc409cf6125ead09123, type: 3}
-  stopSound: {fileID: 8300000, guid: eb4aea5b2b9aa05449ed1fc14a7d5950, type: 3}
 --- !u!114 &151452902980444450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10970,7 +10970,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 914cbc1fc3e54724b8a15c00971976ec, type: 3}
   m_Resource: {fileID: 8300000, guid: 914cbc1fc3e54724b8a15c00971976ec, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.25
   m_Pitch: 1
   Loop: 1
   Mute: 0

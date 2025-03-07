@@ -13,6 +13,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private SelectCarController selectCarController;
 	[SerializeField] private GameObject smoke;
 	[SerializeField] private PersonPickupController personPickupController;
+
+	[Space]
+	[SerializeField] private AudioClip[] onLoseHealthClips;
 	
 	[Space]
 	[SerializeField] private bool aiCarsEnabled;
@@ -65,7 +68,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		personPickupController.OnDrop = () => {
 			personsDropped++;
 			float distance = userCar.transform.position.z - startZ;
-			int coins = (int)Mathf.Lerp(50, 500, Mathf.InverseLerp(100f, 2500f, distance));
+			int coins = Mathf.RoundToInt(userCar.CoinsMultiplier * Mathf.Lerp(50, 500, Mathf.InverseLerp(100f, 2500f, distance)));
 			topPanel.HidePerson(coins);
 			coinsEarned += coins;
 		};
@@ -142,7 +145,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			onGo = Go,
 			onBuy = selectCarController.BuyCar,
 			onCoin = () => {
-				PlayerPrefsManager.UserData.coins += 1000;
+				PlayerPrefsManager.UserData.coins += 10000;
 				PlayerPrefsManager.SaveUserData();
 				garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
 			},
@@ -196,6 +199,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			if (!canControlUserCar) {
 				return;
 			}
+			this.PlaySound(onLoseHealthClips[Random.Range(0, onLoseHealthClips.Length)]);
 			topPanel.UpdateHealthSlider(healthProgress);
 			if (healthProgress < Mathf.Epsilon) {
 				StartCoroutine(OnUserCarEnd());	

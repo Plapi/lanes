@@ -6,9 +6,15 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using DG.Tweening;
 using TMPro;
+using Random = UnityEngine.Random;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
 
+    [Space]
     [SerializeField] private RectTransform ribbon;
     [SerializeField] private RectTransform stats;
     
@@ -20,6 +26,11 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
     [Space]
     [SerializeField] private Button adCollectButton;
     [SerializeField] private Button collectButton;
+
+    [Space]
+    [SerializeField] private AudioClip celebrateClip;
+    [SerializeField] private AudioClip statsClip;
+    [SerializeField] private AudioClip collectsClip;
     
     protected override void OnInit() {
         distanceText.text = $"{data.distance:N0} m";
@@ -39,6 +50,7 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         stats.gameObject.SetActive(false);
         adCollectButton.gameObject.SetActive(false);
         collectButton.gameObject.SetActive(false);
+        this.PlaySound(celebrateClip);
         StartCoroutine(ShowAnimIEnumerator(() => {
             OnShowAnimEnd?.Invoke();
             onComplete?.Invoke();
@@ -66,6 +78,7 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         
         for (int i = 0; i < children.Length; i++) {
             yield return Utils.WaitForRealTime(i == 0 ? 0.2f : 0.5f);
+            this.PlaySound(statsClip);
             RectTransform rectTransform = children[i].GetComponent<RectTransform>();
             float toY = rectTransform.anchoredPosition.y;
             rectTransform.SetAnchorPosY(toY + 100f);
@@ -80,6 +93,8 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
             collectRects.Add(adCollectButton.GetComponent<RectTransform>());
         }
         collectRects.Add(collectButton.GetComponent<RectTransform>());
+        
+        this.PlaySound(collectsClip);
         
         for (int i = 0; i < collectRects.Count; i++) {
             collectRects[i].gameObject.SetActive(true);
@@ -102,3 +117,36 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         public UnityAction onCollect;
     }
 }
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(UIResultsPanel))]
+public class UIResultsPanelEditor : Editor {
+    public override void OnInspectorGUI() {
+        base.OnInspectorGUI();
+		
+        UIResultsPanel resultsPanel = (UIResultsPanel)target;
+		
+        GUILayout.Space(10f);
+        if (GUILayout.Button("Show With Coins")) {
+            resultsPanel.Init(new UIResultsPanel.Data {
+                distance = Random.Range(1000, 10000),
+                persons = Random.Range(2, 6),
+                coins = Random.Range(200, 2000),
+                distanceBest = true,
+                personBest = true
+            });
+            resultsPanel.Show();
+        }
+        if (GUILayout.Button("Show Without Coins")) {
+            resultsPanel.Init(new UIResultsPanel.Data {
+                distance = Random.Range(100, 1000),
+                persons = 0,
+                coins = 0,
+                distanceBest = false,
+                personBest = false
+            });
+            resultsPanel.Show();
+        }
+    }
+}
+#endif

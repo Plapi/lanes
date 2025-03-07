@@ -188,7 +188,8 @@ MonoBehaviour:
   cinemachineFollow: {fileID: 6249257877105996702}
   maxHealth: 400
   healthDamageDivider: 2
-  price: 12000
+  price: 48000
+  coinsMultiplier: 5
   materialAndColorPreset: {fileID: 11400000, guid: dd40cc87f786b452bbb764d486b891a1, type: 2}
   meshRenderers:
   - {fileID: 1361004334880700352}
@@ -342,7 +343,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: 1e71fc686f07c6c4bb4940b61c4f9984, type: 3}
   m_Resource: {fileID: 8300000, guid: 1e71fc686f07c6c4bb4940b61c4f9984, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.25
   m_Pitch: 1
   Loop: 1
   Mute: 0

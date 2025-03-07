@@ -15,6 +15,10 @@ public class UICoinsAnim : UIObject {
 	[SerializeField] private AnimationCurve scaleCurve;
 	[SerializeField] private Ease ease;
 
+	[Space]
+	[SerializeField] private AudioClip coinSoundIn;
+	[SerializeField] private AudioClip coinSoundOut;
+	
 	private Vector3 initCoinLocalPos;
 	private float initCP1X;
 	private float initCP2X;
@@ -55,6 +59,14 @@ public class UICoinsAnim : UIObject {
 			Vector3 cp3 = controlPoints[3].localPosition;
 			cp1.x = Random.Range(-30f, 30f) + initCP1X;
 			cp2.x = Random.Range(-30f, 30f) + initCP2X;
+
+			this.Wait(0.2f, () => {
+				this.PlaySound(coinSoundIn);
+			});
+			
+			this.Wait(1.7f, () => {
+				this.PlaySound(coinSoundOut);
+			});
 			
 			DOTween.To(() => time, x => time = x, 1f, 1.5f)
 				.SetEase(ease)
@@ -63,7 +75,9 @@ public class UICoinsAnim : UIObject {
 					coins[coinIndex].localScale = Vector3.one * scaleCurve.Evaluate(time);
 				}).OnComplete(() => {
 					coins[coinIndex].DOPunchScale(Vector3.one * 0.2f, UIController.defaultTime);
-					coins[coinIndex].GetComponent<Image>().DOFade(0f, 0.4f);
+					coins[coinIndex].GetComponent<Image>().DOFade(0f, 0.4f).OnComplete(() => {
+						coins[coinIndex].gameObject.SetActive(false);
+					});
 					if (coinIndex == coinsCount - 1) {
 						onComplete?.Invoke();
 					}
@@ -94,8 +108,7 @@ public class UICoinsAnim : UIObject {
 
 	private Vector3 GetBezierLocalPoint(float t) {
 		return Bezier.GetPoint(controlPoints[0].localPosition, controlPoints[1].localPosition,
-			controlPoints[2].localPosition,
-			controlPoints[3].localPosition, t);
+			controlPoints[2].localPosition, controlPoints[3].localPosition, t);
 	}
 
 	private Vector3 GetBezierPoint(float t) {
