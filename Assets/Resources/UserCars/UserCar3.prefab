@@ -15687,6 +15687,7 @@ MonoBehaviour:
   boxCollider: {fileID: 2091359296035361117}
   cinemachineFollow: {fileID: 8295645927959319263}
   maxHealth: 500
+  healthDamageDivider: 4
   price: 5000
   materialAndColorPreset: {fileID: 11400000, guid: 0dacadb45d0d24f35a37fd8c3f94e87b, type: 2}
   meshRenderers:

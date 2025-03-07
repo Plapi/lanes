@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using ArcadeVP;
+using Unity.Mathematics;
 
 public class SelectCarController : MonoBehaviour {
 
@@ -9,6 +10,9 @@ public class SelectCarController : MonoBehaviour {
 
 	private UserCar[] templatesUserCar;
 	private Transform templatesContainer;
+
+	private float[] speeds;
+	private float[] healths;
 
 	private UIGaragePanel garagePanel;
 	
@@ -30,6 +34,9 @@ public class SelectCarController : MonoBehaviour {
 		templatesContainer.parent = transform;
 		templatesContainer.SetLocalPositionAndRotation(userCars[0].transform.position, userCars[0].transform.rotation);
 		templatesContainer.SetSiblingIndex(0);
+
+		float maxSpeed = 0f;
+		float maxHealth = 0f;
 		
 		for (int i = 0; i < templatesUserCar.Length; i++) {
 			templatesUserCar[i] = Instantiate(userCars[i], templatesContainer);
@@ -44,7 +51,22 @@ public class SelectCarController : MonoBehaviour {
 				Destroy(skidMarks[j].gameObject);
 			}
 			ApplyCarMaterial(i);
+
+			if (userCars[i].MaxSpeed > maxSpeed) {
+				maxSpeed = userCars[i].MaxSpeed;
+			}
+			if (userCars[i].MaxHealth > maxHealth) {
+				maxHealth = userCars[i].MaxHealth;
+			}
 		}
+
+		speeds = new float[userCars.Length];
+		healths = new float[userCars.Length];
+		for (int i = 0; i < userCars.Length; i++) {
+			speeds[i] = userCars[i].MaxSpeed / maxSpeed;
+			healths[i] = userCars[i].MaxHealth / maxHealth;
+		}
+		garagePanel.UpdateSliders(speeds[selection], healths[selection], true);
 
 		UpdateSelection(0);
 	}
@@ -70,6 +92,8 @@ public class SelectCarController : MonoBehaviour {
 		} else {
 			garagePanel.HideChangeColor();
 		}
+		
+		garagePanel.UpdateSliders(speeds[selection], healths[selection], false);
 	}
 
 	private void ApplyCarMaterial(int carSelection) {
@@ -114,6 +138,10 @@ public class SelectCarController : MonoBehaviour {
 	
 	private static bool CarIsUnlocked(int selection) {
 		return PlayerPrefsManager.UserData.unlockedCars.Contains(selection);
+	}
+
+	private void SetSpeedsAndHealths() {
+		
 	}
 	
 	private static void RemoveComponentsInChildren(Transform root, params Type[] componentTypes) {

@@ -214,6 +214,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		userCar.SetSegments(startSegment, currentSegment);
 		userCar.SetStartPoints();
 		userCar.GoToStart(mainCamera, () => {
+			if (!Input.GetMouseButton(0)) {
+				inputManager.ResetValues();	
+			}
 			canControlUserCar = true;
 			onCanControlCar();
 		});

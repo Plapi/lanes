@@ -55,6 +55,9 @@ namespace ArcadeVP
 
         private float radius, steeringInput, accelerationInput, brakeInput;
         private Vector3 origin;
+        
+        public float AccelerationInput => accelerationInput;
+        public float BrakeInput => brakeInput;
 
         private void Start()
         {

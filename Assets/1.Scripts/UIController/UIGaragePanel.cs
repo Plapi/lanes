@@ -12,6 +12,10 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	[SerializeField] private CanvasGroup centerContainer;
 	
 	[Space]
+	[SerializeField] private Slider speedSlider;
+	[SerializeField] private Slider healthSlider;
+	
+	[Space]
 	[SerializeField] private TextMeshProUGUI coinsText;
 	[SerializeField] private Button leftButton;
 	[SerializeField] private Button rightButton;
@@ -67,6 +71,18 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 		changeColor.Init(colors, selection, onSelect);
 	}
 
+	public void UpdateSliders(float speed, float health, bool instant) {
+		speedSlider.DOKill();
+		healthSlider.DOKill();
+		if (instant) {
+			speedSlider.value = speed;
+			healthSlider.value = health;
+		} else {
+			speedSlider.DOValue(speed, UIController.defaultTime).SetEase(Ease.OutQuad);
+			healthSlider.DOValue(health, UIController.defaultTime).SetEase(Ease.OutQuad);
+		}
+	}
+
 	public void HideChangeColor() {
 		changeColor.gameObject.SetActive(false);
 	}
@@ -78,23 +94,9 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 				topContainer.SetAnchorPosY(0f);
 				onComplete?.Invoke();
 			});
-			
-			RectTransform leftButtonRectTransform = leftButton.GetComponent<RectTransform>();
-			float initLeftX = leftButtonRectTransform.anchoredPosition.x;
-			leftButtonRectTransform.DOAnchorPosX(-70f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
-				leftButtonRectTransform.SetAnchorPosX(initLeftX);
-			});
-			
-			RectTransform rightButtonRectTransform = rightButton.GetComponent<RectTransform>();
-			float initRightX = rightButtonRectTransform.anchoredPosition.x;
-			rightButtonRectTransform.DOAnchorPosX(70f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
-				rightButtonRectTransform.SetAnchorPosX(initRightX);
-			});
-			
 			bottomContainer.DOAnchorPosY(-250f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
 				bottomContainer.SetAnchorPosY(0f);
 			});
-			
 			centerContainer.DOFade(0f, UIController.defaultTime).OnComplete(() => {
 				centerContainer.alpha = 1f;
 			});

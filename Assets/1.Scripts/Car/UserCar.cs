@@ -10,6 +10,7 @@ public class UserCar : Car {
 
 	[SerializeField] private CinemachineFollow cinemachineFollow;
 	[SerializeField] private int maxHealth;
+	[SerializeField] private float healthDamageDivider = 1f;
 	[SerializeField] private int price;
 	
 	[Space]
@@ -21,6 +22,8 @@ public class UserCar : Car {
 	
 	private float currentHealth;
 	public int Price => price;
+	public float MaxSpeed => avc.MaxSpeed;
+	public int MaxHealth => maxHealth;
 	
 	public Segment CurrentSegment { get; private set; }
 	private Segment nextSegment;
@@ -79,8 +82,27 @@ public class UserCar : Car {
 	}
 	
 	private void UpdateCarInputs(float verticalInput) {
-		float accelerationInput = Mathf.Lerp(0.1f, 0.5f, verticalInput);
-		float brakeInput = Mathf.Lerp(0.5f, 0f, Mathf.InverseLerp(0f, 0.1f, verticalInput));
+		
+		float desiredSpeed = verticalInput * avc.MaxSpeed;
+		float speedDifference = desiredSpeed - avc.CurrentSpeed;
+
+		float accelerationInput = 0f;
+		float brakeInput = 0f;
+
+		if (verticalInput > 0.9f) {
+			accelerationInput = 0.5f;
+			brakeInput = 0f;
+		} else if (verticalInput < 0.1f) {
+			accelerationInput = 0f;
+			brakeInput = 1f;
+		} else if (Mathf.Abs(speedDifference) > 0.1f) {
+			if (speedDifference > 0) {
+				accelerationInput = Mathf.Clamp(speedDifference / avc.MaxSpeed, 0, 1f);
+			} else {
+				brakeInput = Mathf.Clamp(-speedDifference / avc.MaxSpeed, 0, 1f);
+			}
+		}
+		
 		avc.ProvideInputs(GetSteering(), accelerationInput, brakeInput);
 	}
 
@@ -96,7 +118,7 @@ public class UserCar : Car {
 				return;
 			}
 			lastHitAICar = aiCar;
-			currentHealth -= magnitude;
+			currentHealth -= magnitude / healthDamageDivider;
 			currentHealth = Mathf.Max(0, currentHealth);
 			OnHealthUpdate?.Invoke(currentHealth / maxHealth);
 		}
@@ -182,7 +204,7 @@ public class UserCar : Car {
 			targetPos = new Vector3(point.x, FrontPos.y, point.z);
 			while (Vector3.Distance(targetPos, FrontPos) >= 1f) {
 				targetPos.y = FrontPos.y;
-				UpdateCarInputs(0.5f);
+				UpdateCarInputs(1f);
 				yield return null;
 			}
 		}

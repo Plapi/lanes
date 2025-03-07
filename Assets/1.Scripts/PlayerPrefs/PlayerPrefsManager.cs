@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 public static class PlayerPrefsManager {
@@ -27,6 +28,7 @@ public static class PlayerPrefsManager {
 	}
 }
 
+[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
 public class UserData {
 	public int coins;
 	public List<int> unlockedCars = new() { 0 };
