@@ -16,6 +16,9 @@ public class UserCar : Car {
 	[Space]
 	[SerializeField] private MaterialAndColorPreset materialAndColorPreset;
 	[SerializeField] private MeshRenderer[] meshRenderers;
+
+	[Space]
+	[SerializeField] private AudioClip startSound;
 	
 	public Action OnRequireNewSegments;
 	public Action<float> OnHealthUpdate;
@@ -141,7 +144,7 @@ public class UserCar : Car {
 	}
 	
 	public void GoToStart(Camera cam, Action onComplete) {
-		this.Wait(0.5f, () => {
+		this.PlaySound(cam.gameObject, startSound, () => {
 			float prevMaxSpeed = avc.MaxSpeed;
 			avc.MaxSpeed = 60;
 			EnableCar();

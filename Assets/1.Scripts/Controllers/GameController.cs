@@ -141,6 +141,11 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			onRight = () => selectCarController.UpdateSelection(1),
 			onGo = Go,
 			onBuy = selectCarController.BuyCar,
+			onCoin = () => {
+				PlayerPrefsManager.UserData.coins += 1000;
+				PlayerPrefsManager.SaveUserData();
+				garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
+			},
 			coins = PlayerPrefsManager.UserData.coins
 		});
 		

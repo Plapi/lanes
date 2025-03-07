@@ -3,18 +3,6 @@ using UnityEngine;
 
 public static partial class TransformExtensions {
 	
-	public static void SetX(this GameObject obj, float x) {
-		obj.transform.SetX(x);
-	}
-	
-	public static void SetY(this GameObject obj, float y) {
-		obj.transform.SetY(y);
-	}
-	
-	public static void SetZ(this GameObject obj, float z) {
-		obj.transform.SetZ(z);
-	}
-	
 	public static void SetX(this Transform transform, float x) {
 		transform.position = new Vector3(x, transform.position.y, transform.position.z);
 	}
@@ -43,24 +31,12 @@ public static partial class TransformExtensions {
 		transform.position = new Vector3(x, y, z);
 	}
 	
-	public static void SetLocalX(this GameObject obj, float x) {
-		obj.transform.SetLocalX(x);
-	}
-	
 	public static void SetLocalX(this Transform transform, float x) {
 		transform.localPosition = new Vector3(x, transform.localPosition.y, transform.localPosition.z);
 	}
 	
-	public static void SetLocalY(this GameObject obj, float y) {
-		obj.transform.SetLocalY(y);
-	}
-	
 	public static void SetLocalY(this Transform transform, float y) {
 		transform.localPosition = new Vector3(transform.localPosition.x, y, transform.localPosition.z);
-	}
-	
-	public static void SetLocalZ(this GameObject obj, float z) {
-		obj.transform.SetLocalZ(z);
 	}
 	
 	public static void SetLocalZ(this Transform transform, float z) {

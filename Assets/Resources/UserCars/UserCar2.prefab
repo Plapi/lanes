@@ -10242,10 +10242,12 @@ MonoBehaviour:
   boxCollider: {fileID: 2021688452620412597}
   cinemachineFollow: {fileID: 5523251035025561910}
   maxHealth: 80
+  healthDamageDivider: 1
   price: 1000
   materialAndColorPreset: {fileID: 11400000, guid: dd40cc87f786b452bbb764d486b891a1, type: 2}
   meshRenderers:
   - {fileID: 4412871570824676003}
+  startSound: {fileID: 8300000, guid: f44e0e77f6aaca14795f6cf1d11fed3b, type: 3}
 --- !u!114 &3812935757262937016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10392,8 +10394,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 0b2844ba13c61eb459484abc96bde242, type: 3}
-  m_Resource: {fileID: 8300000, guid: 0b2844ba13c61eb459484abc96bde242, type: 3}
+  m_audioClip: {fileID: 8300000, guid: ee1a2242cade2f14ebf6569c68bcf4df, type: 3}
+  m_Resource: {fileID: 8300000, guid: ee1a2242cade2f14ebf6569c68bcf4df, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -10492,7 +10494,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: a0212963d11a06c4caa454df8e2a2a57, type: 3}
   m_Resource: {fileID: 8300000, guid: a0212963d11a06c4caa454df8e2a2a57, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.1
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0

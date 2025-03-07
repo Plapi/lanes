@@ -428,6 +428,7 @@ MonoBehaviour:
   materialAndColorPreset: {fileID: 11400000, guid: 48fc5ad79af174e738dfff624a6b6bbf, type: 2}
   meshRenderers:
   - {fileID: 910429515635855588}
+  startSound: {fileID: 8300000, guid: f44e0e77f6aaca14795f6cf1d11fed3b, type: 3}
 --- !u!114 &8152313046421799679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -574,8 +575,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 0b2844ba13c61eb459484abc96bde242, type: 3}
-  m_Resource: {fileID: 8300000, guid: 0b2844ba13c61eb459484abc96bde242, type: 3}
+  m_audioClip: {fileID: 8300000, guid: fcce88acd4f459749bacfa82fb59dcf8, type: 3}
+  m_Resource: {fileID: 8300000, guid: fcce88acd4f459749bacfa82fb59dcf8, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -674,7 +675,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: a0212963d11a06c4caa454df8e2a2a57, type: 3}
   m_Resource: {fileID: 8300000, guid: a0212963d11a06c4caa454df8e2a2a57, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.1
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0

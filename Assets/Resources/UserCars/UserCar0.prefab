@@ -15649,9 +15649,11 @@ MonoBehaviour:
   boxCollider: {fileID: 6257591930687371955}
   cinemachineFollow: {fileID: 2176767317052459185}
   maxHealth: 100
+  healthDamageDivider: 1
   price: 0
   materialAndColorPreset: {fileID: 11400000, guid: dd40cc87f786b452bbb764d486b891a1, type: 2}
   meshRenderers: []
+  startSound: {fileID: 0}
 --- !u!114 &5370458563235718490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15898,7 +15900,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: a0212963d11a06c4caa454df8e2a2a57, type: 3}
   m_Resource: {fileID: 8300000, guid: a0212963d11a06c4caa454df8e2a2a57, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.1
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0

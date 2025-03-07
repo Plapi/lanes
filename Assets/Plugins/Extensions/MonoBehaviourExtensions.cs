@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public static class RoutineExtensions {
+public static class MonoBehaviourExtensions {
 	
 	public static Coroutine Wait(this MonoBehaviour behaviour, float delay, Action onComplete) {
 		return behaviour != null ? behaviour.StartCoroutine(Wait(delay, onComplete)) : null;
@@ -106,5 +106,23 @@ public static class RoutineExtensions {
 			yield return null;
 		}
 		onComplete?.Invoke();
+	}
+	
+	public static void PlaySound(this MonoBehaviour obj, GameObject target, AudioClip clip, Action onComplete = null) {
+		if (clip == null) {
+			onComplete?.Invoke();
+			return;
+		}
+		
+		AudioSource audioSource = target.gameObject.AddComponent<AudioSource>();
+		audioSource.clip = clip;
+		audioSource.Play();
+
+		obj.Wait(clip.length, () => {
+			if (audioSource != null) {
+				UnityEngine.Object.Destroy(audioSource);	
+			}
+			onComplete?.Invoke();
+		});
 	}
 }
