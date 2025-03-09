@@ -18,8 +18,9 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	[Space]
 	[SerializeField] private TextMeshProUGUI coinsText;
 	[SerializeField] private Button coinButton;
-	
+
 	[Space]
+	[SerializeField] private Button settingsButton;
 	[SerializeField] private Button leftButton;
 	[SerializeField] private Button rightButton;
 
@@ -33,6 +34,7 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	[SerializeField] private TextMeshProUGUI buyPriceText;
 
 	protected override void OnInit() {
+		settingsButton.onClick.AddListener(data.onSettings);
 		leftButton.onClick.AddListener(data.onLeft);
 		rightButton.onClick.AddListener(data.onRight);
 		goButton.onClick.AddListener(data.onGo);
@@ -112,6 +114,7 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	}
 
 	public new class Data: UIPanelBase.Data {
+		public UnityAction onSettings;
 		public UnityAction onLeft;
 		public UnityAction onRight;
 		public UnityAction onGo;

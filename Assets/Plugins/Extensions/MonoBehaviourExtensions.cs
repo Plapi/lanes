@@ -108,27 +108,4 @@ public static class MonoBehaviourExtensions {
 		}
 		onComplete?.Invoke();
 	}
-
-	public static void PlaySound(this MonoBehaviour obj, AudioClip clip, Action onComplete = null) {
-		obj.PlaySound(obj.gameObject, clip, onComplete);
-	}
-
-	public static void PlaySound(this MonoBehaviour obj, GameObject target, AudioClip clip, Action onComplete = null) {
-		if (clip == null) {
-			onComplete?.Invoke();
-			return;
-		}
-		
-		AudioSource audioSource = target.gameObject.AddComponent<AudioSource>();
-		audioSource.spatialBlend = 0f;
-		audioSource.clip = clip;
-		audioSource.Play();
-
-		obj.Wait(clip.length, () => {
-			if (audioSource != null) {
-				UnityEngine.Object.Destroy(audioSource);	
-			}
-			onComplete?.Invoke();
-		});	
-	}
 }

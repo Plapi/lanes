@@ -50,7 +50,7 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         stats.gameObject.SetActive(false);
         adCollectButton.gameObject.SetActive(false);
         collectButton.gameObject.SetActive(false);
-        this.PlaySound(celebrateClip);
+        AudioSystem.Play(celebrateClip);
         StartCoroutine(ShowAnimIEnumerator(() => {
             OnShowAnimEnd?.Invoke();
             onComplete?.Invoke();
@@ -78,7 +78,7 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         
         for (int i = 0; i < children.Length; i++) {
             yield return Utils.WaitForRealTime(i == 0 ? 0.2f : 0.5f);
-            this.PlaySound(statsClip);
+            AudioSystem.Play(statsClip);
             RectTransform rectTransform = children[i].GetComponent<RectTransform>();
             float toY = rectTransform.anchoredPosition.y;
             rectTransform.SetAnchorPosY(toY + 100f);
@@ -94,7 +94,7 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         }
         collectRects.Add(collectButton.GetComponent<RectTransform>());
         
-        this.PlaySound(collectsClip);
+        AudioSystem.Play(collectsClip);
         
         for (int i = 0; i < collectRects.Count; i++) {
             collectRects[i].gameObject.SetActive(true);

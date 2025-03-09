@@ -61,11 +61,11 @@ public class UICoinsAnim : UIObject {
 			cp2.x = Random.Range(-30f, 30f) + initCP2X;
 
 			this.Wait(0.2f, () => {
-				this.PlaySound(coinSoundIn);
+				AudioSystem.Play(coinSoundIn);
 			});
 			
 			this.Wait(1.7f, () => {
-				this.PlaySound(coinSoundOut);
+				AudioSystem.Play(coinSoundOut);
 			});
 			
 			DOTween.To(() => time, x => time = x, 1f, 1.5f)

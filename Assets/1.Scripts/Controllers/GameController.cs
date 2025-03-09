@@ -36,6 +36,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private UIGaragePanel garagePanel;
 	private UIPausePanel pausePanel;
 	private UIResultsPanel resultsPanel;
+	private UISettingsPanel settingsPanel;
 	
 	private PosAndRot initCameraPosAndRot;
 	private PosAndRot initUserCarPosAndRot;
@@ -45,6 +46,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private int coinsEarned;
 	
 	protected void Start() {
+		AudioSystem.Init(this, PlayerPrefsManager.UserData.volumes);
 		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
 		InitFirstSegments();
 		InitPersonPickupController();
@@ -138,8 +140,10 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		garagePanel = UIController.Instance.GetPanel<UIGaragePanel>();
 		pausePanel = UIController.Instance.GetPanel<UIPausePanel>();
 		resultsPanel = UIController.Instance.GetPanel<UIResultsPanel>();
+		settingsPanel = UIController.Instance.GetPanel<UISettingsPanel>();
 		
 		garagePanel.Init(new UIGaragePanel.Data {
+			onSettings = settingsPanel.Show,
 			onLeft = () => selectCarController.UpdateSelection(-1),
 			onRight = () => selectCarController.UpdateSelection(1),
 			onGo = Go,
@@ -161,9 +165,8 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		});
 		
 		pausePanel.Init(new UIPausePanel.Data {
-			onSettings = () => {
-				
-			}, onRestart = () => {
+			onSettings = settingsPanel.Show,
+			onRestart = () => {
 				if (coinsEarned > 0) {
 					ShowResults();
 				} else {
@@ -178,6 +181,17 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			onClose = () => {
 				Time.timeScale = 1f;
 				userCar.SetSoundEnabled(true);
+			}
+		});
+
+		settingsPanel.Init(new UISettingsPanel.Data {
+			volumes = PlayerPrefsManager.UserData.volumes,
+			onUpdateSlider = (index, volume) => {
+				AudioSystem.UpdateVolume((MixerType)index, volume);
+			},
+			onClose = volumes => {
+				PlayerPrefsManager.UserData.volumes = volumes;
+				PlayerPrefsManager.SaveUserData();
 			}
 		});
 	}
@@ -199,7 +213,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			if (!canControlUserCar) {
 				return;
 			}
-			this.PlaySound(onLoseHealthClips[Random.Range(0, onLoseHealthClips.Length)]);
+			AudioSystem.Play(onLoseHealthClips[Random.Range(0, onLoseHealthClips.Length)]);
 			topPanel.UpdateHealthSlider(healthProgress);
 			if (healthProgress < Mathf.Epsilon) {
 				StartCoroutine(OnUserCarEnd());	

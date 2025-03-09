@@ -15687,7 +15687,7 @@ MonoBehaviour:
   boxCollider: {fileID: 2091359296035361117}
   cinemachineFollow: {fileID: 8295645927959319263}
   maxHealth: 500
-  healthDamageDivider: 4
+  healthDamageDivider: 3
   price: 15000
   coinsMultiplier: 4
   materialAndColorPreset: {fileID: 11400000, guid: 0dacadb45d0d24f35a37fd8c3f94e87b, type: 2}
@@ -15839,11 +15839,11 @@ AudioSource:
   m_GameObject: {fileID: 7310700429028748832}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 4c5f837b47a7e483380dd059efa3868c, type: 2}
   m_audioClip: {fileID: 8300000, guid: a4756995b0141bb4fa1446d329768fbe, type: 3}
   m_Resource: {fileID: 8300000, guid: a4756995b0141bb4fa1446d329768fbe, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.25
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -15936,7 +15936,7 @@ AudioSource:
   m_GameObject: {fileID: 7310700429028748832}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 4c5f837b47a7e483380dd059efa3868c, type: 2}
   m_audioClip: {fileID: 8300000, guid: a0212963d11a06c4caa454df8e2a2a57, type: 3}
   m_Resource: {fileID: 8300000, guid: a0212963d11a06c4caa454df8e2a2a57, type: 3}
   m_PlayOnAwake: 1

@@ -31,8 +31,10 @@ public class PersonPickupController : MonoBehaviour {
 	}
 
 	private void Update() {
-		if (State == PickupState.WaitingForPickup) {
+		if (person.gameObject.activeSelf && userCar != null) {
 			person.transform.LookAt(userCar.transform);
+		}
+		if (State == PickupState.WaitingForPickup) {
 			if (Vector3.Distance(userCar.FrontPos, startPin.position) < 2f) {
 				State = PickupState.Pickup;
 				person.gameObject.SetActive(false);

@@ -146,7 +146,7 @@ public class UserCar : Car {
 	}
 	
 	public void GoToStart(Camera cam, Action onComplete) {
-		this.PlaySound(cam.gameObject, startSound, () => {
+		AudioSystem.Play(startSound, MixerType.CarEngine, () => {
 			float prevMaxSpeed = avc.MaxSpeed;
 			avc.MaxSpeed = 60;
 			EnableCar();

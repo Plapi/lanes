@@ -76,7 +76,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 
 	public void ShowPerson(int blocks) {
 
-		this.PlaySound(showPersonSound);
+		AudioSystem.Play(showPersonSound);
 		
 		if (waitCoroutine != null) {
 			StopCoroutine(waitCoroutine);
@@ -93,7 +93,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		personTransform.SetAnchorPosY(-UIController.Instance.Size.y * 0.75f);
 		personTransform.DOAnchorPosY(initY, 0.5f).SetEase(Ease.OutQuad);
 		personTransform.DOBlendableRotateBy(new Vector3(0f, 0f, 360f), 0.5f, RotateMode.LocalAxisAdd).OnComplete(() => {
-			this.PlaySound(showSpeechBubbleSound);
+			AudioSystem.Play(showSpeechBubbleSound);
 			ShowBubbleSpeech(blocks == 1 ? "Let me off\nnext block!" : $"Let me off\nin {blocks} blocks!",
 				personSpeechBubbleTextNormalColor);
 		});
@@ -107,7 +107,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		}
 		
 		if (coins > 0) {
-			this.PlaySound(hidePersonSuccessSound);
+			AudioSystem.Play(hidePersonSuccessSound);
 			string successText = RandomTextsSystem.Get(RandomTextsSystem.SuccessPerson);
 			successText = successText.Replace("#coins#", $"<color=#00D740>{coins}</color>");
 			ShowBubbleSpeech(successText, personSpeechBubbleTextNormalColor, -1f);
@@ -116,7 +116,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 				personIcon.DOFade(0f, 0.2f);
 			});
 		} else {
-			this.PlaySound(hidePersonFailSound);
+			AudioSystem.Play(hidePersonFailSound);
 			ShowBubbleSpeech(RandomTextsSystem.Get(RandomTextsSystem.FailPerson), personSpeechBubbleTextFailColor, 2f, () => {
 				personIcon.DOFade(0f, 0.2f);
 			});

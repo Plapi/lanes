@@ -11,7 +11,7 @@ public class UIButtonSound : MonoBehaviour {
 	[SerializeField] private AudioClip audioClip;
 	
 	public void PlaySound() {
-		this.PlaySound(gameObject, audioClip);
+		AudioSystem.Play(audioClip);
 	}
 
 #if UNITY_EDITOR

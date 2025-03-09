@@ -43,6 +43,20 @@ public static class Utils {
 		return items[^1];
 	}
 	
+	public static void EnumerateEnum<T>(Action<T> action) {
+		foreach (T item in Enum.GetValues(typeof(T))) {
+			action?.Invoke(item);
+		}
+	}
+
+	public static void EnumerateEnum<T>(Action<T, int> action) {
+		int index = 0;
+		foreach (T item in Enum.GetValues(typeof(T))) {
+			action?.Invoke(item, index);
+			index++;
+		}
+	}
+	
 	public static bool IsOverUI() {
 		if (EventSystem.current.IsPointerOverGameObject()) {
 			return true;
