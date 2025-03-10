@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviourSingleton<GameController> {
@@ -89,7 +90,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		smoke.gameObject.SetActive(true);
 		userCar.UpdateCar(0f, 0.5f);
 		canControlUserCar = false;
-
+		
 		float time = 4f;
 		while (time > 0f && !Input.GetMouseButtonDown(0)) {
 			yield return null;
@@ -188,7 +189,14 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		settingsPanel.Init(new UISettingsPanel.Data {
 			volumes = PlayerPrefsManager.UserData.volumes,
 			onUpdateSlider = (index, volume) => {
-				AudioSystem.UpdateVolume((MixerType)index, volume);
+				MixerType mixerType = (MixerType)index;
+				if (mixerType == MixerType.CarEngine) {
+					if (userCar != null) {
+						userCar.SetAudioVolume(volume);
+					}
+				} else {
+					AudioSystem.UpdateVolume(mixerType, volume);	
+				}
 			},
 			hapticFeedback = PlayerPrefsManager.UserData.hapticFeedback,
 			onUpdateHapticFeedback = hapticFeedback => {
@@ -244,6 +252,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private void InitUserCar(Action onCanControlCar) {
 		userCar.transform.SetPosAndRot(initUserCarPosAndRot);
+		userCar.SetAudioVolume(PlayerPrefsManager.UserData.volumes[(int)MixerType.CarEngine]);
 		userCar.SetSegments(startSegment, currentSegment);
 		userCar.SetStartPoints();
 		userCar.GoToStart(mainCamera, () => {

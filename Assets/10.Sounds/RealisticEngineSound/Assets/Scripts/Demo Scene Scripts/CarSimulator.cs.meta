@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 9d14e5f54432d9b42878a897e3a33fc4
+timeCreated: 1511265804
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 224787
+  packageName: Realistic Engine Sounds 2 - Lite Edition
+  packageVersion: 2.1.13
+  assetPath: Assets/RealisticEngineSound/Assets/Scripts/Demo Scene Scripts/CarSimulator.cs
+  uploadId: 703377

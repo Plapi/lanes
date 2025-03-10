@@ -4,6 +4,8 @@ using UnityEngine;
 using Unity.Cinemachine;
 using System.Collections.Generic;
 using DG.Tweening;
+using SkrilStudio;
+using Unity.VisualScripting;
 
 public class UserCar : Car {
 
@@ -18,6 +20,8 @@ public class UserCar : Car {
 	[SerializeField] private MeshRenderer[] meshRenderers;
 
 	[Space]
+	[SerializeField] private RealisticEngineSound realisticEngineSound;
+	[SerializeField] private float maxEngineRPM;
 	[SerializeField] private AudioClip startSound;
 	
 	public Action OnRequireNewSegments;
@@ -34,9 +38,10 @@ public class UserCar : Car {
 	private Segment nextSegment;
 	
 	public MaterialAndColorPreset MaterialAndColorPreset => materialAndColorPreset;
-
+	
 	private void Start() {
 		currentHealth = maxHealth;
+		realisticEngineSound.carMaxSpeed = MaxSpeed;
 	}
 	
 	public override void DisableCar() {
@@ -48,7 +53,21 @@ public class UserCar : Car {
 		currentHealth = maxHealth;
 		DisableCar();
 	}
-	
+
+	public override void SetSoundEnabled(bool enabled) {
+		base.SetSoundEnabled(enabled);
+		realisticEngineSound.gameObject.SetActive(enabled);
+		if (!enabled) {
+			realisticEngineSound.gasPedalPressing = false;
+			realisticEngineSound.engineCurrentRPM = 0f;
+		}
+	}
+
+	public void SetAudioVolume(float volume) {
+		realisticEngineSound.masterVolume = volume;
+		avc.SkidSound.volume = volume;
+	}
+
 	public void SetSegments(Segment currentSegment, Segment nextSegment) {
 		CurrentSegment = currentSegment;
 		this.nextSegment = nextSegment;
@@ -104,6 +123,11 @@ public class UserCar : Car {
 		}
 		
 		avc.ProvideInputs(GetSteering(), accelerationInput, brakeInput);
+		
+		if (realisticEngineSound.gameObject.activeSelf) {
+			realisticEngineSound.gasPedalPressing = verticalInput > 0.1f;
+			realisticEngineSound.engineCurrentRPM = Mathf.Lerp(0, maxEngineRPM, avc.CurrentSpeed / realisticEngineSound.carMaxSpeed);
+		}
 	}
 
 	private float GetSegmentProgress(Segment segment) {
@@ -146,7 +170,14 @@ public class UserCar : Car {
 	}
 	
 	public void GoToStart(Camera cam, Action onComplete) {
-		AudioSystem.Play(startSound, MixerType.CarEngine, () => {
+		
+		realisticEngineSound.gameObject.SetActive(true);
+		realisticEngineSound.transform.parent = cam.transform;
+		realisticEngineSound.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+		realisticEngineSound.gasPedalPressing = false;
+		realisticEngineSound.engineCurrentRPM = 0f;
+		
+		AudioSource startAudioSource = AudioSystem.Play(startSound, MixerType.CarEngine, () => {
 			float prevMaxSpeed = avc.MaxSpeed;
 			avc.MaxSpeed = 60;
 			EnableCar();
@@ -168,6 +199,8 @@ public class UserCar : Car {
 					});
 			});
 		});
+		startAudioSource.transform.position = cam.transform.position;
+		startAudioSource.volume = realisticEngineSound.masterVolume;
 	}
 
 	private void CameraTransition(Camera cam, Action onComplete) {

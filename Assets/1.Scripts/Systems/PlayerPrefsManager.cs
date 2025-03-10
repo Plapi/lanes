@@ -46,6 +46,6 @@ public class UserData {
 	public int carSelection;
 	public int distanceBest = -1;
 	public int personsBest = -1;
-	public float[] volumes = { 1f, 0.4f, 0.3f };
+	public float[] volumes = { 1f, 0.3f, 0.4f };
 	public bool hapticFeedback = true;
 }

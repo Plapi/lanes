@@ -83,14 +83,18 @@ namespace ArcadeVP
 
         public void AudioManager()
         {
-            engineSound.pitch = Mathf.Lerp(minPitch, MaxPitch, Mathf.Abs(carVelocity.z) / MaxSpeed);
-            if (Mathf.Abs(carVelocity.x) > 10 && grounded())
-            {
-                SkidSound.mute = false;
+            if (engineSound != null) {
+                engineSound.pitch = Mathf.Lerp(minPitch, MaxPitch, Mathf.Abs(carVelocity.z) / MaxSpeed);    
             }
-            else
-            {
-                SkidSound.mute = true;
+            if (SkidSound != null) {
+                if (Mathf.Abs(carVelocity.x) > 10 && grounded())
+                {
+                    SkidSound.mute = false;
+                }
+                else
+                {
+                    SkidSound.mute = true;
+                }    
             }
         }
 

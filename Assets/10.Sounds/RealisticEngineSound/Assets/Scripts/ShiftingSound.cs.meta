@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 50f51344cce581944adbd2830a17666c
+timeCreated: 1512837272
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 224787
+  packageName: Realistic Engine Sounds 2 - Lite Edition
+  packageVersion: 2.1.13
+  assetPath: Assets/RealisticEngineSound/Assets/Scripts/ShiftingSound.cs
+  uploadId: 703377

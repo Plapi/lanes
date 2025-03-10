@@ -48,23 +48,20 @@ public abstract class Car : MonoBehaviour {
 		ResetVelocity();
 		avc.carBody.isKinematic = true;
 		avc.rb.isKinematic = true;
-		avc.engineSound.enabled = false;
-		avc.SkidSound.enabled = false;
+		SetSoundEnabled(false);
 		SetSoundEnabled(false);
 	}
 
 	public virtual void EnableCar() {
 		avc.carBody.isKinematic = false;
 		avc.rb.isKinematic = false;
-		avc.engineSound.enabled = true;
-		avc.SkidSound.enabled = true;
+		SetSoundEnabled(true);
 		ResetVelocity();
 		avc.enabled = true;
 		SetSoundEnabled(true);
 	}
 
-	public void SetSoundEnabled(bool enabled) {
-		avc.engineSound.enabled = enabled;
+	public virtual void SetSoundEnabled(bool enabled) {
 		avc.SkidSound.enabled = enabled;
 	}
 

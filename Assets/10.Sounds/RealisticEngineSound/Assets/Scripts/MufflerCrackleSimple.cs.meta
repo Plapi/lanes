@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 5615c129d0646a84ea24d8d9a1d9f15a
+timeCreated: 1516467143
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 224787
+  packageName: Realistic Engine Sounds 2 - Lite Edition
+  packageVersion: 2.1.13
+  assetPath: Assets/RealisticEngineSound/Assets/Scripts/MufflerCrackleSimple.cs
+  uploadId: 703377

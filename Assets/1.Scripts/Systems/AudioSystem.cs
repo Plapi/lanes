@@ -5,20 +5,22 @@ using UnityEngine.Audio;
 public static class AudioSystem {
 	
 	private static Mixer[] mixers;
-	public static MonoBehaviour monoBehaviour;
+	private static MonoBehaviour monoBehaviour;
 
 	public static void Init(MonoBehaviour behaviour, float[] volumes) {
 		monoBehaviour = behaviour;
 		mixers = new Mixer[volumes.Length];
 		Utils.EnumerateEnum<MixerType>((mixerType, index) => {
-			mixers[index] = new Mixer(mixerType.ToString(), volumes[index]);
+			if (mixerType != MixerType.CarEngine) {
+				mixers[index] = new Mixer(mixerType.ToString(), volumes[index]);	
+			}
 		});
 	}
 	
-	public static void Play(AudioClip audioClip, MixerType mixerType = MixerType.Effects, Action onComplete = null) {
+	public static AudioSource Play(AudioClip audioClip, MixerType mixerType = MixerType.Effects, Action onComplete = null) {
 		if (audioClip == null) {
 			onComplete?.Invoke();
-			return;
+			return null;
 		}
 		AudioSource audioSource = SetAudioSourceComponent(new GameObject($"OneShotSound_{audioClip.name}"), mixerType);
 		audioSource.volume = 1f;
@@ -27,6 +29,7 @@ public static class AudioSystem {
 		if (onComplete != null) {
 			monoBehaviour.Wait(audioClip.length, onComplete);	
 		}
+		return audioSource;
 	}
 	
 	public static AudioSource SetAudioSourceComponent(GameObject gameObject, MixerType mixerType) {

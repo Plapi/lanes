@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4dcf2d09aacd3c24aa2dbf796d6b0d82
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 224787
+  packageName: Realistic Engine Sounds 2 - Lite Edition
+  packageVersion: 2.1.13
+  assetPath: Assets/RealisticEngineSound/Assets/Scripts/Demo Scene Scripts/DemoController.cs
+  uploadId: 703377

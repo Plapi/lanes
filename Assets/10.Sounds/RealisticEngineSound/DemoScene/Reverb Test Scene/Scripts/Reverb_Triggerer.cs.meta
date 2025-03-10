@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: d3f7cd4592f414a429cfc82fae2eeda0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 224787
+  packageName: Realistic Engine Sounds 2 - Lite Edition
+  packageVersion: 2.1.13
+  assetPath: Assets/RealisticEngineSound/DemoScene/Reverb Test Scene/Scripts/Reverb_Triggerer.cs
+  uploadId: 703377

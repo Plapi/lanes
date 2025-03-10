@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: db09cf25ebdc2c349ba0cb527012c8ae
+timeCreated: 1509399217
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 224787
+  packageName: Realistic Engine Sounds 2 - Lite Edition
+  packageVersion: 2.1.13
+  assetPath: Assets/RealisticEngineSound/Documentation/Release Notes.txt
+  uploadId: 703377

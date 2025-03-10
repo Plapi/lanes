@@ -77,6 +77,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 	public void ShowPerson(int blocks) {
 
 		AudioSystem.Play(showPersonSound);
+		HapticFeedback.VibrateHaptic(HapticFeedback.Type.Light);
 		
 		if (waitCoroutine != null) {
 			StopCoroutine(waitCoroutine);
@@ -108,6 +109,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		
 		if (coins > 0) {
 			AudioSystem.Play(hidePersonSuccessSound);
+			HapticFeedback.VibrateHaptic(HapticFeedback.Type.Light);
 			string successText = RandomTextsSystem.Get(RandomTextsSystem.SuccessPerson);
 			successText = successText.Replace("#coins#", $"<color=#00D740>{coins}</color>");
 			ShowBubbleSpeech(successText, personSpeechBubbleTextNormalColor, -1f);
