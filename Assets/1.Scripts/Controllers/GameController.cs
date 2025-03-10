@@ -47,6 +47,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	
 	protected void Start() {
 		AudioSystem.Init(this, PlayerPrefsManager.UserData.volumes);
+		HapticFeedback.SetEnabled(PlayerPrefsManager.UserData.hapticFeedback);
 		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
 		InitFirstSegments();
 		InitPersonPickupController();
@@ -189,6 +190,12 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			onUpdateSlider = (index, volume) => {
 				AudioSystem.UpdateVolume((MixerType)index, volume);
 			},
+			hapticFeedback = PlayerPrefsManager.UserData.hapticFeedback,
+			onUpdateHapticFeedback = hapticFeedback => {
+				PlayerPrefsManager.UserData.hapticFeedback = hapticFeedback;
+				PlayerPrefsManager.SaveUserData();
+				HapticFeedback.SetEnabled(hapticFeedback);
+			},
 			onClose = volumes => {
 				PlayerPrefsManager.UserData.volumes = volumes;
 				PlayerPrefsManager.SaveUserData();
@@ -214,6 +221,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 				return;
 			}
 			AudioSystem.Play(onLoseHealthClips[Random.Range(0, onLoseHealthClips.Length)]);
+			HapticFeedback.VibrateHaptic(HapticFeedback.Type.Medium);
 			topPanel.UpdateHealthSlider(healthProgress);
 			if (healthProgress < Mathf.Epsilon) {
 				StartCoroutine(OnUserCarEnd());	

@@ -12,6 +12,9 @@ public class UIButtonSound : MonoBehaviour {
 	
 	public void PlaySound() {
 		AudioSystem.Play(audioClip);
+#if UNITY_IOS
+		HapticFeedback.VibrateHaptic(HapticFeedback.Type.Light);
+#endif
 	}
 
 #if UNITY_EDITOR

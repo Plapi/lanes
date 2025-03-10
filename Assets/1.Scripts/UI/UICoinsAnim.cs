@@ -66,6 +66,9 @@ public class UICoinsAnim : UIObject {
 			
 			this.Wait(1.7f, () => {
 				AudioSystem.Play(coinSoundOut);
+#if UNITY_IOS
+				HapticFeedback.VibrateHaptic(HapticFeedback.Type.Light);
+#endif
 			});
 			
 			DOTween.To(() => time, x => time = x, 1f, 1.5f)

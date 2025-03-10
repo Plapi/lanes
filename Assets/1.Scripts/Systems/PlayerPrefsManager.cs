@@ -3,10 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 public static class PlayerPrefsManager {
-	
-	private const string userDataKey = "UserData";
+
+	private const string userDataKey = "GameUserData";
 	private static UserData userData;
-	
+
 	public static UserData UserData {
 		get {
 			if (userData == null) {
@@ -14,7 +14,8 @@ public static class PlayerPrefsManager {
 					string json = PlayerPrefs.GetString(userDataKey);
 					userData = JsonUtility.FromJson<UserData>(json);
 				} else {
-					userData = new UserData();	
+					SetNoBackup();
+					userData = new UserData();
 				}
 			}
 			return userData;
@@ -25,6 +26,15 @@ public static class PlayerPrefsManager {
 		string json = JsonUtility.ToJson(UserData);
 		PlayerPrefs.SetString(userDataKey, json);
 		PlayerPrefs.Save();
+	}
+
+	private static void SetNoBackup() {
+#if UNITY_IOS
+		string path = System.IO.Path.Combine(Application.persistentDataPath, $"../Library/Preferences/{Application.identifier}.plist");
+		if (!string.IsNullOrEmpty(path)) {
+			UnityEngine.iOS.Device.SetNoBackupFlag(path);
+		}
+#endif
 	}
 }
 
@@ -37,4 +47,5 @@ public class UserData {
 	public int distanceBest = -1;
 	public int personsBest = -1;
 	public float[] volumes = { 1f, 0.4f, 0.3f };
+	public bool hapticFeedback = true;
 }
