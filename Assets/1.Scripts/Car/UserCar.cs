@@ -170,12 +170,8 @@ public class UserCar : Car {
 	}
 	
 	public void GoToStart(Camera cam, Action onComplete) {
-		
-		realisticEngineSound.gameObject.SetActive(true);
-		realisticEngineSound.transform.parent = cam.transform;
-		realisticEngineSound.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
-		realisticEngineSound.gasPedalPressing = false;
-		realisticEngineSound.engineCurrentRPM = 0f;
+
+		SetEngineSoundToCamera(cam);
 		
 		AudioSource startAudioSource = AudioSystem.Play(startSound, MixerType.CarEngine, () => {
 			float prevMaxSpeed = avc.MaxSpeed;
@@ -259,6 +255,14 @@ public class UserCar : Car {
 		for (int i = 0; i < meshRenderers.Length; i++) {
 			meshRenderers[i].material = materialAndColor.material;
 		}
+	}
+
+	public void SetEngineSoundToCamera(Camera cam) {
+		realisticEngineSound.gameObject.SetActive(true);
+		realisticEngineSound.transform.parent = cam.transform;
+		realisticEngineSound.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+		realisticEngineSound.gasPedalPressing = false;
+		realisticEngineSound.engineCurrentRPM = 0f;
 	}
 	
 	protected override void OnDrawGizmos() {

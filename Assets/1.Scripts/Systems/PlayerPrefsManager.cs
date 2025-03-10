@@ -40,6 +40,7 @@ public static class PlayerPrefsManager {
 
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
 public class UserData {
+	public bool isTutorialDone;
 	public int coins;
 	public List<int> unlockedCars = new() { 0 };
 	public List<int> carColors = new() { 7, 4, 0, 0, 9, 1 };

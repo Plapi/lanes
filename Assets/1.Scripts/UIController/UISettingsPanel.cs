@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 
 	[SerializeField] private Slider[] sliders;
 	[SerializeField] private Slider hapticSlider;
+	[SerializeField] private Button aboutButton;
+	[SerializeField] private Button tutorialButton;
 	
 	protected override void OnInit() {
 
@@ -39,6 +42,9 @@ public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 			}
 			data.onClose(volumes);
 		};
+		
+		aboutButton.onClick.AddListener(data.onAbout);
+		tutorialButton.onClick.AddListener(data.onTutorial);
 	}
 	
 	public new class Data: UIPanelBase.Data {
@@ -47,6 +53,8 @@ public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 		public Action<int, float> onUpdateSlider;
 		public Action<bool> onUpdateHapticFeedback;
 		public new Action<float[]> onClose;
+		public UnityAction onAbout;
+		public UnityAction onTutorial;
 	}
 	
 }

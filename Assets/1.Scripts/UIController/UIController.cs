@@ -17,6 +17,13 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 
 	public Vector2 Size => canvasScaler.referenceResolution;
 	
+	private void Start() {
+		fadeToBlackImage.SetAlpha(1f);
+		fadeToBlackImage.gameObject.SetActive(true);
+		FadeOutToBlack();
+		Debug.Break();
+	}
+
 	public void Init() {
 		for (int i = 0; i < panels.Length; i++) {
 			dictPanels.Add(panels[i].GetType(), panels[i]);

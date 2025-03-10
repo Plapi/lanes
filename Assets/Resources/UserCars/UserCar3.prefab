@@ -15694,7 +15694,7 @@ MonoBehaviour:
   meshRenderers:
   - {fileID: 3120048720172399045}
   realisticEngineSound: {fileID: 7311585680019187504}
-  maxEngineRPM: 5000
+  maxEngineRPM: 4000
   startSound: {fileID: 8300000, guid: 25c5c4c24f2e71246b0640f52e033218, type: 3}
 --- !u!114 &8670231261682287563
 MonoBehaviour:

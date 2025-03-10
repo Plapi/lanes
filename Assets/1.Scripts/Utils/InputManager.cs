@@ -18,6 +18,10 @@ public class InputManager : MonoBehaviour {
 		ResetValues();
 	}
 
+	public void UpdateVerticalInput(float value) {
+		VerticalInput = value;
+	}
+
 	public void ResetValues() {
 		VerticalInput = 0.9f;
 		HorizontalInput = 0.5f;
@@ -51,10 +55,10 @@ public class InputManager : MonoBehaviour {
 		}
 		
 		if (avc == null) {
-			if (GameController.Instance.GetUserCar() == null) {
-				return;
-			}
-			avc = GameController.Instance.GetUserCar().GetComponent<ArcadeVehicleController>();
+			avc = FindFirstObjectByType<ArcadeVehicleController>();
+		}
+		if (avc == null) {
+			return;
 		}
 		
 		if (texture == null) {

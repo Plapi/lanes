@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class GameController : MonoBehaviourSingleton<GameController> {
@@ -47,6 +47,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private int coinsEarned;
 	
 	protected void Start() {
+		DontDestroyOnLoad(ObjectPoolManager.Instance);
 		AudioSystem.Init(this, PlayerPrefsManager.UserData.volumes);
 		HapticFeedback.SetEnabled(PlayerPrefsManager.UserData.hapticFeedback);
 		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
@@ -203,10 +204,15 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 				PlayerPrefsManager.UserData.hapticFeedback = hapticFeedback;
 				PlayerPrefsManager.SaveUserData();
 				HapticFeedback.SetEnabled(hapticFeedback);
-			},
-			onClose = volumes => {
+			}, onClose = volumes => {
 				PlayerPrefsManager.UserData.volumes = volumes;
 				PlayerPrefsManager.SaveUserData();
+			}, onAbout = () => {
+				
+			}, onTutorial = () => {
+				UIController.Instance.FadeInToBlack(() => {
+					SceneManager.LoadScene("Tutorial");
+				});
 			}
 		});
 	}
@@ -441,14 +447,14 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private static SegmentData GetRandomSegmentData() {
 		SegmentInputData segmentInputData = new() {
-			backLanes = Random.Range(1, 4),
-			frontLanes = Random.Range(1, 4),
+			backLanes = Random.Range(1, 5),
+			frontLanes = Random.Range(1, 5),
 			length = Settings.Instance.laneSize * Random.Range(40, 100)
 		};
 		return GetSegmentData(segmentInputData);
 	}
 
-	private static SegmentData GetSegmentData(SegmentInputData segmentInputData) {
+	public static SegmentData GetSegmentData(SegmentInputData segmentInputData) {
 		List<LaneData> lanes = new() {
 			new LaneData {
 				type = LaneType.SideWalkLaneLeft
@@ -501,10 +507,10 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		};
 	}
 	
-	[Serializable]
-	private class SegmentInputData {
-		[Range(1, 4)] public int backLanes = 2;
-		[Range(1, 4)] public int frontLanes = 2;
-		public int length;
-	}
+}
+
+public class SegmentInputData {
+	[Range(1, 4)] public int backLanes = 2;
+	[Range(1, 4)] public int frontLanes = 2;
+	public int length;
 }
