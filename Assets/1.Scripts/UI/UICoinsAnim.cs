@@ -23,6 +23,8 @@ public class UICoinsAnim : UIObject {
 	private float initCP1X;
 	private float initCP2X;
 
+	public Action OnCoinReach;
+
 	private void Awake() {
 		initCoinLocalPos = coins[0].localPosition;
 		initCP1X = controlPoints[1].localPosition.x;
@@ -47,6 +49,7 @@ public class UICoinsAnim : UIObject {
 			image.SetAlpha(1f);
 			coins[i].gameObject.SetActive(i < coinsCount);
 			coins[i].localPosition = initCoinLocalPos;
+			coins[i].GetComponent<Image>().SetAlpha(0f);
 		}
 		WaitForSeconds waitForSeconds = new WaitForSeconds(0.1f);
 		for (int i = 0; i < coinsCount; i++) {
@@ -71,16 +74,19 @@ public class UICoinsAnim : UIObject {
 #endif
 			});
 			
+			Image coinImage = coins[i].GetComponent<Image>();
 			DOTween.To(() => time, x => time = x, 1f, 1.5f)
 				.SetEase(ease)
 				.OnUpdate(() => {
 					coins[coinIndex].localPosition = Bezier.GetPoint(cp0, cp1, cp2, cp3, time);
 					coins[coinIndex].localScale = Vector3.one * scaleCurve.Evaluate(time);
+					coinImage.SetAlpha(Mathf.Lerp(0f, 1f, time * 4f));
 				}).OnComplete(() => {
 					coins[coinIndex].DOPunchScale(Vector3.one * 0.2f, UIController.defaultTime);
 					coins[coinIndex].GetComponent<Image>().DOFade(0f, 0.4f).OnComplete(() => {
 						coins[coinIndex].gameObject.SetActive(false);
 					});
+					OnCoinReach?.Invoke();
 					if (coinIndex == coinsCount - 1) {
 						onComplete?.Invoke();
 					}

@@ -8,9 +8,16 @@ public abstract class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBe
 		get {
 			if (instance == null) {
 				instance = FindFirstObjectByType<T>();
+				if (instance == null) {
+					instance = new GameObject(typeof(T).ToString()).AddComponent<T>();	
+				}
 			}
 			return instance;
 		}
+	}
+	
+	public static bool HasInstance() {
+		return instance != null;
 	}
 
 	protected virtual void Awake() {

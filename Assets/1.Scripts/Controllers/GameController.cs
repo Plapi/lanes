@@ -14,7 +14,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private SelectCarController selectCarController;
 	[SerializeField] private GameObject smoke;
 	[SerializeField] private PersonPickupController personPickupController;
-
+	
 	[Space]
 	[SerializeField] private AudioClip[] onLoseHealthClips;
 	
@@ -101,7 +101,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	}
 
 	private void ShowResults() {
-		AddCoins(coinsEarned);
 		int distance = Mathf.RoundToInt(userCar.transform.position.z - initUserCarPosAndRot.position.z);
 		bool distanceBest = distance > PlayerPrefsManager.UserData.distanceBest;
 		bool personBest = personsDropped > PlayerPrefsManager.UserData.personsBest;
@@ -114,9 +113,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			personBest = personBest,
 			onAdCollect = () => {
 				AdsController.Instance.ShowAd(success => {
-					if (success) {
-						AddCoins(coinsEarned);
-					}
+					coinsEarned = success ? coinsEarned * 2 : coinsEarned;
 					Restart();
 				});
 			},
@@ -134,7 +131,8 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		}
 	}
 
-	private static void AddCoins(int coins) {
+	private void AddCoins(int coins) {
+		garagePanel.PlayCoinsAnim(PlayerPrefsManager.UserData.coins, PlayerPrefsManager.UserData.coins + coinsEarned);
 		PlayerPrefsManager.UserData.coins += coins;
 		PlayerPrefsManager.SaveUserData();
 	}
@@ -315,9 +313,13 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			selectCarController.ReInit();
 					
 			garagePanel.Show();
-			garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
+			if (coinsEarned > 0) {
+				AddCoins(coinsEarned);	
+			}
 			UIController.Instance.FadeOutToBlack();
 			Time.timeScale = 1f;
+
+			
 		});
 	}
 

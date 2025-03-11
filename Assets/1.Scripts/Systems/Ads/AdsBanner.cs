@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Advertisements;
 
@@ -9,10 +10,10 @@ public class AdsBanner : MonoBehaviour {
 	private string addUnitId;
 	private bool bannerVisible;
 	
-	public void Start() {
-		if (!AdsController.Instance.WasInitSuccessful) {
-			return;
-		}
+	public IEnumerator Start() {
+
+		yield return new WaitUntil(() => AdsController.HasInstance() && AdsController.Instance.WasInitSuccessful);
+		
 		addUnitId = Application.platform == RuntimePlatform.IPhonePlayer ? iOSAdUnitId : androidAdUnitId;
 		Advertisement.Banner.SetPosition(BannerPosition.BOTTOM_CENTER);
 		Advertisement.Banner.Load(addUnitId, new BannerLoadOptions {

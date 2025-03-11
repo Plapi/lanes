@@ -32,6 +32,9 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	[SerializeField] private Button goButton;
 	[SerializeField] private Button buyButton;
 	[SerializeField] private TextMeshProUGUI buyPriceText;
+	
+	[Space]
+	[SerializeField] private UICoinsAnim coinsAnim;
 
 	protected override void OnInit() {
 		settingsButton.onClick.AddListener(data.onSettings);
@@ -54,6 +57,22 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 			HorizontalLayoutGroup horizontalLayoutGroup = coinsText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;
 			horizontalLayoutGroup.enabled = true;
+		});
+	}
+
+	public void PlayCoinsAnim(int from, int to, int count = 10) {
+		int coins = from;
+		int add = (to - from) / count;
+		coinsAnim.OnCoinReach = () => {
+			coins += add;
+			UpdateCoins(coins);
+			Transform coinsContainer = coinsText.transform.parent;
+			coinsContainer.DOKill();
+			coinsContainer.transform.localScale = Vector3.one;
+			coinsContainer.DOPunchScale(Vector3.one * 0.2f, UIController.defaultTime);
+		};
+		coinsAnim.Play(10, () => {
+			UpdateCoins(to);
 		});
 	}
 
