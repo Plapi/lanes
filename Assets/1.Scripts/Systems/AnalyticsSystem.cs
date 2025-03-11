@@ -22,6 +22,14 @@ public class AnalyticsSystem {
 	public static void RecordBuyCarEvent(int carId) {
 		AnalyticsService.Instance.RecordEvent(new BuyCarEvent("BuyCar", carId));
 	}
+
+	public static void RecordOpenAboutEvent() {
+		AnalyticsService.Instance.RecordEvent("OpenAbout");
+	}
+
+	public static void RecordClickMailEvent() {
+		AnalyticsService.Instance.RecordEvent("ClickMail");
+	}
 	
 	private class TutorialEvent : Unity.Services.Analytics.Event {
 		public TutorialEvent(string name, int stepId) : base(name) {

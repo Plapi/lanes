@@ -213,13 +213,27 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 					Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[1] * 100),
 					Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[2] * 100), true);
 			}, onAbout = () => {
-				
+				AnalyticsSystem.RecordOpenAboutEvent();
+				UIController.Instance.GetPanel<UIAboutPanel>().Init(new UIAboutPanel.Data {
+					onMail = () => {
+						AnalyticsSystem.RecordClickMailEvent();
+						const string email = "adrian.plapamaru@gmail.com";
+						string subject = EscapeURL("Feedback about Quick Lane Driver");
+						string body = EscapeURL("Hi, I’d like to share my thoughts about the game...");
+						string mailto = $"mailto:{email}?subject={subject}&body={body}";
+						Application.OpenURL(mailto);
+					}
+				}).Show();
 			}, onTutorial = () => {
 				UIController.Instance.FadeInToBlack(() => {
 					SceneManager.LoadScene("Tutorial");
 				});
 			}
 		});
+	}
+	
+	private static string EscapeURL(string text) {
+		return UnityEngine.Networking.UnityWebRequest.EscapeURL(text).Replace("+", "%20");
 	}
 
 	private void Go() {
