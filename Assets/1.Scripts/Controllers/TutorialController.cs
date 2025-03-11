@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Services.Analytics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -56,7 +55,7 @@ public class TutorialController : MonoBehaviour {
 
 	private IEnumerator Tutorial() {
 
-		AnalyticsService.Instance.RecordEvent(new TutorialEvent("Tutorial", 0));
+		AnalyticsSystem.RecordTutorialEvent(0);
 		
 		yield return new WaitForSeconds(2f);
 		
@@ -70,7 +69,7 @@ public class TutorialController : MonoBehaviour {
 		});
 
 		yield return new WaitUntil(() => advance);
-		AnalyticsService.Instance.RecordEvent(new TutorialEvent("Tutorial", 1));
+		AnalyticsSystem.RecordTutorialEvent(1);
 		
 		tutorialPanel.HideNextButton();
 		tutorialPanel.ShowText(tutorialTexts[1]);
@@ -83,7 +82,7 @@ public class TutorialController : MonoBehaviour {
 		yield return new WaitUntil(() => inputManager.VerticalInput < 0.2f);
 		yield return new WaitUntil(() => inputManager.VerticalInput > 0.8f);
 		
-		AnalyticsService.Instance.RecordEvent(new TutorialEvent("Tutorial", 2));
+		AnalyticsSystem.RecordTutorialEvent(2);
 
 		AudioSystem.Play(successClip);
 		tutorialPanel.HideText();
@@ -98,7 +97,7 @@ public class TutorialController : MonoBehaviour {
 		yield return new WaitUntil(() => inputManager.HorizontalInput < 0.3f);
 		yield return new WaitUntil(() => inputManager.HorizontalInput > 0.7f);
 		
-		AnalyticsService.Instance.RecordEvent(new TutorialEvent("Tutorial", 3));
+		AnalyticsSystem.RecordTutorialEvent(3);
 		
 		AudioSystem.Play(successClip);
 		tutorialPanel.HideText();
@@ -114,7 +113,7 @@ public class TutorialController : MonoBehaviour {
 		
 		yield return new WaitUntil(() => advance);
 		
-		AnalyticsService.Instance.RecordEvent(new TutorialEvent("Tutorial", 4));
+		AnalyticsSystem.RecordTutorialEvent(4);
 		
 		UIController.Instance.FadeInToBlack(() => {
 			PlayerPrefsManager.UserData.isTutorialDone = true;
@@ -210,11 +209,5 @@ public class TutorialController : MonoBehaviour {
 			length = Settings.Instance.laneSize * Random.Range(40, 100)
 		};
 		return GameController.GetSegmentData(segmentInputData);
-	}
-	
-	private class TutorialEvent : Unity.Services.Analytics.Event {
-		public TutorialEvent(string name, int stepId) : base(name) {
-			SetParameter("stepId", stepId);
-		}
 	}
 }

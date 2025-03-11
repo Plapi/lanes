@@ -110,6 +110,7 @@ public class SelectCarController : MonoBehaviour {
 			garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
 			garagePanel.UpdateBottom(0);
 			rotateObjController.SetObj(templatesUserCar[selection].BoxCollider);
+			AnalyticsSystem.RecordBuyCarEvent(selection);
 		} else {
 			UIController.Instance.GetPanel<UIInfoPanel>().Init(new UIInfoPanel.Data {
 				title = "Not Enough Coins!",
@@ -127,6 +128,8 @@ public class SelectCarController : MonoBehaviour {
 		templatesContainer.gameObject.SetActive(false);
 		userCars[selection].gameObject.SetActive(true);
 		rotateObjController.enabled = false;
+		
+		AnalyticsSystem.RecordRaceStartEvent(selection);
 		
 		return userCars[selection];
 	}

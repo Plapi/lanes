@@ -129,6 +129,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			}
 			PlayerPrefs.Save();
 		}
+		AnalyticsSystem.RecordRaceEndEvent(PlayerPrefsManager.UserData.carSelection, distance, personsDropped, coinsEarned);
 	}
 
 	private void AddCoins(int coins) {
@@ -208,6 +209,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			}, onClose = volumes => {
 				PlayerPrefsManager.UserData.volumes = volumes;
 				PlayerPrefsManager.SaveUserData();
+				AnalyticsSystem.RecordSettingsEvent(Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[0] * 100),
+					Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[1] * 100),
+					Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[2] * 100), true);
 			}, onAbout = () => {
 				
 			}, onTutorial = () => {
