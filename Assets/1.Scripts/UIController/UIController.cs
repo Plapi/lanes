@@ -21,7 +21,6 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 		fadeToBlackImage.SetAlpha(1f);
 		fadeToBlackImage.gameObject.SetActive(true);
 		FadeOutToBlack();
-		Debug.Break();
 	}
 
 	public void Init() {

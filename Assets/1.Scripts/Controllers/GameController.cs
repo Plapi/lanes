@@ -47,7 +47,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private int coinsEarned;
 	
 	protected void Start() {
-		DontDestroyOnLoad(ObjectPoolManager.Instance);
 		AudioSystem.Init(this, PlayerPrefsManager.UserData.volumes);
 		HapticFeedback.SetEnabled(PlayerPrefsManager.UserData.hapticFeedback);
 		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
@@ -114,8 +113,12 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			distanceBest = distanceBest,
 			personBest = personBest,
 			onAdCollect = () => {
-				AddCoins(coinsEarned);
-				Restart();
+				AdsController.Instance.ShowAd(success => {
+					if (success) {
+						AddCoins(coinsEarned);
+					}
+					Restart();
+				});
 			},
 			onCollect = Restart
 		});

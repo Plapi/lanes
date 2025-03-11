@@ -5,6 +5,7 @@
     <!-- Required for Android versions below API 31 -->
     <uses-permission android:name="android.permission.VIBRATE"/>
     <application>
+        <meta-data android:name="unity.ads" android:value="true"/>
         <!--Used when Application Entry is set to Activity, otherwise remove this activity block-->
         <activity android:name="com.unity3d.player.UnityPlayerActivity"
                   android:theme="@style/UnityThemeSelector">

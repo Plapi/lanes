@@ -3,10 +3,11 @@
 public abstract class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBehaviour {
 
 	private static T instance;
+
 	public static T Instance {
 		get {
 			if (instance == null) {
-				instance = new GameObject(typeof(T).ToString()).AddComponent<T>();
+				instance = FindFirstObjectByType<T>();
 			}
 			return instance;
 		}
@@ -14,7 +15,6 @@ public abstract class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBe
 
 	protected virtual void Awake() {
 		instance = this as T;
-		// DontDestroyOnLoad(gameObject);
 	}
 
 	private void OnDestroy() {

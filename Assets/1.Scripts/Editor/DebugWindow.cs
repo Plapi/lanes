@@ -75,6 +75,11 @@ public class DebugWindow : EditorWindow {
 
 	}
 	
+	[MenuItem("Editor/Take Screenshot %k")]
+	private static void TakeScreenshot() {
+		EditorCoroutine.Start(TakeScreenshotIEnumerator());
+	}
+	
 	private static IEnumerator TakeScreenshotIEnumerator() {
 		string screenCaptureName = "ScreenCapture " + DateTime.Now.ToString("MM-dd-yyyy HH-mm-ss") + ".png";
 
@@ -93,6 +98,84 @@ public class DebugWindow : EditorWindow {
 		};
 
 		m_process.Start();
+	}
+	
+	[MenuItem("Editor/Play From Splash %g")]
+	public static void PlayFromSplash() {
+		if (Application.isPlaying) {
+			EditorApplication.ExecuteMenuItem("Edit/Play");
+			string lastScenePath = EditorPrefs.GetString("LANES_LAST_SCENE", "");
+			if (!string.IsNullOrEmpty(lastScenePath)) {
+				EditorCoroutine.Start(WaitToApplicationClose(() => {
+					EditorSceneManager.OpenScene(lastScenePath);
+					SelectLastGameObjectSelected();
+				}));
+				EditorPrefs.DeleteKey("LANES_LAST_SCENE");
+			}
+			return;
+		}
+		
+		CheckSaveScene(() => {
+			string[] assets = AssetDatabase.FindAssets("t:scene", new string[] { "Assets/0.Scenes" });
+			for (int i = 0; i < assets.Length; i++) {
+				SceneAsset scene = AssetDatabase.LoadAssetAtPath<SceneAsset>(AssetDatabase.GUIDToAssetPath(assets[i]));
+				if (scene != null && scene.name == "Splash") {
+					CheckSaveScene(() => {
+						SaveLastGameObjectSelected(Selection.activeGameObject);
+						EditorSceneManager.OpenScene(AssetDatabase.GUIDToAssetPath(assets[i]));
+						EditorApplication.ExecuteMenuItem("Edit/Play");
+					});
+					return;
+				}
+			}
+			Debug.LogError("Scene Splash not found");
+		});
+	}
+	
+	[MenuItem("Editor/Reload Current Scene Or Prefab %t")]
+	public static void ReloadCurrentSceneOrPrefab() {
+		if (!Application.isPlaying) {
+			PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+			if (prefabStage != null) {
+				AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(prefabStage.assetPath));
+			} else {
+				CheckSaveScene(() => {
+					SaveLastGameObjectSelected(Selection.activeGameObject);
+					EditorSceneManager.OpenScene(SceneManager.GetActiveScene().path);
+					SelectLastGameObjectSelected();
+				});
+			}
+		}
+	}
+	
+	private static IEnumerator WaitToApplicationClose(Action onComplete) {
+		while (Application.isPlaying) {
+			yield return null;
+		}
+		onComplete();
+	}
+	
+	private static void SaveLastGameObjectSelected(GameObject _selectedGameObject) {
+		EditorPrefs.SetString("LANES_LAST_GAMEOBJECT_SELECTED_NAME", _selectedGameObject != null ? _selectedGameObject.name : null);
+	}
+	
+	private static void SelectLastGameObjectSelected() {
+		Selection.activeGameObject = GameObject.Find(EditorPrefs.GetString("LANES_LAST_GAMEOBJECT_SELECTED_NAME"));
+	}
+	
+	private static void CheckSaveScene(Action onComplete) {
+		Scene scene = SceneManager.GetActiveScene();
+		EditorPrefs.SetString("LANES_LAST_SCENE", scene.path);
+		if (scene.isDirty) {
+			if (EditorUtility.DisplayDialog("Save Scene", "Do you want to save " + scene.name + " before playing?", "Yes", "No")) {
+				EditorSceneManager.SaveScene(scene, "", false);
+				onComplete();
+			} else {
+				onComplete();
+			}
+		} else {
+			onComplete();
+		}
 	}
 
 	private void CropTexture(string inPath, string outPath, int startX, int startY) {

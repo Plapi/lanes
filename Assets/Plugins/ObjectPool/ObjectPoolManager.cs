@@ -5,6 +5,11 @@ public class ObjectPoolManager : MonoBehaviourSingleton<ObjectPoolManager> {
 
 	private readonly Dictionary<string, Queue<MonoBehaviour>> pools = new();
 
+	protected override void Awake() {
+		base.Awake();
+		DontDestroyOnLoad(this);
+	}
+	
 	public static void CreatePool<T>(IPoolableObject<T> poolableObject, int size = 10) where T : MonoBehaviour {
 		if (!Application.isPlaying) {
 			return;
