@@ -1,34 +1,46 @@
 using Unity.Services.Analytics;
 using UnityEngine;
 
-public class AnalyticsSystem {
+public static class AnalyticsSystem {
 
 	public static void RecordTutorialEvent(int stepId) {
-		AnalyticsService.Instance.RecordEvent(new TutorialEvent("Tutorial", stepId));
+		RecordEvent(new TutorialEvent("Tutorial", stepId));
 	}
 
 	public static void RecordSettingsEvent(int soundFxLevel, int musicLevel, int carEngineLevel, bool haptic) {
-		AnalyticsService.Instance.RecordEvent(new SettingsEvent("Settings", soundFxLevel, musicLevel, carEngineLevel, haptic));
+		RecordEvent(new SettingsEvent("Settings", soundFxLevel, musicLevel, carEngineLevel, haptic));
 	}
 	
 	public static void RecordRaceStartEvent(int carId) {
-		AnalyticsService.Instance.RecordEvent(new RaceStartEvent("RaceStart", carId));
+		RecordEvent(new RaceStartEvent("RaceStart", carId));
 	}
 
 	public static void RecordRaceEndEvent(int carId, int distance, int persons, int coins) {
-		AnalyticsService.Instance.RecordEvent(new RaceEndEvent("RaceEnd", carId, distance, persons, coins));
+		RecordEvent(new RaceEndEvent("RaceEnd", carId, distance, persons, coins));
 	}
 
 	public static void RecordBuyCarEvent(int carId) {
-		AnalyticsService.Instance.RecordEvent(new BuyCarEvent("BuyCar", carId));
+		RecordEvent(new BuyCarEvent("BuyCar", carId));
 	}
 
 	public static void RecordOpenAboutEvent() {
-		AnalyticsService.Instance.RecordEvent("OpenAbout");
+		RecordEvent("OpenAbout");
 	}
 
 	public static void RecordClickMailEvent() {
-		AnalyticsService.Instance.RecordEvent("ClickMail");
+		RecordEvent("ClickMail");
+	}
+	
+	private static void RecordEvent(Unity.Services.Analytics.Event ev) {
+		if (Settings.Instance.enableAnalytics) {
+			AnalyticsService.Instance.RecordEvent(ev);	
+		}
+	}
+	
+	private static void RecordEvent(string eventName) {
+		if (Settings.Instance.enableAnalytics) {
+			AnalyticsService.Instance.RecordEvent(eventName);	
+		}
 	}
 	
 	private class TutorialEvent : Unity.Services.Analytics.Event {

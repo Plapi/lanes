@@ -7,7 +7,13 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 	public int spawnAICarDistanceMin;
 	public int spawnAICarDistanceMax;
 	public AICar[] aiCarPrefabs;
+	
+	[Space]
 	public Environment environment;
+	
+	[Space]
+	public bool enableAdds;
+	public bool enableAnalytics;
 	
 	[System.Serializable]
 	public class Environment {

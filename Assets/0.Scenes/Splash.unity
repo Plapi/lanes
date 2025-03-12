@@ -973,7 +973,7 @@ MonoBehaviour:
   iOSGameId: 5811619
   androidAdUnitId: Interstitial_Android
   iOSAdUnitId: Interstitial_iOS
-  testMode: 1
+  testMode: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
