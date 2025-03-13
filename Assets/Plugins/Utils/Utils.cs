@@ -27,7 +27,7 @@ public static class Utils {
 		}
 	}
 
-	public static T SelectRandomItem<T>(T[] items, float[] probabilities) {
+	public static T SelectRandomItem<T>(T[] items, float[] probabilities, out int index) {
 		double totalWeight = probabilities.Sum();
 		if (totalWeight == 0) {
 			throw new InvalidOperationException("All probabilities are zero, no item can be selected.");
@@ -37,9 +37,11 @@ public static class Utils {
 		for (int i = 0; i < items.Length; i++) {
 			cumulative += probabilities[i];
 			if (randomValue <= cumulative) {
+				index = i;
 				return items[i];
 			}
 		}
+		index = items.Length - 1;
 		return items[^1];
 	}
 	

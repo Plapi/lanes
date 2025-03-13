@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public abstract class Lane<T> : LaneBase where T : LaneData {
 	
@@ -23,38 +21,18 @@ public abstract class Lane<T> : LaneBase where T : LaneData {
 
 [ExecuteInEditMode]
 public abstract class LaneBase : MonoBehaviour {
-	
-	[SerializeField] private Element[] elements;
-	
-	private readonly List<Element> instantiatedElements = new();
 
-	public virtual void Init(LaneData data) {
-		for (int i = 0; i < elements.Length; i++) {
-			elements[i].Id = elements[i].GetInstanceID().ToString();
-			ObjectPoolManager.CreatePool(elements[i]);
-		}
-		int elementsCount = data.length / Settings.Instance.laneSize;
-		for (int i = 0; i < elementsCount; i++) {
-			Element element = ObjectPoolManager.Get(GetElement(), transform);
-			element.name = element.name.Replace("(Clone)", "");
-			element.transform.SetLocalZ(i * Settings.Instance.laneSize);
-			element.gameObject.SetActive(true);
-			instantiatedElements.Add(element);
-		}
-	}
+	public GameObject meshObj;
 	
-	public virtual void Clear() {
-		foreach (var element in instantiatedElements) {
-			ObjectPoolManager.Release(element);
-		}
-		instantiatedElements.Clear();
-	}
-
-	private Element GetElement() {
-		return elements[Random.Range(0, elements.Length)];
-	}
+	public virtual void Init(LaneData data) { }
 	
 	public abstract void SetData(LaneData data);
+	
+	public virtual void Clear() {
+		if (meshObj != null) {
+			Destroy(meshObj);
+		}
+	}
 }
 
 public class LaneData {
@@ -63,11 +41,8 @@ public class LaneData {
 }
 
 public enum LaneType {
-	RoadLaneSingleLeft,
-	RoadLaneSingleRight,
-	RoadLaneMiddle,
-	RoadLaneEdgeLeft,
-	RoadLaneEdgeRight,
-	SideWalkLaneRight,
-	SideWalkLaneLeft
+	SideWalk,
+	RoadFirst,
+	RoadMiddle,
+	RoadLast
 }

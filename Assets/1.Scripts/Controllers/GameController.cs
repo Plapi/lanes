@@ -353,17 +353,13 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	}
 
 	private void InitFirstSegments(bool restart = false) {
-		startSegment.Init(GetSegmentData(new SegmentInputData {
-			backLanes = 2,
-			frontLanes = 2,
+		startSegment.Init(Segment.GetSegmentData(new SegmentInputData {
 			length = 200
 		}));
 		if (!restart) {
 			startSegment.SetStartAndEndPosForRoadLanes();	
 		}
-		currentSegment = NewSegment("CurrentSegment", GetSegmentData(new SegmentInputData {
-			backLanes = 2,
-			frontLanes = 2,
+		currentSegment = Segment.Create(transform, "CurrentSegment", Segment.GetSegmentData(new SegmentInputData {
 			length = 50
 		}));
 		segments.Add(currentSegment);
@@ -425,9 +421,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	}
 	
 	private void CreateNextSegments() {
-		leftSegment = NewSegment("LeftSegment", GetRandomSegmentData(),-90f);
-		rightSegment = NewSegment("RightSegment", GetRandomSegmentData(), -90f);
-		nextSegment = NewSegment("NextSegment", GetRandomSegmentData());
+		leftSegment = Segment.Create(transform, "LeftSegment", GetRandomSegmentData(),-90f);
+		rightSegment = Segment.Create(transform, "RightSegment", GetRandomSegmentData(), -90f);
+		nextSegment = Segment.Create(transform, "NextSegment", GetRandomSegmentData());
 		
 		segments.Add(leftSegment);
 		segments.Add(rightSegment);
@@ -452,14 +448,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		intersection.Init(currentSegment, leftSegment, rightSegment, nextSegment);
 	}
 
-	private Segment NewSegment(string segmentName, SegmentData segmentData, float angle = 0f) {
-		Segment segment = new GameObject(segmentName).AddComponent<Segment>();
-		segment.transform.parent = transform;
-		segment.Init(segmentData);
-		segment.transform.SetLocalAngleY(angle);
-		return segment;
-	}
-
 	private void ConnectCurrentSegmentWithStartSegment() {
 		for (int i = 0; i < currentSegment.BackRoadLanes.Count; i++) {
 			RoadLane lane0 = currentSegment.BackRoadLanes[i];
@@ -474,66 +462,12 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			frontLanes = Random.Range(1, 5),
 			length = Settings.Instance.laneSize * Random.Range(40, 100)
 		};
-		return GetSegmentData(segmentInputData);
+		return Segment.GetSegmentData(segmentInputData);
 	}
-
-	public static SegmentData GetSegmentData(SegmentInputData segmentInputData) {
-		List<LaneData> lanes = new() {
-			new LaneData {
-				type = LaneType.SideWalkLaneLeft
-			}
-		};
-		
-		int backLanes = segmentInputData.backLanes;
-		int frontLanes = segmentInputData.frontLanes;
-
-		if (backLanes > 1) {
-			lanes.Add(new RoadLaneData {
-				type = LaneType.RoadLaneSingleLeft
-			});	
-			for (int i = 1; i < backLanes - 1; i++) {
-				lanes.Add(new RoadLaneData {
-					type = LaneType.RoadLaneMiddle
-				});	
-			}
-		}
-		lanes.Add(new RoadLaneData {
-			type = LaneType.RoadLaneEdgeLeft
-		});
-		
-		lanes.Add(new RoadLaneData {
-			type = LaneType.RoadLaneEdgeRight,
-			hasFrontDirection = true,
-		});
-		if (frontLanes > 1) {
-			for (int i = 1; i < frontLanes - 1; i++) {
-				lanes.Add(new RoadLaneData {
-					type = LaneType.RoadLaneMiddle,
-					hasFrontDirection = true
-				});	
-			}
-			lanes.Add(new RoadLaneData {
-				type = LaneType.RoadLaneSingleRight,
-				hasFrontDirection = true,
-			});
-		}
-		
-		lanes.Add(new LaneData {
-			type = LaneType.SideWalkLaneRight
-		});
-		for (int i = 0; i < lanes.Count; i++) {
-			lanes[i].length = segmentInputData.length;
-		}
-		
-		return new SegmentData {
-			lanes = lanes.ToArray()
-		};
-	}
-	
 }
 
 public class SegmentInputData {
-	[Range(1, 4)] public int backLanes = 2;
-	[Range(1, 4)] public int frontLanes = 2;
-	public int length;
+	public int backLanes = 2;
+	public int frontLanes = 2;
+	public int length = 100;
 }

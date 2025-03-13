@@ -149,7 +149,7 @@ public class TutorialController : MonoBehaviour {
 	}
 
 	private void InitFirstSegments() {
-		currentSegment = NewSegment("CurrentSegment", GameController.GetSegmentData(new SegmentInputData {
+		currentSegment = NewSegment("CurrentSegment", Segment.GetSegmentData(new SegmentInputData {
 			backLanes = 2,
 			frontLanes = 2,
 			length = 200
@@ -208,6 +208,6 @@ public class TutorialController : MonoBehaviour {
 			frontLanes = Random.Range(2, 5),
 			length = Settings.Instance.laneSize * Random.Range(40, 100)
 		};
-		return GameController.GetSegmentData(segmentInputData);
+		return Segment.GetSegmentData(segmentInputData);
 	}
 }

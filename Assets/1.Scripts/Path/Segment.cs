@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,6 +20,8 @@ public class Segment : MonoBehaviour {
 	private SegmentEnvironment leftEnvironment;
 	private SegmentEnvironment rightEnvironment;
 	
+	private readonly GameObject[] laneMeshObjects = new GameObject[4];
+	
 	public virtual void Init(SegmentData segmentData) {
 		SegmentData = segmentData;
 		RoadLanes = new List<RoadLane>();
@@ -26,10 +29,16 @@ public class Segment : MonoBehaviour {
 		BackRoadLanes = new List<RoadLane>();
 		Width = segmentData.lanes.Length * Settings.Instance.laneSize;
 		for (int i = 0; i < segmentData.lanes.Length; i++) {
-			LaneBase lane = Instantiate(Resources.Load<LaneBase>("Lanes/" + segmentData.lanes[i].type), transform);
-			lane.name = lane.name.Replace("(Clone)", "");
+			
+			LaneType laneType = segmentData.lanes[i].type;
+			Type type = laneType == LaneType.SideWalk ? typeof(SideWalkLane) : typeof(RoadLane);
+			LaneBase lane = (LaneBase)new GameObject(segmentData.lanes[i].type.ToString()).AddComponent(type);
+			
+			lane.transform.parent = transform;
 			lane.transform.SetLocalX(i * Settings.Instance.laneSize);
 			lane.Init(segmentData.lanes[i]);
+			lane.meshObj = GetLaneMeshObj(segmentData.lanes[i], lane.transform);
+			
 			lanes.Add(lane);
 			if (lane is RoadLane roadLane) {
 				RoadLanes.Add(roadLane);
@@ -40,6 +49,18 @@ public class Segment : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	private GameObject GetLaneMeshObj(LaneData laneData, Transform parent) {
+		int laneIndex = (int)laneData.type;
+		if (laneMeshObjects[laneIndex] == null) {
+			laneMeshObjects[laneIndex] = LaneGenerator.Instance.Generate(parent, laneData);
+			return laneMeshObjects[laneIndex];
+		}
+		GameObject obj = Instantiate(laneMeshObjects[laneIndex], parent);
+		obj.transform.localPosition = new Vector3(Settings.Instance.laneSize, 0, laneData.length);
+		obj.transform.SetAngleY(180f);
+		return obj;
 	}
 
 	public void SetStartAndEndPosForRoadLanes() {
@@ -121,6 +142,71 @@ public class Segment : MonoBehaviour {
 		segmentEnvironment.transform.parent = transform;
 		segmentEnvironment.transform.localPosition = Vector3.zero;
 		return segmentEnvironment;
+	}
+
+	public static Segment Create(Transform parent, string segmentName, SegmentInputData segmentInputData, float angle = 0f) {
+		return Create(parent, segmentName, GetSegmentData(segmentInputData), angle);
+	}
+
+	public static Segment Create(Transform parent, string segmentName, SegmentData segmentData, float angle = 0f) {
+		Segment segment = new GameObject(segmentName).AddComponent<Segment>();
+		segment.transform.parent = parent;
+		segment.Init(segmentData);
+		segment.transform.SetLocalAngleY(angle);
+		return segment;
+	}
+	
+	public static SegmentData GetSegmentData(SegmentInputData segmentInputData) {
+		List<LaneData> lanes = new() {
+			new LaneData {
+				type = LaneType.SideWalk
+			}
+		};
+		
+		int backLanes = segmentInputData.backLanes;
+		int frontLanes = segmentInputData.frontLanes;
+
+		if (backLanes > 1) {
+			lanes.Add(new RoadLaneData {
+				type = LaneType.RoadFirst
+			});	
+			for (int i = 1; i < backLanes - 1; i++) {
+				lanes.Add(new RoadLaneData {
+					type = LaneType.RoadMiddle
+				});	
+			}
+		}
+		lanes.Add(new RoadLaneData {
+			type = LaneType.RoadLast
+		});
+		
+		lanes.Add(new RoadLaneData {
+			type = LaneType.RoadLast,
+			hasFrontDirection = true,
+		});
+		if (frontLanes > 1) {
+			for (int i = 1; i < frontLanes - 1; i++) {
+				lanes.Add(new RoadLaneData {
+					type = LaneType.RoadMiddle,
+					hasFrontDirection = true
+				});	
+			}
+			lanes.Add(new RoadLaneData {
+				type = LaneType.RoadFirst,
+				hasFrontDirection = true,
+			});
+		}
+		
+		lanes.Add(new LaneData {
+			type = LaneType.SideWalk
+		});
+		for (int i = 0; i < lanes.Count; i++) {
+			lanes[i].length = segmentInputData.length;
+		}
+		
+		return new SegmentData {
+			lanes = lanes.ToArray()
+		};
 	}
 
 	public void ClearAICars() {

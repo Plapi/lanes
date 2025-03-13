@@ -30,7 +30,7 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 					probabilities.Add(buildingRandomProbabilities[i]);
 				}
 			}
-			building = list.Count > 0 ? Utils.SelectRandomItem(list.ToArray(), probabilities.ToArray()): null;
+			building = list.Count > 0 ? Utils.SelectRandomItem(list.ToArray(), probabilities.ToArray(), out _): null;
 			return building != null;
 		}
 	}

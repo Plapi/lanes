@@ -10,7 +10,7 @@ public class MaterialRandomizer : ScriptableObject {
 		for (int i = 0; i < probabilities.Length; i++) {
 			probabilities[i] = materials[i].probability;
 		}
-		return Utils.SelectRandomItem(materials, probabilities).material;
+		return Utils.SelectRandomItem(materials, probabilities, out _).material;
 	}
 }
 

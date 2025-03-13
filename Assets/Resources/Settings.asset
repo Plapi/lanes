@@ -43,5 +43,5 @@ MonoBehaviour:
     - 1
     - 1
     - 0.1
-  enableAdds: 1
-  enableAnalytics: 1
+  enableAdds: 0
+  enableAnalytics: 0
