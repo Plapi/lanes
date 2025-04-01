@@ -6,6 +6,7 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 	public int spawnAICarDistanceMin;
 	public int spawnAICarDistanceMax;
 	public AICar[] aiCarPrefabs;
+	public Sprite[] personSprites;
 
 	[Space]
 	public bool testMode;

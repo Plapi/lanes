@@ -8,15 +8,16 @@ public class PersonPickupController : MonoBehaviour {
 	[SerializeField] private Transform endPin;
 
 	private UserCar userCar;
+	private int personIndex;
 	
 	public PickupState State { get; private set; }
-	public Action OnPickup;
+	public Action<int> OnPickup;
 	public Action OnDrop;
 	public Action OnMiss;
 	public Action<int> OnUpdateDistance;
 	
 	public void SetPickUp(Vector3 pos, Transform segment, UserCar userCar) {
-		person.SetWaving();
+		person.SetWaving(out personIndex);
 		person.transform.position = pos;
 		startPin.transform.position = pos - segment.transform.right * 3.5f;
 		startPin.transform.forward = segment.transform.forward;
@@ -42,7 +43,7 @@ public class PersonPickupController : MonoBehaviour {
 				State = PickupState.Pickup;
 				person.gameObject.SetActive(false);
 				startPin.gameObject.SetActive(false);
-				OnPickup?.Invoke();
+				OnPickup?.Invoke(personIndex);
 				return;
 			}
 			if (distance < 50f &&

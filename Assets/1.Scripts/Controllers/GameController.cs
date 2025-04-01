@@ -33,7 +33,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private int totalDistance;
 	private int personPickupSegments;
-	private int personsDropped;
+	private readonly List<int> personsDropped = new();
 	private int coinsEarned;
 
 	private GenerateDir prevGenerateDir;
@@ -51,19 +51,21 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private void InitPersonPickupController() {
 		int startDistance = 0;
+		int pIndex = 0;
 		List<int> personPickupSegmentsList = new() { 1, Random.Range(1, 3), Random.Range(2, 4) };
-		personPickupController.OnPickup = () => {
+		personPickupController.OnPickup = personIndex => {
 			if (personPickupSegmentsList.Count > 0) {
 				personPickupSegments = personPickupSegmentsList[0];
 				personPickupSegmentsList.RemoveAt(0);
 			} else {
 				personPickupSegments = Random.Range(1, 6);	
 			}
-			topPanel.ShowPerson(personPickupSegments);
+			topPanel.ShowPerson(personPickupSegments, Settings.Instance.personSprites[personIndex]);
 			startDistance = totalDistance;
+			pIndex = personIndex;
 		};
 		personPickupController.OnDrop = () => {
-			personsDropped++;
+			personsDropped.Add(pIndex);
 			float distance = totalDistance - startDistance + Vector3.Distance(trackGenerator.GetNextSegment(prevGenerateDir).transform.position, userCar.transform.position);
 			int coins = Mathf.RoundToInt(userCar.CoinsMultiplier * Mathf.Lerp(50, 500, Mathf.InverseLerp(100f, 2500f, distance)));
 			topPanel.HidePerson(coins);
@@ -95,7 +97,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private void ShowResults() {
 		bool distanceBest = totalDistance > PlayerPrefsManager.UserData.distanceBest;
-		bool personBest = personsDropped > PlayerPrefsManager.UserData.personsBest;
+		bool personBest = personsDropped.Count > PlayerPrefsManager.UserData.personsBest;
 		Time.timeScale = 0f;
 		resultsPanel.Init(new UIResultsPanel.Data {
 			distance = totalDistance,
@@ -117,11 +119,11 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 				PlayerPrefsManager.UserData.distanceBest = totalDistance;
 			}
 			if (personBest) {
-				PlayerPrefsManager.UserData.personsBest = personsDropped;
+				PlayerPrefsManager.UserData.personsBest = personsDropped.Count;
 			}
 			PlayerPrefs.Save();
 		}
-		AnalyticsSystem.RecordRaceEndEvent(PlayerPrefsManager.UserData.carSelection, totalDistance, personsDropped, coinsEarned);
+		AnalyticsSystem.RecordRaceEndEvent(PlayerPrefsManager.UserData.carSelection, totalDistance, personsDropped.Count, coinsEarned);
 	}
 
 	private void AddCoins(int coins) {
@@ -268,7 +270,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			}
 		};
 		
-		personsDropped = 0;
+		personsDropped.Clear();
 		coinsEarned = 0;
 		InitUserCar(() => {
 			topPanel.HideDistance();

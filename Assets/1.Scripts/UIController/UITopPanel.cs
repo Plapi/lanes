@@ -80,7 +80,7 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		healthSlider.transform.DOPunchScale(Vector3.one * 0.2f, UIController.defaultTime).SetUpdate(true);
 	}
 
-	public void ShowPerson(int blocks) {
+	public void ShowPerson(int blocks, Sprite personSprite) {
 
 		AudioSystem.Play(showPersonSound);
 		HapticFeedback.VibrateHaptic(HapticFeedback.Type.Light);
@@ -93,15 +93,15 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 		personSpeechBubble.gameObject.SetActive(false);
 		personTransform.gameObject.SetActive(true);
 		
+		personIcon.sprite = personSprite;
 		personIcon.SetAlpha(0f);
 		personIcon.DOFade(1, 0.2f);
 		
 		float initY = personTransform.anchoredPosition.y;
 		personTransform.SetAnchorPosY(-UIController.Instance.Size.y * 0.75f);
-		personTransform.DOAnchorPosY(initY, 0.5f).SetEase(Ease.OutQuad);
-		personTransform.DOBlendableRotateBy(new Vector3(0f, 0f, 360f), 0.5f, RotateMode.LocalAxisAdd).OnComplete(() => {
+		personTransform.DOAnchorPosY(initY, 0.5f).SetEase(Ease.OutQuad).OnComplete(() => {
 			AudioSystem.Play(showSpeechBubbleSound);
-			ShowBubbleSpeech(blocks == 1 ? "Let me off\nnext block!" : $"Let me off\nin {blocks} blocks!",
+			ShowBubbleSpeech(blocks == 1 ? "Let me off\nnext block!" : $"Let me off\nin {blocks} blocks!", 
 				personSpeechBubbleTextNormalColor);
 		});
 	}
@@ -213,7 +213,7 @@ public class UITopPanelEditor : Editor {
 		
 		GUILayout.Space(10f);
 		if (GUILayout.Button("Show Persons")) {
-			topPanel.ShowPerson(Random.Range(1, 6));
+			topPanel.ShowPerson(Random.Range(1, 6), Settings.Instance.personSprites[0]);
 		}
 		if (GUILayout.Button("Hide Persons Success")) {
 			topPanel.HidePerson(Random.Range(50, 500));
