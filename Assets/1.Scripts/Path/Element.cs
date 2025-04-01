@@ -12,6 +12,14 @@ public class Element : MonoBehaviour, IPoolableObject<Element> {
 	public Element GetMonoBehaviour() {
 		return this;
 	}
+
+	public Element Create(string name, Transform parent, float angleY) {
+		Element element = ObjectPoolManager.Get(this, parent);
+		element.name = name;
+		element.transform.SetAngleY(angleY);
+		element.gameObject.SetActive(true);
+		return element;
+	}
 	
 	public Element Create(string name, Transform parent, float angleY, float x, float z) {
 		Element element = ObjectPoolManager.Get(this, parent);

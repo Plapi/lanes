@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,15 +6,9 @@ public class TutorialController : MonoBehaviour {
 
 	[SerializeField] private Camera mainCamera;
 	[SerializeField] private InputManager inputManager;
+	[SerializeField] private TrackGenerator trackGenerator;
 	[SerializeField] private UserCar userCar;
 	[SerializeField] private AudioClip successClip;
-	
-	private readonly List<Segment> segments = new(4);
-	private Segment currentSegment;
-	private Segment leftSegment;
-	private Segment rightSegment;
-	private Segment nextSegment;
-	private Intersection intersection;
 
 	private UITutorialPanel tutorialPanel;
 
@@ -33,17 +26,17 @@ public class TutorialController : MonoBehaviour {
 		inputManager.UpdateVerticalInput(0.4f);
 		inputManager.enabled = false;
 		
-		InitFirstSegments();
+		trackGenerator.Init(GenerateDir.Forward);
 		
 		userCar.ApplyMaterial(PlayerPrefsManager.UserData.carColors[4]);
 		userCar.SetAudioVolume(PlayerPrefsManager.UserData.volumes[(int)MixerType.CarEngine]);
-		userCar.SetSegments(currentSegment, nextSegment);
+		userCar.SetSegments(trackGenerator.GetCurrentSegment(), trackGenerator.GetNextSegment(GenerateDir.Forward), GenerateDir.Forward);
 		userCar.SetStartPoints();
 		userCar.SetSoundEnabled(true);
 		userCar.SetEngineSoundToCamera(mainCamera);
 		userCar.OnRequireNewSegments = () => {
-			InitNextSegments();
-			userCar.SetSegments(currentSegment, nextSegment);
+			trackGenerator.Generate(GenerateDir.Forward, GenerateDir.Forward);
+			userCar.SetSegments(trackGenerator.GetCurrentSegment(), trackGenerator.GetNextSegment(GenerateDir.Forward), GenerateDir.Forward);
 		};
 
 		UIController.Instance.Init();
@@ -124,90 +117,5 @@ public class TutorialController : MonoBehaviour {
 
 	private void Update() {
 		userCar.UpdateCar(inputManager.VerticalInput, inputManager.HorizontalInput);
-	}
-	
-	private void InitNextSegments() {
-		segments.Clear();
-		currentSegment.Clear();
-		leftSegment.Clear();
-		rightSegment.Clear();
-		intersection.Clear();
-		currentSegment = nextSegment;
-		currentSegment.name = "CurrentSegment";
-		currentSegment.ClearNextRoadLanes();
-		segments.Add(currentSegment);
-		
-		CreateNextSegments();
-		for (int i = 0; i < segments.Count; i++) {
-			segments[i].SetStartAndEndPosForRoadLanes();
-		}
-		intersection.CreateRoadConnections();
-		
-		currentSegment.ContinueGenerateEnvIfNeeded(leftSegment, rightSegment);
-		nextSegment.CreteTopLeftEnvironment(leftSegment);
-		nextSegment.CreteTopRightEnvironment(rightSegment);
-	}
-
-	private void InitFirstSegments() {
-		currentSegment = NewSegment("CurrentSegment", Segment.GetSegmentData(new SegmentInputData {
-			backLanes = 2,
-			frontLanes = 2,
-			length = 200
-		}));
-		segments.Add(currentSegment);
-		CreateNextSegments();
-		for (int i = 0; i < segments.Count; i++) {
-			segments[i].SetStartAndEndPosForRoadLanes();
-		}
-		intersection.CreateRoadConnections();
-		currentSegment.CreateBottomLeftEnvironment(leftSegment);
-		currentSegment.CreateBottomRightEnvironment(rightSegment);
-		nextSegment.CreteTopLeftEnvironment(leftSegment);
-		nextSegment.CreteTopRightEnvironment(rightSegment);
-	}
-	
-	private void CreateNextSegments() {
-		leftSegment = NewSegment("LeftSegment", GetRandomSegmentData(),-90f);
-		rightSegment = NewSegment("RightSegment", GetRandomSegmentData(), -90f);
-		nextSegment = NewSegment("NextSegment", GetRandomSegmentData());
-		
-		segments.Add(leftSegment);
-		segments.Add(rightSegment);
-		segments.Add(nextSegment);
-		
-		leftSegment.AlignHorizontalWith(rightSegment);
-		nextSegment.AlignVerticalWith(currentSegment);
-		
-		leftSegment.transform.SetLocalX(Mathf.Min(currentSegment.transform.localPosition.x, nextSegment.transform.localPosition.x));
-		rightSegment.transform.SetLocalX(Mathf.Max(currentSegment.transform.localPosition.x + currentSegment.Width, nextSegment.transform.localPosition.x + nextSegment.Width) + rightSegment.Length);
-		
-		float addZ = currentSegment.transform.localPosition.z + currentSegment.Length - Mathf.Min(leftSegment.transform.localPosition.z, rightSegment.transform.localPosition.z);
-		leftSegment.transform.SetLocalZ(leftSegment.transform.localPosition.z + addZ);
-		rightSegment.transform.SetLocalZ(rightSegment.transform.localPosition.z + addZ);
-		
-		nextSegment.transform.SetLocalZ(Mathf.Max(leftSegment.transform.localPosition.z + leftSegment.Width, rightSegment.transform.localPosition.z + rightSegment.Width));
-		
-		intersection = Instantiate(Resources.Load<Intersection>("Intersection/Intersection"), transform);
-		intersection.name = "Intersection";
-		intersection.transform.SetLocalX(leftSegment.transform.localPosition.x);
-		intersection.transform.SetLocalZ(currentSegment.transform.localPosition.z + currentSegment.Length);
-		intersection.Init(currentSegment, leftSegment, rightSegment, nextSegment);
-	}
-	
-	private Segment NewSegment(string segmentName, SegmentData segmentData, float angle = 0f) {
-		Segment segment = new GameObject(segmentName).AddComponent<Segment>();
-		segment.transform.parent = transform;
-		segment.Init(segmentData);
-		segment.transform.SetLocalAngleY(angle);
-		return segment;
-	}
-	
-	private static SegmentData GetRandomSegmentData() {
-		SegmentInputData segmentInputData = new() {
-			backLanes = Random.Range(2, 5),
-			frontLanes = Random.Range(2, 5),
-			length = Settings.Instance.laneSize * Random.Range(40, 100)
-		};
-		return Segment.GetSegmentData(segmentInputData);
 	}
 }

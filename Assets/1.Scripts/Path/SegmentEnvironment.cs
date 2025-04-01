@@ -3,83 +3,136 @@ using UnityEngine;
 
 public class SegmentEnvironment : MonoBehaviour {
 
-	private readonly List<Element> sideWalks = new();
 	private readonly List<Building> buildings = new();
 
-	private Settings.Environment environmentData;
-	private int sideWalksLength;
-	private int buildingsLength;
-	private int unitLength;
-	private int xSign;
-	private bool isLeftSide;
-	private BoxCollider boxCollider;
+	private Transform leftSide;
+	private Transform rightSide;
 	
-	public void Create(int length, bool isLeftSide) {
+	private int leftBuildingsLength;
+	private int rightBuildingsLength;
+	
+	private BoxCollider leftBoxCollider;
+	private BoxCollider rightBoxCollider;
 
-		environmentData = Settings.Instance.environment;
-		unitLength = Settings.Instance.laneSize;
-		buildingsLength = -unitLength;
-		this.isLeftSide = isLeftSide;
-		xSign = isLeftSide ? -1 : 1;
+	private const int sideWalkWidth = 25;
+	private GameObject leftSideWalkMesh0;
+	private GameObject leftSideWalkMesh1;
+	private GameObject rightSideWalkMesh0;
+	private GameObject rightSideWalkMesh1;
+	private int leftSideWalkLength;
+	private int rightSideWalkLength;
+	
+	public void Create() {
 		
-		CreateBoxCollider();
-		CreateSideWalks(length);
-		CreateBuildings(length);
+	}
+	
+	public void Create(int lengthLeft0, int lengthRight0, int lengthLeft1, int lengthRight1, int laneWidth) {
+		// leftSide = CreateSide("LeftSide");
+		// rightSide = CreateSide("RightSide");
+		// rightSide.transform.SetLocalX(laneWidth);
+		//
+		// leftBoxCollider = CreateBoxCollider(leftSide);
+		// rightBoxCollider = CreateBoxCollider(rightSide);
+		//
+		// CreateSideWalks(lengthLeft0, lengthRight0, lengthLeft1, lengthRight1);
+		// CreateBuildings(lengthLeft, lengthRight);
 	}
 
-	public void ContinueGenerateIfNeeded(int length) {
-		CreateSideWalks(length);
-		CreateBuildings(length);
+	public void ContinueCreateIfNeeded(int leftMaxZ, int rightMaxZ) {
+		// ContinueSideWalksIfNeeded(leftMaxZ, rightMaxZ);
+		// CreateBuildings(leftMaxZ - (int)leftSide.transform.position.z, rightMaxZ - (int)rightSide.transform.position.z);
+	}
+	
+	private void CreateSideWalks(int leftLength0, int rightLength0, int leftLength1, int rightLength1) {
+		leftSideWalkMesh0 = GeneratorsController.Instance.EnvironmentGenerator.GenerateSideWalk(leftSide, leftLength0, sideWalkWidth);
+		leftSideWalkMesh0.transform.SetLocalX(-sideWalkWidth);
+		
+		rightSideWalkMesh0 = leftLength0 == rightLength0 ? Instantiate(leftSideWalkMesh0, rightSide) : 
+			GeneratorsController.Instance.EnvironmentGenerator.GenerateSideWalk(rightSide, rightLength0, sideWalkWidth);
+		rightSideWalkMesh0.transform.SetLocalX(0f);
+		
+		leftSideWalkMesh1 = GeneratorsController.Instance.EnvironmentGenerator.GenerateSideWalk(leftSide, leftLength1 - sideWalkWidth, sideWalkWidth);
+		leftSideWalkMesh1.transform.SetLocalXZ(-sideWalkWidth, leftLength0 - sideWalkWidth);
+		leftSideWalkMesh1.transform.SetLocalAngleY(-90f);
+		
+		rightSideWalkMesh1 = GeneratorsController.Instance.EnvironmentGenerator.GenerateSideWalk(rightSide, rightLength1 - sideWalkWidth, sideWalkWidth);
+		rightSideWalkMesh1.transform.SetLocalXZ(sideWalkWidth, rightLength0);
+		rightSideWalkMesh1.transform.SetLocalAngleY(90f);
+		
+		leftBoxCollider.size = new Vector3(leftLength1, 20f, leftLength0);
+		leftBoxCollider.center = new Vector3(-leftLength1 / 2f, 10f, leftLength0 / 2f);
+		
+		rightBoxCollider.size = new Vector3(rightLength1, 20f, rightLength0);
+		rightBoxCollider.center = new Vector3(rightLength1 / 2f, 10f, rightLength0 / 2f);
+		
+		// leftSideWalkLength = lengthLeft0;
+		// rightSideWalkLength = lengthRight0;
 	}
 
-	private void CreateBoxCollider() {
-		boxCollider = new GameObject().AddComponent<BoxCollider>();
-		boxCollider.name = "BoxCollider";
-		boxCollider.transform.parent = transform;
-		boxCollider.transform.localPosition = new Vector3(0f, 0f, -unitLength);
-		boxCollider.gameObject.layer = LayerMask.NameToLayer("drivable");
-	}
+	private void ContinueSideWalksIfNeeded(int leftMaxZ, int rightMaxZ) {
+		int leftCurrentMaxZ = (int)leftSideWalkMesh0.transform.position.z + leftSideWalkLength;
+		int rightCurrentMaxZ = (int)rightSideWalkMesh0.transform.position.z + rightSideWalkLength;
 
-	private void CreateSideWalks(int length) {
-		for (int x = isLeftSide ? 0 : unitLength; x <= unitLength * 5; x += unitLength) {
-			for (int z = sideWalksLength; z <= length; z += unitLength) {
-				sideWalks.Add(environmentData.sideWalk.Create("SideWalk", transform, xSign * x, z));
-			}
+		int leftDif = leftMaxZ - leftCurrentMaxZ;
+		int rightDif = rightMaxZ - rightCurrentMaxZ;
+		if (leftDif > 0) {
+			GameObject leftSWMesh = GeneratorsController.Instance.EnvironmentGenerator.GenerateSideWalk(leftSide, leftDif, sideWalkWidth);
+			leftSWMesh.transform.SetLocalX(-sideWalkWidth);
+			leftSWMesh.SetZ(leftCurrentMaxZ);
 		}
-		sideWalksLength = length + unitLength;
+		if (rightDif > 0) {
+			GameObject rightSWMesh = leftDif == rightDif ? Instantiate(rightSideWalkMesh0, transform) :
+				GeneratorsController.Instance.EnvironmentGenerator.GenerateSideWalk(rightSide, rightDif, sideWalkWidth);
+			rightSWMesh.transform.SetLocalX(0f);
+			rightSWMesh.SetZ(rightCurrentMaxZ);
+		}
 	}
 
-	private void CreateBuildings(int length) {
-		int currentZ0 = buildingsLength;
-		while (environmentData.TryGetRandomBuilding(length - currentZ0, out Building buildingPrefab)) {
+	public void SetZ(int leftZ, int rightZ) {
+		leftSide.SetZ(leftZ);
+		rightSide.SetZ(rightZ);
+	}
+
+	private void CreateBuildings(int lengthLeft, int lengthRight) {
+		leftBuildingsLength = CreateBuildings(leftBuildingsLength, lengthLeft, true, leftBoxCollider, leftSide);
+		rightBuildingsLength = CreateBuildings(rightBuildingsLength, lengthRight, false, rightBoxCollider, rightSide);
+	}
+	
+	private int CreateBuildings(int lengthStart, int length, bool isLeftSide, BoxCollider boxCollider,  Transform parent) {
+		int currentZ0 = lengthStart;
+		
+		while (GeneratorsController.Instance.EnvironmentGenerator.TryGetRandomBuilding(length - currentZ0, out Building buildingPrefab)) {
 			currentZ0 += buildingPrefab.Length;
-			Building building = (Building)buildingPrefab.Create(buildingPrefab.name, transform, 0f, currentZ0);
+			Building building = (Building)buildingPrefab.Create(buildingPrefab.name, parent, 0f, currentZ0);
 			if (!isLeftSide) {
 				building.transform.SetLocalAngleY(180f);
 				building.transform.SetLocalZ(building.transform.localPosition.z - building.Length);
 			}
 			buildings.Add(building);
 		}
-		buildingsLength = currentZ0;
+
+		boxCollider.size = new Vector3(20f, 20f, currentZ0);
+		boxCollider.center = new Vector3((isLeftSide ? -1 : 1) * 10f, 10f, boxCollider.size.z / 2f);
 		
-		/*float space = (float)(length - buildingsLength) / buildings.Count;
-		if (space > 0f) {
-			float currentZ1 = buildings[0].transform.localPosition.z;
-			for (int i = 1; i < buildings.Count; i++) {
-				currentZ1 += space + buildings[i].Length;
-				buildings[i].transform.SetLocalZ(currentZ1);
-			}
-		}*/
-		
-		boxCollider.size = new Vector3(20f, 20f, currentZ0 + unitLength);
-		boxCollider.center = new Vector3(xSign * 10f, 10f, boxCollider.size.z / 2f);
+		return currentZ0;
+	}
+	
+	private static BoxCollider CreateBoxCollider(Transform parent) {
+		BoxCollider boxCollider = new GameObject("BoxCollider").AddComponent<BoxCollider>();
+		boxCollider.transform.parent = parent;
+		boxCollider.transform.localPosition = Vector3.zero;
+		boxCollider.gameObject.layer = LayerMask.NameToLayer("drivable");
+		return boxCollider;
+	}
+
+	private Transform CreateSide(string name) {
+		Transform side = new GameObject(name).transform;
+		side.transform.parent = transform;
+		side.transform.localPosition = Vector3.zero;
+		return side;
 	}
 
 	public void Clear() {
-		for (int i = 0; i < sideWalks.Count; i++) {
-			ObjectPoolManager.Release(sideWalks[i]);
-		}
-		sideWalks.Clear();
 		for (int i = 0; i < buildings.Count; i++) {
 			ObjectPoolManager.Release(buildings[i]);
 		}

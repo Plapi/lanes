@@ -25,6 +25,7 @@ public class UserCar : Car {
 	[SerializeField] private AudioClip startSound;
 	
 	public Action OnRequireNewSegments;
+	public Action OnPassIntersection;
 	public Action<float> OnHealthUpdate;
 	
 	public float CoinsMultiplier => coinsMultiplier;
@@ -33,9 +34,18 @@ public class UserCar : Car {
 	public int Price => price;
 	public float MaxSpeed => avc.MaxSpeed;
 	public int MaxHealth => maxHealth;
-	
-	public Segment CurrentSegment { get; private set; }
+
+	private Segment currentSegment;
 	private Segment nextSegment;
+
+	private SegmentNavHelper segmentNavHelper;
+	private ForwardNavHelper forwardNavHelper;
+	private CurveNavHelper curveNavHelper;
+	
+	private bool passCurrentSegment;
+	private bool passIntersection;
+
+	private GenerateDir generateDir;
 	
 	public MaterialAndColorPreset MaterialAndColorPreset => materialAndColorPreset;
 	
@@ -68,36 +78,101 @@ public class UserCar : Car {
 		avc.SkidSound.volume = volume;
 	}
 
-	public void SetSegments(Segment currentSegment, Segment nextSegment) {
-		CurrentSegment = currentSegment;
+	public void SetSegments(Segment currentSegment, Segment nextSegment, GenerateDir generateDir) {
+		this.currentSegment = currentSegment;
 		this.nextSegment = nextSegment;
+		this.generateDir = generateDir;
+		passCurrentSegment = passIntersection = false;
+		if (segmentNavHelper != null) {
+			Destroy(segmentNavHelper.gameObject);
+		}
+		if (curveNavHelper != null) {
+			Destroy(curveNavHelper.gameObject);
+		}
+		if (forwardNavHelper != null) {
+			Destroy(forwardNavHelper.gameObject);
+		}
 	}
 	
 	public void UpdateCar(float verticalInput, float horizontalInput) {
 		SetTargetPos(horizontalInput);
 		UpdateCarInputs(verticalInput);
-		if (nextSegment != null && GetSegmentProgress(nextSegment) > 0.5f) {
+		if (passIntersection && nextSegment != null && GetSegmentProgress(nextSegment) > 0.4f) {
 			OnRequireNewSegments();
 		}
 	}
 
 	private void SetTargetPos(float horizontalInput) {
-		if (CurrentSegment == null) {
+		if (currentSegment == null) {
 			targetPos.x = Mathf.Lerp(transform.position.x - 4f, transform.position.x + 4f, horizontalInput);
 			targetPos.y = FrontPos.y;
 			targetPos.z = FrontPos.z + 2.5f;
 			return;
 		}
-		float progress = Mathf.InverseLerp(CurrentSegment.transform.position.z + CurrentSegment.Length, nextSegment.transform.position.z, transform.position.z);
-		float minX = Mathf.Lerp(CurrentSegment.RoadLanes[0].transform.position.x + Settings.Instance.laneSize / 2f - 1f, 
-			nextSegment.RoadLanes[0].transform.position.x + Settings.Instance.laneSize / 2f - 1f, 
-			progress);
-		float maxX = Mathf.Lerp(CurrentSegment.RoadLanes[^1].transform.position.x + Settings.Instance.laneSize / 2f + 1f, 
-			nextSegment.RoadLanes[^1].transform.position.x + Settings.Instance.laneSize / 2f + 1f, 
-			progress);
-		targetPos.x = Mathf.Clamp(Mathf.Lerp(transform.position.x - 4f, transform.position.x + 4f, horizontalInput), minX, maxX);
-		targetPos.y = FrontPos.y;
-		targetPos.z = FrontPos.z + 2.5f;
+
+		if (!passCurrentSegment) {
+			ApplyForwardTargetPos(currentSegment, horizontalInput);
+			passCurrentSegment = GetSegmentProgress(currentSegment) >= 1f;
+			if (!passCurrentSegment) {
+				UpdateSegmentNavHelper(currentSegment);
+				return;
+			}
+			if (segmentNavHelper != null) {
+				Destroy(segmentNavHelper.gameObject);
+			}
+		}
+
+		if (!passIntersection) {
+			if (generateDir == GenerateDir.Forward) {
+				if (forwardNavHelper == null) {
+					forwardNavHelper = ForwardNavHelper.Create(currentSegment, nextSegment);
+				}
+				ApplyForwardTargetPos(nextSegment, horizontalInput);
+				targetPos = forwardNavHelper.CalculateTarget(targetPos);
+				float progress = GetSegmentProgress(nextSegment);
+				passIntersection = progress > 0f;
+				if (passIntersection) {
+					if (forwardNavHelper != null) {
+						Destroy(forwardNavHelper.gameObject);
+					}
+					OnPassIntersection?.Invoke();
+				}
+			} else {
+				if (curveNavHelper == null) {
+					curveNavHelper = CurveNavHelper.Create(currentSegment, nextSegment);
+				}
+				
+				float progress = curveNavHelper.CalculateProgress(targetPos);
+				Vector3 dir0 = Vector3.Lerp(currentSegment.transform.forward, nextSegment.transform.forward, progress);
+				Vector3 dir1 = Vector3.Lerp(currentSegment.transform.right, nextSegment.transform.right, progress);
+				targetPos = FrontPos + dir0 * 2.5f + dir1 * ((horizontalInput - 0.5f) * 3f);
+				
+				targetPos = curveNavHelper.CalculateTarget(targetPos);
+				passIntersection = progress >= 0.95f;
+				if (passIntersection) {
+					if (curveNavHelper != null) {
+						Destroy(curveNavHelper.gameObject);
+					}
+					OnPassIntersection?.Invoke();
+				}	
+			}
+		}
+
+		if (passIntersection) {
+			ApplyForwardTargetPos(nextSegment, horizontalInput);
+			UpdateSegmentNavHelper(nextSegment);
+		}
+	}
+
+	private void ApplyForwardTargetPos(Segment segment, float horizontalInput) {
+		targetPos = FrontPos + segment.transform.forward * 2.5f + segment.transform.right * ((horizontalInput - 0.5f) * 3f);
+	}
+
+	private void UpdateSegmentNavHelper(Segment segment) {
+		if (segmentNavHelper == null) {
+			segmentNavHelper = SegmentNavHelper.Create(segment);
+		}
+		targetPos = segmentNavHelper.CalculateTarget(targetPos);
 	}
 	
 	private void UpdateCarInputs(float verticalInput) {
@@ -131,9 +206,13 @@ public class UserCar : Car {
 	}
 
 	private float GetSegmentProgress(Segment segment) {
-		return (transform.position.z - segment.transform.position.z) / segment.Length;
+		return Utils.ComputeProgress(FrontPos, 
+			segment.transform.position,
+			segment.transform.position + segment.transform.right * segment.Width,
+			segment.transform.position + segment.transform.forward * segment.Length,
+			segment.transform.position + segment.transform.right * segment.Width + segment.transform.forward * segment.Length);
 	}
-
+	
 	private AICar lastHitAICar;
 	private void OnCollisionEnter(Collision collision) {
 		if (collision.gameObject.TryGetComponent(out AICar aiCar) && lastHitAICar != aiCar) {
@@ -151,7 +230,7 @@ public class UserCar : Car {
 	private readonly List<Vector3> startPoints = new();
 	public void SetStartPoints() {
 		Vector3 dir = transform.forward.normalized;
-		RoadLane roadLane = CurrentSegment.RoadLanes[2];
+		RoadLane roadLane = currentSegment.RoadLanes[2];
 		Vector3 point0 = new Vector3(roadLane.transform.position.x + Settings.Instance.laneSize / 2f, FrontPos.y, roadLane.EndPos.z);
 		Vector3 point1 = new Vector3(transform.position.x, FrontPos.y, transform.position.z);
 		Vector3 vectorToPoint1 = point1 - point0;

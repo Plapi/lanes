@@ -9,7 +9,7 @@ public class Building : Element {
 	
 	private void OnDrawGizmos() {
 		Gizmos.color = Color.green;
-		Gizmos.DrawLine(transform.position, transform.position - transform.forward * length);
+		Gizmos.DrawLine(transform.position + transform.forward * (length / 2f), transform.position - transform.forward * (length / 2f));
 	}
 	
 #if UNITY_EDITOR

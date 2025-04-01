@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -44,6 +45,11 @@ public class RoadLane : Lane<RoadLaneData> {
 	}
 
 	private void SpawnAICar(float posZ, bool checkAround = false) {
+
+		if (!gameObject.activeSelf) {
+			return;
+		}
+		
 		AICar carPrefab = Settings.Instance.aiCarPrefabs[Random.Range(0, Settings.Instance.aiCarPrefabs.Length)];
 		Vector3 dir = (EndPos - StartPos).normalized;
 		Vector3 pos = StartPos + dir * posZ;
@@ -56,13 +62,13 @@ public class RoadLane : Lane<RoadLaneData> {
 					return;
 				}
 			}
-			if (Vector3.Distance(GameController.Instance.GetUserCar().transform.position, pos) < 100f) {
+			if (GameController.HasInstance() && Vector3.Distance(GameController.Instance.GetUserCar().transform.position, pos) < 100f) {
 				this.Wait(1f, () => SpawnAICar(posZ, checkAround));
 				return;
 			}
 		}
 		
-		AICar aiCar = ObjectPoolManager.Get(carPrefab, GameController.Instance.transform);
+		AICar aiCar = ObjectPoolManager.Get(carPrefab, TrackGenerator.Instance.transform);
 		aiCar.name = carPrefab.name;
 		aiCar.transform.position = pos;
 		aiCar.transform.LookAt(new Vector3(EndPos.x, aiCar.transform.position.y, EndPos.z));
@@ -141,25 +147,32 @@ public class RoadLane : Lane<RoadLaneData> {
 		aiCars.Clear();
 	}
 
-	private void OnDrawGizmos() {
+	/*private void OnDrawGizmos() {
 		
-		Gizmos.color = Color.blue;
-		Gizmos.DrawLine(StartPos, EndPos);
+		Gizmos.color = Color.green;
+		Gizmos.DrawSphere(StartPos, 0.5f);
+		Gizmos.color = Color.red;
+		Gizmos.DrawSphere(EndPos, 0.5f);
 		
 		for (int i = 0; i < nextRoadLanes.Count; i++) {
 			List<Vector3> points = nextRoadLanes[i].transPoints;
 			
-			Gizmos.color = Color.blue;
 			for (int j = 0; j < points.Count - 1; j++) {
+				Gizmos.color = Color.blue;
 				Gizmos.DrawLine(points[j], points[j + 1]);
-			}
-			
-			Gizmos.color = Color.yellow;
-			for (int j = 0; j < points.Count; j++) {
-				Gizmos.DrawSphere(points[j],0.1f);
+				Gizmos.color = Color.yellow;
+				DrawArrowHead(points[j], points[j + 1], 1f);
 			}
 		}
 	}
+	
+	private static void DrawArrowHead(Vector3 start, Vector3 end, float size) {
+		Vector3 direction = (end - start).normalized;
+		Vector3 right = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 35, 0) * Vector3.forward;
+		Vector3 left = Quaternion.LookRotation(direction) * Quaternion.Euler(0, -35, 0) * Vector3.forward;
+		Gizmos.DrawLine(end, end - right * size);
+		Gizmos.DrawLine(end, end - left * size);
+	}*/
 	
 	[Serializable]
 	private class NextRoadLane {

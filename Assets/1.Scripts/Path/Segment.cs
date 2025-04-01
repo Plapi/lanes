@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Segment : MonoBehaviour {
 
@@ -16,10 +17,12 @@ public class Segment : MonoBehaviour {
 	public int Width { get; protected set; }
 	
 	public int Length => RoadLanes[0].Length;
-	
-	private SegmentEnvironment leftEnvironment;
-	private SegmentEnvironment rightEnvironment;
-	
+	public int LeftLength { get; private set; }
+	public int RightLength { get; private set; }
+
+	public SideEnvironment LeftEnvironment { get; set; }
+	public SideEnvironment RightEnvironment { get; set; }
+
 	private readonly GameObject[] laneMeshObjects = new GameObject[4];
 	
 	public virtual void Init(SegmentData segmentData) {
@@ -54,7 +57,7 @@ public class Segment : MonoBehaviour {
 	private GameObject GetLaneMeshObj(LaneData laneData, Transform parent) {
 		int laneIndex = (int)laneData.type;
 		if (laneMeshObjects[laneIndex] == null) {
-			laneMeshObjects[laneIndex] = LaneGenerator.Instance.Generate(parent, laneData);
+			laneMeshObjects[laneIndex] = GeneratorsController.Instance.LaneGenerator.Generate(parent, laneData);
 			return laneMeshObjects[laneIndex];
 		}
 		GameObject obj = Instantiate(laneMeshObjects[laneIndex], parent);
@@ -85,63 +88,65 @@ public class Segment : MonoBehaviour {
 		}
 	}
 
+	public void SetLengthSides(int leftSideWalks, int rightSideWalks) {
+		LeftLength = leftSideWalks * Settings.Instance.laneSize + Length;
+		RightLength = rightSideWalks * Settings.Instance.laneSize + Length;
+	}
+
 	public void ClearNextRoadLanes() {
 		for (int i = 0; i < RoadLanes.Count; i++) {
 			RoadLanes[i].ClearNextRoadLanes();
 		}
 	}
 
-	public void AlignVerticalWith(Segment other) {
-		int backLanesCount0 = BackRoadLanes.Count;
-		int backLanesCount1 = other.BackRoadLanes.Count;
-		transform.SetLocalX(other.transform.localPosition.x + (backLanesCount1 - backLanesCount0) * Settings.Instance.laneSize);
-	}
-
-	public void AlignHorizontalWith(Segment other) {
-		int backLanesCount0 = BackRoadLanes.Count;
-		int backLanesCount1 = other.BackRoadLanes.Count;
-		transform.SetLocalZ(other.transform.localPosition.z + (backLanesCount1 - backLanesCount0) * Settings.Instance.laneSize);
-	}
-
-	public void CreateBottomLeftEnvironment(Segment leftSegment) {
-		SegmentEnvironment segmentEnvironment = CreateEnvironment();
-		segmentEnvironment.Create((int)transform.InverseTransformPoint(leftSegment.transform.position).z, true);
-		leftEnvironment = segmentEnvironment;
-	}
-
-	public void CreateBottomRightEnvironment(Segment rightSegment) {
-		SegmentEnvironment segmentEnvironment = CreateEnvironment();
-		segmentEnvironment.transform.SetLocalX(Width);
-		segmentEnvironment.Create((int)transform.InverseTransformPoint(rightSegment.transform.position).z, false);
-		rightEnvironment = segmentEnvironment;
-	}
-
-	public void CreteTopLeftEnvironment(Segment leftSegment) {
-		SegmentEnvironment segmentEnvironment = CreateEnvironment();
-		segmentEnvironment.transform.SetZ(leftSegment.transform.position.z + leftSegment.Width + Settings.Instance.laneSize);
-		segmentEnvironment.Create((int)((transform.position.z + Length) - (leftSegment.transform.position.z + leftSegment.Width)) - Settings.Instance.laneSize, true);
-		leftEnvironment = segmentEnvironment;
-	}
-
-	public void CreteTopRightEnvironment(Segment rightSegment) {
-		SegmentEnvironment segmentEnvironment = CreateEnvironment();
-		segmentEnvironment.transform.SetLocalX(Width);
-		segmentEnvironment.transform.SetZ(rightSegment.transform.position.z + rightSegment.Width + Settings.Instance.laneSize);
-		segmentEnvironment.Create((int)((transform.position.z + Length) - (rightSegment.transform.position.z + rightSegment.Width)) - Settings.Instance.laneSize, false);
-		rightEnvironment = segmentEnvironment;
-	}
-
-	public void ContinueGenerateEnvIfNeeded(Segment leftSegment, Segment rightSegment) {
-		leftEnvironment.ContinueGenerateIfNeeded((int)(transform.InverseTransformPoint(leftSegment.transform.position).z - leftEnvironment.transform.localPosition.z));
-		rightEnvironment.ContinueGenerateIfNeeded((int)(transform.InverseTransformPoint(rightSegment.transform.position).z - rightEnvironment.transform.localPosition.z));
+	public void CreateInitEnv() {
+		LeftEnvironment = CreateEnv("LeftEnv");
+		LeftEnvironment.transform.position = transform.position + transform.forward * Length;
+		LeftEnvironment.Generate(LeftEnvironment.transform.position - transform.forward * Length - transform.right * 10f, true);
+		RightEnvironment = CreateEnv("RightEnv");
+		RightEnvironment.transform.position = LeftEnvironment.transform.position + transform.right * Width;
+		RightEnvironment.Generate(RightEnvironment.transform.position - transform.forward * Length + transform.right * 10f, false);
 	}
 	
-	protected SegmentEnvironment CreateEnvironment() {
-		SegmentEnvironment segmentEnvironment = new GameObject().AddComponent<SegmentEnvironment>();
-		segmentEnvironment.name = "SegmentEnvironment";
-		segmentEnvironment.transform.parent = transform;
-		segmentEnvironment.transform.localPosition = Vector3.zero;
-		return segmentEnvironment;
+	public void CreateBottomEnv() {
+		LeftEnvironment = CreateEnv("LeftEnv");
+		LeftEnvironment.Generate(LeftEnvironment.transform.position + transform.forward * LeftLength - transform.right * 10f, true);
+		RightEnvironment = CreateEnv("RightEnv");
+		RightEnvironment.transform.position = LeftEnvironment.transform.position + transform.right * Width;
+		RightEnvironment.Generate(RightEnvironment.transform.position + transform.forward * RightLength + transform.right * 10f, false);
+	}
+	
+	public void CreateTopEnv() {
+		LeftEnvironment = CreateEnv("LeftEnv");
+		LeftEnvironment.transform.position = transform.position + transform.forward * Length;
+		LeftEnvironment.Generate(LeftEnvironment.transform.position - transform.forward * RightLength - transform.right * 10f, true);
+		RightEnvironment = CreateEnv("RightEnv");
+		RightEnvironment.transform.position = LeftEnvironment.transform.position + transform.right * Width;
+		RightEnvironment.Generate(RightEnvironment.transform.position - transform.forward * LeftLength + transform.right * 10f, false);
+	}
+
+	public void CreateSideEnv() {
+		LeftEnvironment = CreateEnv("LeftEnv");
+		LeftEnvironment.transform.position += transform.forward * Length;
+		LeftEnvironment.Generate(LeftEnvironment.transform.position - transform.forward * (RightLength - 10f) - transform.right * 10f, true);
+		RightEnvironment = CreateEnv("RightEnv");
+		RightEnvironment.transform.position = LeftEnvironment.transform.position + transform.right * Width;
+		RightEnvironment.Generate(RightEnvironment.transform.position - transform.forward * (LeftLength - 10f) + transform.right * 10f, false);
+	}
+
+	protected SideEnvironment CreateEnv(string name) {
+		SideEnvironment env = new GameObject(name).AddComponent<SideEnvironment>();
+		env.transform.parent = transform;
+		env.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+		return env;
+	}
+
+	public static Segment Create(Transform parent, string segmentName, float angle = 0f) {
+		return Create(parent, segmentName, GetRandomSegmentData(), angle);
+	}
+	
+	public static Segment Create(Transform parent, string segmentName, int length, float angle = 0f) {
+		return Create(parent, segmentName, GetRandomSegmentData(length), angle);
 	}
 
 	public static Segment Create(Transform parent, string segmentName, SegmentInputData segmentInputData, float angle = 0f) {
@@ -208,6 +213,15 @@ public class Segment : MonoBehaviour {
 			lanes = lanes.ToArray()
 		};
 	}
+	
+	private static SegmentData GetRandomSegmentData(int length = -1) {
+		SegmentInputData segmentInputData = new() {
+			backLanes = Random.Range(1, 5),
+			frontLanes = Random.Range(1, 5),
+			length = length == -1 ? Settings.Instance.laneSize * Random.Range(30, 50) : length
+		};
+		return GetSegmentData(segmentInputData);
+	}
 
 	public void ClearAICars() {
 		foreach (var roadLane in RoadLanes) {
@@ -221,11 +235,11 @@ public class Segment : MonoBehaviour {
 			Destroy(lane.gameObject);
 		}
 		lanes.Clear();
-		if (leftEnvironment != null) {
-			leftEnvironment.Clear();
+		if (LeftEnvironment != null) {
+			LeftEnvironment.Clear();
 		}
-		if (rightEnvironment != null) {
-			rightEnvironment.Clear();
+		if (RightEnvironment != null) {
+			RightEnvironment.Clear();
 		}
 		Destroy(gameObject);
 	}
@@ -233,6 +247,12 @@ public class Segment : MonoBehaviour {
 
 public class SegmentData {
 	public LaneData[] lanes;
+}
+
+public class SegmentInputData {
+	public int backLanes = 2;
+	public int frontLanes = 2;
+	public int length = 100;
 }
 
 

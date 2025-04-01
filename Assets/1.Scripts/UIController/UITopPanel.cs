@@ -38,6 +38,12 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 	[Space]
 	[SerializeField] private RectTransform distanceTransform;
 	[SerializeField] private TextMeshProUGUI distanceText;
+
+	[Space]
+	[SerializeField] private Image arrowDirImage;
+	[SerializeField] private Sprite forwardArrowSprite;
+	[SerializeField] private Sprite leftArrowSprite;
+	[SerializeField] private Sprite rightArrowSprite;
 	
 	private Coroutine waitCoroutine;
 	
@@ -146,6 +152,11 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 				distanceTransform.gameObject.SetActive(false);
 			});
 		}
+	}
+
+	public void SetArrowDirImage(GenerateDir dir) {
+		arrowDirImage.sprite = dir == GenerateDir.Forward ? forwardArrowSprite : dir == GenerateDir.Left ? leftArrowSprite : rightArrowSprite;
+		arrowDirImage.gameObject.SetActive(true);
 	}
 
 	private void ShowBubbleSpeech(string text, Color color, float hideDelay = 3f, Action onComplete = null) {

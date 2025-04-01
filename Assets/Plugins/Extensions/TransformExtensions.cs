@@ -117,4 +117,12 @@ public static partial class TransformExtensions {
 			IterateAllChildren(child, action);
 		}
 	}
+	
+	public static Vector3 ToVector3(this Vector2 pos) {
+		return new Vector3(pos.x, 0f, pos.y);
+	}
+	
+	public static Vector2 ToVector2(this Vector3 pos) {
+		return new Vector2(pos.x, pos.z);
+	}
 }

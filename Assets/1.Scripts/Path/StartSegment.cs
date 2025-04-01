@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class StartSegment : Segment {
 
-	public Building garage;
-	
 	public override void Init(SegmentData segmentData) {
 		SegmentData = segmentData;
 		RoadLanes = new List<RoadLane>();
@@ -22,11 +20,9 @@ public class StartSegment : Segment {
 				}
 			}
 		}
-	}
-
-	public void CreateRightEnvironment(Segment rightSegment) {
-		SegmentEnvironment segmentEnvironment = CreateEnvironment();
-		segmentEnvironment.transform.SetLocalXZ(Width, garage.transform.localPosition.z + garage.Length + Settings.Instance.laneSize);
-		segmentEnvironment.Create((int)segmentEnvironment.transform.InverseTransformPoint(rightSegment.transform.position).z, false);
+		
+		LeftEnvironment = CreateEnv("LeftEnv");
+		LeftEnvironment.transform.position = transform.position + transform.forward * Length;
+		LeftEnvironment.Generate(LeftEnvironment.transform.position - transform.forward * Length - transform.right * 10f, true);
 	}
 }

@@ -17,15 +17,15 @@ public class Intersection : MonoBehaviour {
 	private Segment rightSegment;
 	private Segment topSegment;
 	
-	private TrafficLight bottomTrafficLight;
-	private TrafficLight leftTrafficLight;
-	private TrafficLight rightTrafficLight;
-	private TrafficLight topTrafficLight;
-	
 	private Element bottomLeftCorner;
 	private Element bottomRightCorner;
 	private Element topRightCorner;
 	private Element topLeftCorner;
+	
+	private TrafficLight bottomLeftTrafficLight;
+	private TrafficLight bottomRightTrafficLight;
+	private TrafficLight topRightTrafficLight;
+	private TrafficLight topLeftTrafficLight;
 
 	private int laneSize;
 
@@ -42,14 +42,14 @@ public class Intersection : MonoBehaviour {
 		CreateCorners();
 		CreateTrafficLights();
 		CreateCrossings();
-		CreateSideWalks(); 
+		CreateSideWalks();
 		CreateRoadBares();
-		
+
 		verticallyRoadLanes.AddRange(this.bottomSegment.ForwardRoadLanes);
 		verticallyRoadLanes.AddRange(this.topSegment.BackRoadLanes);
 		
 		horizontallyRoadLanes.AddRange(this.leftSegment.BackRoadLanes);
-		horizontallyRoadLanes.AddRange(this.rightSegment.ForwardRoadLanes);
+		horizontallyRoadLanes.AddRange(this.rightSegment.BackRoadLanes);
 
 		StartCoroutine(SemaphoreSystem());
 	}
@@ -63,28 +63,28 @@ public class Intersection : MonoBehaviour {
 		void allowPassingVertically() {
 			allowPassingRoadLanes(verticallyRoadLanes, true);
 			allowPassingRoadLanes(horizontallyRoadLanes, false);
-			bottomTrafficLight.SetGreen();
-			topTrafficLight.SetGreen();
-			leftTrafficLight.SetRed();
-			rightTrafficLight.SetRed();
+			bottomLeftTrafficLight.SetRed();
+			bottomRightTrafficLight.SetGreen();
+			topRightTrafficLight.SetRed();
+			topLeftTrafficLight.SetGreen();
 		}
 
 		void allowPassingHorizontally() {
 			allowPassingRoadLanes(verticallyRoadLanes, false);
 			allowPassingRoadLanes(horizontallyRoadLanes, true);
-			bottomTrafficLight.SetRed();
-			topTrafficLight.SetRed();
-			leftTrafficLight.SetGreen();
-			rightTrafficLight.SetGreen();
+			bottomLeftTrafficLight.SetGreen();
+			bottomRightTrafficLight.SetRed();
+			topRightTrafficLight.SetGreen();
+			topLeftTrafficLight.SetRed();
 		}
 
 		void disallowPassingAll() {
 			allowPassingRoadLanes(verticallyRoadLanes, false);
 			allowPassingRoadLanes(horizontallyRoadLanes, false);
-			bottomTrafficLight.SetYellow();
-			topTrafficLight.SetYellow();
-			leftTrafficLight.SetYellow();
-			rightTrafficLight.SetYellow();
+			bottomLeftTrafficLight.SetYellow();
+			bottomRightTrafficLight.SetYellow();
+			topRightTrafficLight.SetYellow();
+			topLeftTrafficLight.SetYellow();
 		}
 		
 		while (true) {
@@ -103,126 +103,140 @@ public class Intersection : MonoBehaviour {
 	}
 	
 	private void CreateCorners() {
-		bottomLeftCorner = cornerPrefab.Create("BottomLeftCorner", transform, 0f, bottomSegment.transform.position.x, leftSegment.transform.position.z);
-		bottomRightCorner = cornerPrefab.Create("BottomRightCorner", transform, -90f, bottomSegment.transform.position.x + bottomSegment.Width, rightSegment.transform.position.z);
-		topRightCorner = cornerPrefab.Create("TopRightCorner", transform, 180f, topSegment.transform.position.x + topSegment.Width, rightSegment.transform.position.z + rightSegment.Width);
-		topLeftCorner = cornerPrefab.Create("TopLeftCorner", transform, 90f, topSegment.transform.position.x, leftSegment.transform.position.z + leftSegment.Width);
+		bottomLeftCorner = cornerPrefab.Create("BottomLeftCorner", transform, bottomSegment.transform.localEulerAngles.y);
+		Utils.GetIntersection(bottomSegment.transform.position, bottomSegment.transform.forward,
+			leftSegment.transform.position, leftSegment.transform.forward, out Vector3 p0);
+		bottomLeftCorner.transform.position = p0;
 		elements.Add(bottomLeftCorner);
+		
+		bottomRightCorner = cornerPrefab.Create("BottomRightCorner", transform, bottomLeftCorner.transform.localEulerAngles.y - 90f);
+		Utils.GetIntersection(bottomSegment.transform.position + bottomSegment.transform.right * bottomSegment.Width, bottomSegment.transform.forward,
+			rightSegment.transform.position + rightSegment.transform.right * rightSegment.Width, rightSegment.transform.forward, out Vector3 p1);
+		bottomRightCorner.transform.position = p1;
 		elements.Add(bottomRightCorner);
+		
+		topRightCorner = cornerPrefab.Create("TopRightCorner", transform, bottomLeftCorner.transform.localEulerAngles.y - 180f);
+		Utils.GetIntersection(rightSegment.transform.position, rightSegment.transform.forward,
+			topSegment.transform.position + topSegment.transform.right * topSegment.Width, topSegment.transform.forward, out Vector3 p2);
+		topRightCorner.transform.position = p2;
 		elements.Add(topRightCorner);
+
+		topLeftCorner = cornerPrefab.Create("TopLeftCorner", transform, bottomLeftCorner.transform.localEulerAngles.y + 90f);
+		Utils.GetIntersection(topSegment.transform.position, topSegment.transform.forward,
+			leftSegment.transform.position + leftSegment.transform.right * leftSegment.Width, leftSegment.transform.forward, out Vector3 p3);
+		topLeftCorner.transform.position = p3;
 		elements.Add(topLeftCorner);
 	}
 
 	private void CreateTrafficLights() {
-		bottomTrafficLight = (TrafficLight)trafficLightPrefab.Create("BottomTrafficLight", transform, 180f, bottomRightCorner.transform.position.x - 3f, bottomRightCorner.transform.position.z);
-		leftTrafficLight = (TrafficLight)trafficLightPrefab.Create("LeftTrafficLight", transform, 270f, bottomLeftCorner.transform.position.x, bottomLeftCorner.transform.position.z + 3f);
-		rightTrafficLight = (TrafficLight)trafficLightPrefab.Create("RightTrafficLight", transform, 90f, topRightCorner.transform.position.x, topRightCorner.transform.position.z - 3f);
-		topTrafficLight = (TrafficLight)trafficLightPrefab.Create("TopTrafficLight", transform, 0f, topLeftCorner.transform.position.x + 3f, topLeftCorner.transform.position.z);
-		elements.Add(bottomTrafficLight);
-		elements.Add(leftTrafficLight);
-		elements.Add(rightTrafficLight);
-		elements.Add(topTrafficLight);
+		bottomLeftTrafficLight = CreateTrafficLight("BottomLeftTrafficLight", bottomLeftCorner.transform);
+		bottomRightTrafficLight = CreateTrafficLight("BottomRightTrafficLight", bottomRightCorner.transform);
+		topRightTrafficLight = CreateTrafficLight("TopRightTrafficLight", topRightCorner.transform);
+		topLeftTrafficLight = CreateTrafficLight("TopLeftTrafficLight", topLeftCorner.transform);
+	}
+
+	private TrafficLight CreateTrafficLight(string name, Transform corner) {
+		TrafficLight trafficLight = (TrafficLight)trafficLightPrefab.Create(name, transform, corner.transform.localEulerAngles.y - 90f);
+		trafficLight.transform.position = corner.transform.position + corner.transform.forward * 3f;
+		elements.Add(trafficLight);
+		return trafficLight;
 	}
 
 	private void CreateCrossings() {
-		int start = Mathf.RoundToInt(bottomLeftCorner.transform.position.z) + laneSize;
-		int end = Mathf.RoundToInt(topLeftCorner.transform.position.z) - laneSize;
-		for (int z = start; z < end; z += laneSize) {
-			elements.Add(crossingPrefab.Create("LeftCrossing", transform, 0f, Mathf.Min(bottomLeftCorner.transform.position.x, topLeftCorner.transform.position.x), z));
-		}
-		start = Mathf.RoundToInt(bottomLeftCorner.transform.position.x) + laneSize;
-		end = Mathf.RoundToInt(bottomRightCorner.transform.position.x) - laneSize;
-		for (int x = start; x < end; x += laneSize) {
-			elements.Add(crossingPrefab.Create("BottomCrossing", transform, 90f, x, Mathf.Min(bottomLeftCorner.transform.position.z, bottomRightCorner.transform.position.z) + laneSize));
-		}
-		start = Mathf.RoundToInt(bottomRightCorner.transform.position.z) + laneSize;
-		end = Mathf.RoundToInt(topRightCorner.transform.position.z) - laneSize;
-		for (int z = start; z < end; z += laneSize) {
-			elements.Add(crossingPrefab.Create("RightCrossing", transform, 0f, Mathf.Max(bottomRightCorner.transform.position.x, topRightCorner.transform.position.x) - laneSize, z));
-		}
-		start = Mathf.RoundToInt(topLeftCorner.transform.position.x) + laneSize;
-		end = Mathf.RoundToInt(topRightCorner.transform.position.x) - laneSize;
-		for (int x = start; x < end; x += laneSize) {
-			elements.Add(crossingPrefab.Create("TopCrossing", transform, 90f, x, Mathf.Max(topLeftCorner.transform.position.z, topRightCorner.transform.position.z)));
-		}
+		CreateCrossing("CurrentCrossing", bottomSegment, bottomSegment.Length + laneSize);
+		CreateCrossing("RightCrossing", rightSegment);
+		CreateCrossing("TopCrossing", topSegment);
+		CreateCrossing("LeftCrossing", leftSegment);
 	}
 
+	private void CreateCrossing(string name, Segment segment, int length = 0) {
+		GameObject crossing = GeneratorsController.Instance.CrossingGenerator.Generate(name, transform, laneSize, segment.RoadLanes.Count * laneSize);
+		crossing.transform.SetLocalAngleY(segment.transform.localEulerAngles.y + 90f);
+		crossing.transform.position = segment.transform.position + segment.transform.forward * length + segment.transform.right * laneSize;
+	}
+	
 	private void CreateSideWalks() {
-		int start = Mathf.RoundToInt(leftSegment.transform.position.x);
-		int end = Mathf.RoundToInt(bottomLeftCorner.transform.position.x);
-		for (int x = start; x < end; x += laneSize) {
-			elements.Add(sideWalkPrefab.Create("LeftBottomSideWalk", transform, 0f, x, leftSegment.transform.position.z));
+		int bottomLeftSideWalks0 = CreateSideWalk("BottomLeftSideWalk0", 
+			leftSegment.transform.position, 
+			bottomLeftCorner.transform.position, leftSegment.transform.localEulerAngles.y + 90f, -laneSize);
+		int bottomLeftSideWalks1 = CreateSideWalk("BottomLeftSideWalk1", 
+			bottomSegment.transform.position + bottomSegment.transform.forward * bottomSegment.Length, 
+			bottomLeftCorner.transform.position, bottomSegment.transform.localEulerAngles.y + 90f);
+		int bottomRightSideWalk0 = CreateSideWalk("BottomRightSideWalk0",
+			bottomSegment.transform.position + bottomSegment.transform.forward * bottomSegment.Length + bottomSegment.transform.right * bottomSegment.Width, 
+			bottomRightCorner.transform.position, bottomSegment.transform.localEulerAngles.y - 90f, -laneSize);
+		int bottomRightSideWalk1 = CreateSideWalk("BottomRightSideWalk1",
+			rightSegment.transform.position + rightSegment.transform.right * rightSegment.Width, 
+			bottomRightCorner.transform.position, rightSegment.transform.localEulerAngles.y - 90f);
+		int topRightSideWalk0 = CreateSideWalk("TopRightSideWalk0",
+			rightSegment.transform.position, 
+			topRightCorner.transform.position, rightSegment.transform.localEulerAngles.y + 90f, -laneSize);
+		int topRightSideWalk1 = CreateSideWalk("TopRightSideWalk1",
+			topSegment.transform.position + topSegment.transform.right * topSegment.Width, 
+			topRightCorner.transform.position, topSegment.transform.localEulerAngles.y - 90f);
+		int topLeftSideWalk0 = CreateSideWalk("TopLeftSideWalk0",
+			topSegment.transform.position, 
+			topLeftCorner.transform.position, topSegment.transform.localEulerAngles.y + 90f, -laneSize);
+		int topLeftSideWalk1 = CreateSideWalk("TopLeftSideWalk1",
+			leftSegment.transform.position + leftSegment.transform.right * leftSegment.Width, 
+			topLeftCorner.transform.position, leftSegment.transform.localEulerAngles.y - 90f);
+		bottomSegment.SetLengthSides(bottomLeftSideWalks1, bottomRightSideWalk0);
+		rightSegment.SetLengthSides(bottomRightSideWalk1, topRightSideWalk0);
+		topSegment.SetLengthSides(topRightSideWalk1, topLeftSideWalk0);
+		leftSegment.SetLengthSides(topLeftSideWalk1, bottomLeftSideWalks0);
+	}
+	
+	private int CreateSideWalk(string name, Vector3 start, Vector3 end, float angleY, float offset = 0f) {
+		int dist = Mathf.RoundToInt(Vector3.Distance(start, end));
+		if (dist == 0) {
+			return 0;
 		}
-		start = Mathf.RoundToInt(bottomSegment.transform.position.z + bottomSegment.Length);
-		end = Mathf.RoundToInt(bottomLeftCorner.transform.position.z);
-		for (int z = start; z < end; z += laneSize) {
-			elements.Add(sideWalkPrefab.Create("BottomLeftSideWalk", transform, 90f, bottomSegment.transform.position.x, z + laneSize));
+		int count = dist / laneSize;
+		Vector3 dir = (end - start).normalized;
+		start += dir * offset;
+		for (int i = 0; i < count; i++) {
+			Element sideWalk = sideWalkPrefab.Create(name, transform, angleY);
+			start += dir * laneSize;
+			sideWalk.transform.position = start;
+			elements.Add(sideWalk);
 		}
-		start = Mathf.RoundToInt(bottomSegment.transform.position.z + bottomSegment.Length);
-		end = Mathf.RoundToInt(bottomRightCorner.transform.position.z);
-		for (int z = start; z < end; z += laneSize) {
-			elements.Add(sideWalkPrefab.Create("BottomRightSideWalk", transform, -90f, bottomSegment.transform.position.x + bottomSegment.Width, z));
-		}
-		start = Mathf.RoundToInt(bottomRightCorner.transform.position.x);
-		end = Mathf.RoundToInt(rightSegment.transform.position.x - rightSegment.Length);
-		for (int x = start; x < end; x += laneSize) {
-			elements.Add(sideWalkPrefab.Create("RightBottomSideWalk", transform, 0f, x, bottomRightCorner.transform.position.z));
-		}
-		start = Mathf.RoundToInt(topRightCorner.transform.position.x);
-		end = Mathf.RoundToInt(rightSegment.transform.position.x - rightSegment.Length);
-		for (int x = start; x < end; x += laneSize) {
-			elements.Add(sideWalkPrefab.Create("RightTopSideWalk", transform, 180f, x + laneSize, topRightCorner.transform.position.z));
-		}
-		start = Mathf.RoundToInt(topRightCorner.transform.position.z);
-		end = Mathf.RoundToInt(topSegment.transform.position.z);
-		for (int z = start; z < end; z += laneSize) {
-			elements.Add(sideWalkPrefab.Create("TopRightSideWalk", transform, -90f, topSegment.transform.position.x + topSegment.Width, z));
-		}
-		start = Mathf.RoundToInt(topLeftCorner.transform.position.z);
-		end = Mathf.RoundToInt(topSegment.transform.position.z);
-		for (int z = start; z < end; z += Settings.Instance.laneSize) {
-			elements.Add(sideWalkPrefab.Create("TopLeftSideWalk", transform, 90f, topSegment.transform.position.x, z + laneSize));
-		}
-		start = Mathf.RoundToInt(leftSegment.transform.position.x);
-		end = Mathf.RoundToInt(topLeftCorner.transform.position.x);
-		for (int x = start; x < end; x += Settings.Instance.laneSize) {
-			elements.Add(sideWalkPrefab.Create("LeftTopSideWalk", transform, 180f, x + laneSize, topLeftCorner.transform.position.z));
-		}
+		return count;
 	}
 
 	private void CreateRoadBares() {
-		Vector2[] points = {
-			new (bottomLeftCorner.transform.position.x + laneSize, bottomLeftCorner.transform.position.z + laneSize),
-			new (bottomRightCorner.transform.position.x - laneSize, bottomRightCorner.transform.position.z + laneSize),
-			new (topRightCorner.transform.position.x - laneSize, topRightCorner.transform.position.z - laneSize),
-			new (topLeftCorner.transform.position.x + laneSize, topLeftCorner.transform.position.z - laneSize)
+		List<Vector3> polyPoints = new List<Vector3> {
+			bottomLeftCorner.transform.position + bottomLeftCorner.transform.forward * laneSize + bottomLeftCorner.transform.right * laneSize,
+			bottomSegment.transform.position + bottomSegment.transform.forward * (bottomSegment.Length + laneSize) + bottomSegment.transform.right * laneSize,
+			bottomSegment.transform.position + bottomSegment.transform.forward * (bottomSegment.Length + laneSize) + bottomSegment.transform.right * (bottomSegment.Width - laneSize),
+			bottomRightCorner.transform.position + bottomRightCorner.transform.forward * laneSize + bottomRightCorner.transform.right * laneSize,
+			rightSegment.transform.position - rightSegment.transform.forward * laneSize + rightSegment.transform.right * (rightSegment.Width - laneSize),
+			rightSegment.transform.position - rightSegment.transform.forward * laneSize + rightSegment.transform.right * laneSize,
+			topRightCorner.transform.position + topRightCorner.transform.forward * laneSize + topRightCorner.transform.right * laneSize,
+			topSegment.transform.position - topSegment.transform.forward * laneSize + topSegment.transform.right * (topSegment.Width - laneSize),
+			topSegment.transform.position - topSegment.transform.forward * laneSize + topSegment.transform.right * laneSize,
+			topLeftCorner.transform.position + topLeftCorner.transform.forward * laneSize + topLeftCorner.transform.right * laneSize,
+			leftSegment.transform.position - leftSegment.transform.forward * laneSize + leftSegment.transform.right * (leftSegment.Width - laneSize),
+			leftSegment.transform.position - leftSegment.transform.forward * laneSize + leftSegment.transform.right * laneSize
 		};
 
-		int minX = Mathf.RoundToInt(Mathf.Min(points[0].x, points[1].x, points[2].x, points[3].x));
-		int maxX = Mathf.RoundToInt(Mathf.Max(points[0].x, points[1].x, points[2].x, points[3].x));
-		int minZ = Mathf.RoundToInt(Mathf.Min(points[0].y, points[1].y, points[2].y, points[3].y));
-		int maxZ = Mathf.RoundToInt(Mathf.Max(points[0].y, points[1].y, points[2].y, points[3].y));
+		Vector3[] cornerPoints = new Vector3[4];
+		cornerPoints[0] = transform.position;
+		Utils.GetIntersection(bottomSegment.transform.position + bottomSegment.transform.forward * (bottomSegment.Length + laneSize), 
+			bottomSegment.transform.right,
+			rightSegment.transform.position - rightSegment.transform.forward * laneSize,
+			-rightSegment.transform.right, out cornerPoints[1]);
+		Utils.GetIntersection(rightSegment.transform.position - rightSegment.transform.forward * laneSize, 
+			-rightSegment.transform.right,
+			topSegment.transform.position - topSegment.transform.forward * laneSize,
+			topSegment.transform.right, out cornerPoints[2]);
+		Utils.GetIntersection(topSegment.transform.position - topSegment.transform.forward * laneSize, 
+			-topSegment.transform.right,
+			leftSegment.transform.position - leftSegment.transform.forward * laneSize,
+			-leftSegment.transform.right, out cornerPoints[3]);
 		
-		List<Vector3> polyPoints = new() {
-			new Vector3(points[0].x, 0f, points[0].y),
-			points[0].y > points[1].y ? new Vector3(points[0].x, 0f, points[1].y) : new Vector3(points[1].x, 0f, points[0].y),
-			new Vector3(points[1].x, 0f, points[1].y),
-			points[1].x > points[2].x ? new Vector3(points[1].x, 0f, points[2].y) : new Vector3(points[2].x, 0f, points[1].y),
-			new Vector3(points[2].x, 0f, points[2].y),
-			points[2].y > points[3].y ? new Vector3(points[3].x, 0f, points[2].y) : new Vector3(points[2].x, 0f, points[3].y),
-			new Vector3(points[3].x, 0f, points[3].y),
-			points[3].x > points[0].x ? new Vector3(points[0].x, 0f, points[3].y) : new Vector3(points[3].x, 0f, points[0].y)
-		};
-		for (int x = minX; x < maxX; x += laneSize) {
-			for (int z = minZ; z < maxZ; z += laneSize) {
-				Vector3 point = new Vector3(x + laneSize / 2f, 0f, z + laneSize / 2f);
-				if (GeometryUtils.PointInPolygon(point, polyPoints)) {
-					elements.Add(roadBarePrefab.Create("RoadBare", transform, 0f, point.x, point.z));
-				}
-			}
-		}
+		GeneratorsController.Instance.RoadBareGenerator.Generate("RoadBare", transform, cornerPoints, polyPoints);
 	}
-	
+
 	public void CreateRoadConnections() {
 		// bottomSegment
 		int maxFrontConnections = Mathf.Min(bottomSegment.ForwardRoadLanes.Count, topSegment.ForwardRoadLanes.Count);
@@ -234,7 +248,7 @@ public class Intersection : MonoBehaviour {
 		for (int i = 0; i < bottomSegment.ForwardRoadLanes.Count; i++) {
 			RoadLane lane0 = bottomSegment.ForwardRoadLanes[i];
 			if (i == 0 || !lane0.HasNextRoadLanes()) {
-				RoadLane lane1 = rightSegment.BackRoadLanes[Mathf.Min(i, rightSegment.BackRoadLanes.Count - 1)];
+				RoadLane lane1 = rightSegment.ForwardRoadLanes[Mathf.Min(i, rightSegment.ForwardRoadLanes.Count - 1)];
 				List<Vector3> transPoints = GetTransitionPoints(lane1.transform.forward, lane0.EndPos, lane1.StartPos);
 				lane0.AddNextRoadLane(lane1, transPoints);
 			}
@@ -255,28 +269,28 @@ public class Intersection : MonoBehaviour {
 				lane0.AddNextRoadLane(lane1, transPoints);
 			}
 		}
-		
+
 		// rightSegment
-		int maxRightConnections = Mathf.Min(rightSegment.ForwardRoadLanes.Count, leftSegment.ForwardRoadLanes.Count);
+		int maxRightConnections = Mathf.Min(rightSegment.BackRoadLanes.Count, leftSegment.ForwardRoadLanes.Count);
 		for (int i = 0; i < maxRightConnections; i++) {
-			RoadLane lane0 = rightSegment.ForwardRoadLanes[^(i + 1)];
+			RoadLane lane0 = rightSegment.BackRoadLanes[^(i + 1)];
 			RoadLane lane1 = leftSegment.ForwardRoadLanes[^(i + 1)];
 			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.EndPos, lane1.StartPos });
 		}
-		for (int i = 0; i < rightSegment.ForwardRoadLanes.Count; i++) {
-			RoadLane lane0 = rightSegment.ForwardRoadLanes[i];
+		for (int i = 0; i < rightSegment.BackRoadLanes.Count; i++) {
+			RoadLane lane0 = rightSegment.BackRoadLanes[i];
 			if (i == 0 || !lane0.HasNextRoadLanes()) {
 				RoadLane lane1 = topSegment.ForwardRoadLanes[Mathf.Min(i, topSegment.ForwardRoadLanes.Count - 1)];
 				List<Vector3> transPoints = GetTransitionPoints(lane1.transform.forward, lane0.EndPos, lane1.StartPos);
 				lane0.AddNextRoadLane(lane1, transPoints);
 			}
 		}
-		
+
 		// leftSegment
-		int maxLeftConnections = Mathf.Min(rightSegment.BackRoadLanes.Count, leftSegment.BackRoadLanes.Count);
+		int maxLeftConnections = Mathf.Min(leftSegment.BackRoadLanes.Count, rightSegment.ForwardRoadLanes.Count);
 		for (int i = 0; i < maxLeftConnections; i++) {
 			RoadLane lane0 = leftSegment.BackRoadLanes[^(i + 1)];
-			RoadLane lane1 = rightSegment.BackRoadLanes[^(i + 1)];
+			RoadLane lane1 = rightSegment.ForwardRoadLanes[^(i + 1)];
 			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.EndPos, lane1.StartPos });
 		}
 		for (int i = 0; i < leftSegment.BackRoadLanes.Count; i++) {
