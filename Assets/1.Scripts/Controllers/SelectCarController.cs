@@ -110,6 +110,7 @@ public class SelectCarController : MonoBehaviour {
 			garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
 			garagePanel.UpdateBottom(0);
 			rotateObjController.SetObj(templatesUserCar[selection].BoxCollider);
+			UpdateSelection(0);
 			AnalyticsSystem.RecordBuyCarEvent(selection);
 		} else {
 			UIController.Instance.GetPanel<UIInfoPanel>().Init(new UIInfoPanel.Data {
