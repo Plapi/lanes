@@ -1,11 +1,19 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 
-	[SerializeField] private Segment startSegment;[Space]
+	[SerializeField] private Segment startSegment;
+	
+	[Space]
 	[SerializeField] private bool aiCarsEnabled;
+	[SerializeField] private float spawnAICarDistanceStartMin;
+	[SerializeField] private float spawnAICarDistanceStartMax;
+	[SerializeField] private float spawnAICarDistanceEndMin; // 20
+	[SerializeField] private float spawnAICarDistanceEndMax; // 40
+	[SerializeField] private float spawnAICarDistanceDecrease;
 	
 	private Segment currentSegment;
 	private Segment bottomSegment;
@@ -15,7 +23,12 @@ public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 	private Segment[] segments;
 	private Intersection intersection;
 
+	private float spawnAICarDistanceMin;
+	private float spawnAICarDistanceMax;
+
 	public void Init(GenerateDir dir) {
+		spawnAICarDistanceMin = spawnAICarDistanceStartMin;
+		spawnAICarDistanceMax = spawnAICarDistanceStartMax;
 		if (startSegment == null) {
 			currentSegment = Segment.Create(transform, "CurrentSegment", new SegmentInputData { length = 200 });
 			currentSegment.CreateInitEnv();	
@@ -186,6 +199,14 @@ public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 			}
 		}
 		intersection.Clear();
+	}
+	
+	public float GetSpawnAICarDistance() {
+		spawnAICarDistanceMin = Mathf.Clamp(spawnAICarDistanceMin - spawnAICarDistanceDecrease,
+			spawnAICarDistanceEndMin, spawnAICarDistanceStartMin);
+		spawnAICarDistanceMax = Mathf.Clamp(spawnAICarDistanceMax - spawnAICarDistanceDecrease,
+			spawnAICarDistanceEndMax, spawnAICarDistanceStartMax);
+		return Random.Range(spawnAICarDistanceMin, spawnAICarDistanceMax);
 	}
 	
 	private void Update() {

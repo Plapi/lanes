@@ -37,7 +37,7 @@ public class RoadLane : Lane<RoadLaneData> {
 
 	public void SpawnAICars() {
 		int randomSpawnDistance() {
-			return Random.Range(Settings.Instance.spawnAICarDistanceMin, Settings.Instance.spawnAICarDistanceMax);
+			return Mathf.RoundToInt(TrackGenerator.Instance.GetSpawnAICarDistance());
 		}
 		for (int z = randomSpawnDistance(); z < Length - 4f; z += randomSpawnDistance()) {
 			SpawnAICar(z);

@@ -35,6 +35,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 47dbfa009a2794dfeaa4388a2f0cb980, type: 3}
   - {fileID: 21300000, guid: 95a7560fae6624681a7669bb5e21ba77, type: 3}
   - {fileID: 21300000, guid: 924b1f22941f248e3aeb1cf8b67527df, type: 3}
-  testMode: 0
+  testMode: 1
   enableAdds: 0
   enableAnalytics: 0

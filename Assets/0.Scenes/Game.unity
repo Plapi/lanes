@@ -5848,6 +5848,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startSegment: {fileID: 1503946316}
   aiCarsEnabled: 1
+  spawnAICarDistanceStartMin: 90
+  spawnAICarDistanceStartMax: 110
+  spawnAICarDistanceEndMin: 20
+  spawnAICarDistanceEndMax: 40
+  spawnAICarDistanceDecrease: 0.1
 --- !u!1 &139083115
 GameObject:
   m_ObjectHideFlags: 0
