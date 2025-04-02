@@ -8,16 +8,16 @@ public class PersonPickupController : MonoBehaviour {
 	[SerializeField] private Transform endPin;
 
 	private UserCar userCar;
-	private int personIndex;
 	
 	public PickupState State { get; private set; }
-	public Action<int> OnPickup;
+	public Action OnPickup;
+	public Action OnNotPickup;
 	public Action OnDrop;
-	public Action OnMiss;
+	public Action OnDropMissed;
 	public Action<int> OnUpdateDistance;
 	
-	public void SetPickUp(Vector3 pos, Transform segment, UserCar userCar) {
-		person.SetWaving(out personIndex);
+	public void SetPickUp(Vector3 pos, Transform segment, UserCar userCar, int personIndex) {
+		person.SetWaving(personIndex);
 		person.transform.position = pos;
 		startPin.transform.position = pos - segment.transform.right * 3.5f;
 		startPin.transform.forward = segment.transform.forward;
@@ -43,7 +43,7 @@ public class PersonPickupController : MonoBehaviour {
 				State = PickupState.Pickup;
 				person.gameObject.SetActive(false);
 				startPin.gameObject.SetActive(false);
-				OnPickup?.Invoke(personIndex);
+				OnPickup?.Invoke();
 				return;
 			}
 			if (distance < 50f &&
@@ -51,6 +51,7 @@ public class PersonPickupController : MonoBehaviour {
 				State = PickupState.None;
 				person.gameObject.SetActive(false);
 				startPin.gameObject.SetActive(false);
+				OnNotPickup?.Invoke();
 			}
 		} else if (State == PickupState.Pickup) {
 			if (endPin.gameObject.activeSelf) {
@@ -67,7 +68,7 @@ public class PersonPickupController : MonoBehaviour {
 					Vector3.Dot(userCar.transform.forward, (endPin.position - userCar.transform.position).normalized) < 0f) {
 					State = PickupState.None;
 					endPin.gameObject.SetActive(false);
-					OnMiss?.Invoke();
+					OnDropMissed?.Invoke();
 				}
 			}
 		} else if (State == PickupState.Finish) {

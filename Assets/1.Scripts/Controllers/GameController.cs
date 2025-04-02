@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JsonFx.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
@@ -13,7 +14,10 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private Transform skyline;
 	[SerializeField] private SelectCarController selectCarController;
 	[SerializeField] private GameObject smoke;
+	
+	[Space]
 	[SerializeField] private PersonPickupController personPickupController;
+	[SerializeField] private bool personsEnabled;
 	
 	[Space]
 	[SerializeField] private AudioClip[] onLoseHealthClips;
@@ -36,47 +40,72 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private readonly List<int> personsDropped = new();
 	private int coinsEarned;
 
-	private GenerateDir prevGenerateDir;
-	private GenerateDir nextGenerateDir;
+	private readonly List<GenerateDir> generatedDirs = new();
+	private int currentGeneratedDirsIndex;
+
+	private int currentPersonIndex = -1;
 	
 	protected void Start() {
 		AudioSystem.Init(this, PlayerPrefsManager.UserData.volumes);
 		HapticFeedback.SetEnabled(PlayerPrefsManager.UserData.hapticFeedback);
 		initCameraPosAndRot = new PosAndRot(mainCamera.transform);
 		trackGenerator.Init(GenerateDir.Forward);
-		InitPersonPickupController();
+		if (personsEnabled) {
+			InitPersonPickupController();	
+		}
 		InitUI();
 		selectCarController.Init();
 	}
 
 	private void InitPersonPickupController() {
 		int startDistance = 0;
-		int pIndex = 0;
 		List<int> personPickupSegmentsList = new() { 1, Random.Range(1, 3), Random.Range(2, 4) };
-		personPickupController.OnPickup = personIndex => {
+		personPickupController.OnPickup = () => {
 			if (personPickupSegmentsList.Count > 0) {
 				personPickupSegments = personPickupSegmentsList[0];
 				personPickupSegmentsList.RemoveAt(0);
 			} else {
 				personPickupSegments = Random.Range(1, 6);	
 			}
-			topPanel.ShowPerson(personPickupSegments, Settings.Instance.personSprites[personIndex]);
+			topPanel.ShowPerson(personPickupSegments, Settings.Instance.personSprites[currentPersonIndex]);
 			startDistance = totalDistance;
-			pIndex = personIndex;
+			
+			topPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Checkmark);
+			if (personPickupSegments > 1) {
+				topPanel.Navigation.NextItem(new UINavigationItem.DirData { index = (int)GetNextGeneratedDir() });
+			} else {
+				topPanel.Navigation.NextItem(new UINavigationItem.PersonData {
+					index = currentPersonIndex,
+					state = UINavigationItem.PersonData.State.DropOff
+				});
+			}
+		};
+		personPickupController.OnNotPickup = () => {
+			topPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Missed);
+			GenerateNewPerson();
 		};
 		personPickupController.OnDrop = () => {
-			personsDropped.Add(pIndex);
-			float distance = totalDistance - startDistance + Vector3.Distance(trackGenerator.GetNextSegment(prevGenerateDir).transform.position, userCar.transform.position);
+			personsDropped.Add(currentPersonIndex);
+			float distance = totalDistance - startDistance + Vector3.Distance(trackGenerator.GetNextSegment(generatedDirs[0]).transform.position, userCar.transform.position);
 			int coins = Mathf.RoundToInt(userCar.CoinsMultiplier * Mathf.Lerp(50, 500, Mathf.InverseLerp(100f, 2500f, distance)));
 			topPanel.HidePerson(coins);
 			coinsEarned += coins;
+			topPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Checkmark);
+			GenerateNewPerson();
 		};
-		personPickupController.OnMiss = () => {
+		personPickupController.OnDropMissed = () => {
 			topPanel.HidePerson(-1);
+			topPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Missed);
+			GenerateNewPerson();
 		};
 		personPickupController.OnUpdateDistance = distance => {
 			topPanel.ShowDistance(distance);
 		};
+	}
+
+	private void GenerateNewPerson() {
+		SetRandomCurrentPersonIndex();
+		topPanel.Navigation.NextItem(new UINavigationItem.PersonData { index = currentPersonIndex });
 	}
 
 	private IEnumerator OnUserCarEnd() {
@@ -240,21 +269,34 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		totalDistance = 0;
 		
 		userCar.OnRequireNewSegments = () => {
-			trackGenerator.Generate(prevGenerateDir, nextGenerateDir);
-			userCar.SetSegments(trackGenerator.GetCurrentSegment(), trackGenerator.GetNextSegment(nextGenerateDir), nextGenerateDir);
-			prevGenerateDir = nextGenerateDir;
+			trackGenerator.Generate(generatedDirs[0], generatedDirs[1]);
+			userCar.SetSegments(trackGenerator.GetCurrentSegment(), trackGenerator.GetNextSegment(generatedDirs[1]), generatedDirs[1]);
+			generatedDirs.RemoveAt(0);
+			currentGeneratedDirsIndex--;
 		};
 		userCar.OnPassIntersection = () => {
 			Segment currentSegment = trackGenerator.GetCurrentSegment();
 			totalDistance += currentSegment.Length + currentSegment.Width;
+			
 			SetNextGenerateDir();
-			topPanel.SetArrowDirImage(nextGenerateDir);
-			if (personPickupController.State == PickupState.None) {
-				SetPickUp(trackGenerator.GetNextSegment(prevGenerateDir));
-			} else if (personPickupController.State == PickupState.Pickup) {
-				personPickupSegments--;
-				if (personPickupSegments == 0) {
-					SetDropOff(trackGenerator.GetNextSegment(prevGenerateDir));
+			
+			if (personsEnabled && personPickupController.State == PickupState.Pickup && personPickupSegments == 2) {
+				topPanel.Navigation.NextItem(new UINavigationItem.PersonData {
+					index = currentPersonIndex,
+					state = UINavigationItem.PersonData.State.DropOff
+				});
+			} else {
+				topPanel.Navigation.NextItem(new UINavigationItem.DirData { index = (int)GetNextGeneratedDir() });
+			}
+			
+			if (personsEnabled) {
+				if (personPickupController.State == PickupState.None) {
+					SetPickUp(trackGenerator.GetNextSegment(generatedDirs[0]));
+				} else if (personPickupController.State == PickupState.Pickup) {
+					personPickupSegments--;
+					if (personPickupSegments == 0) {
+						SetDropOff(trackGenerator.GetNextSegment(generatedDirs[0]));
+					}
 				}
 			}
 		};
@@ -283,10 +325,10 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private void InitUserCar(Action onCanControlCar) {
 		userCar.transform.SetPosAndRot(initUserCarPosAndRot);
 		userCar.SetAudioVolume(PlayerPrefsManager.UserData.volumes[(int)MixerType.CarEngine]);
-		prevGenerateDir = nextGenerateDir = GenerateDir.Forward;
-		Segment nextSegment = trackGenerator.GetNextSegment(nextGenerateDir);
-		userCar.SetSegments(trackGenerator.GetCurrentSegment(), nextSegment, nextGenerateDir);
-		topPanel.SetArrowDirImage(nextGenerateDir);
+		generatedDirs.Add(GenerateDir.Forward);
+		Segment nextSegment = trackGenerator.GetNextSegment(generatedDirs[0]);
+		userCar.SetSegments(trackGenerator.GetCurrentSegment(), nextSegment, generatedDirs[0]);
+		
 		userCar.SetStartPoints();
 		userCar.GoToStart(mainCamera, () => {
 			if (!Input.GetMouseButton(0)) {
@@ -295,7 +337,18 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			canControlUserCar = true;
 			onCanControlCar();
 		});
-		SetPickUp(trackGenerator.GetNextSegment(nextGenerateDir));
+
+		currentGeneratedDirsIndex = personsEnabled ? 0 : 1;
+		SetNextGenerateDir();
+		if (personsEnabled) {
+			SetRandomCurrentPersonIndex();
+			SetPickUp(trackGenerator.GetNextSegment(generatedDirs[0]));
+			topPanel.Navigation.Init(new UINavigationItem.DirData { index = (int)generatedDirs[0] },
+				new UINavigationItem.PersonData { index = currentPersonIndex });
+		} else {
+			topPanel.Navigation.Init(new UINavigationItem.DirData { index = (int)generatedDirs[0] },
+				new UINavigationItem.DirData { index = (int)generatedDirs[1] });
+		}
 	}
 
 	private void Restart() {
@@ -319,7 +372,9 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			smoke.gameObject.SetActive(false);
 			smoke.transform.parent = transform;
 			
-			trackGenerator.ClearAndReset(prevGenerateDir = nextGenerateDir = GenerateDir.Forward);
+			generatedDirs.Clear();
+			generatedDirs.Add(GenerateDir.Forward);
+			trackGenerator.ClearAndReset(GenerateDir.Forward);
 					
 			mainCamera.transform.SetPosAndRot(initCameraPosAndRot);
 			skyline.transform.position = Vector3.zero;
@@ -338,15 +393,27 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	public UserCar GetUserCar() {
 		return userCar;
 	}
+
+	private GenerateDir GetNextGeneratedDir() {
+		return generatedDirs[++currentGeneratedDirsIndex];
+	}
 	
 	private void SetNextGenerateDir() {
-		nextGenerateDir = (GenerateDir)Random.Range(0, 3);
+		generatedDirs.Add((GenerateDir)Random.Range(0, 3));
+	}
+
+	private void SetRandomCurrentPersonIndex() {
+		List<Sprite> list = new(Settings.Instance.personSprites);
+		if (currentPersonIndex != -1) {
+			list.RemoveAt(currentPersonIndex);
+		}
+		currentPersonIndex = Random.Range(0, list.Count);
 	}
 
 	private void SetPickUp(Segment nextSegment) {
 		Vector3 pos = nextSegment.transform.position + nextSegment.transform.forward * nextSegment.Length / 2f +
 		              nextSegment.transform.right * (nextSegment.Width - 3.5f); 
-		personPickupController.SetPickUp(pos, nextSegment.transform, userCar);
+		personPickupController.SetPickUp(pos, nextSegment.transform, userCar, currentPersonIndex);
 	}
 
 	private void SetDropOff(Segment nextSegment) {

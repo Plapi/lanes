@@ -118,6 +118,26 @@ public static partial class TransformExtensions {
 		}
 	}
 	
+	public static bool TryGetChild(this Transform transform, int index, out Transform child) {
+		child = null;
+		if (transform.childCount > index) {
+			child = transform.GetChild(index);
+			return true;
+		}
+		return false;
+	}
+	
+	public static void HideAllChildrenExcept(this Transform transform, int index) {
+		foreach (Transform t in transform) {
+			t.gameObject.SetActive(false);
+		}
+		if (transform.TryGetChild(index, out Transform child)) {
+			child.gameObject.SetActive(true);
+		} else {
+			Debug.LogError($"Child index {index} not found");
+		}
+	}
+	
 	public static Vector3 ToVector3(this Vector2 pos) {
 		return new Vector3(pos.x, 0f, pos.y);
 	}
