@@ -8,6 +8,7 @@ using UnityEditor;
 public class UINavigation : UIObject {
 
 	[SerializeField] private UINavigationItem currentItem;
+	[SerializeField] private AudioClip audioClip;
 	
 	private UINavigationItem leftItem;
 	private UINavigationItem rightItem;
@@ -66,6 +67,8 @@ public class UINavigation : UIObject {
 					auxItem.SetAlpha(Mathf.Lerp(0.2f, 0f, value));
 				}
 			});
+		
+		AudioSystem.Play(audioClip);
 	}
 
 	public void UpdateCurrentPersonState(UINavigationItem.PersonData.State state) {

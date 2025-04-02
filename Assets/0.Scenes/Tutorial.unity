@@ -500,6 +500,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startSegment: {fileID: 0}
   aiCarsEnabled: 0
+  spawnAICarDistanceStartMin: 0
+  spawnAICarDistanceStartMax: 0
+  spawnAICarDistanceEndMin: 0
+  spawnAICarDistanceEndMax: 0
+  spawnAICarDistanceDecrease: 0
 --- !u!1001 &604561486
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -515,6 +520,10 @@ PrefabInstance:
     - target: {fileID: 259947731267785587, guid: dac9ade37b6f44bbf9da1b19d913f65c, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 516284921671776897, guid: dac9ade37b6f44bbf9da1b19d913f65c, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 597225407671782371, guid: dac9ade37b6f44bbf9da1b19d913f65c, type: 3}
       propertyPath: m_LocalPosition.x

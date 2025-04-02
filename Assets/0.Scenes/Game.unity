@@ -6723,6 +6723,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentItem: {fileID: 625077536}
+  audioClip: {fileID: 8300000, guid: 7d8ccd6d3b797ab4ca3a6b2bb18de198, type: 3}
 --- !u!1 &194506361
 GameObject:
   m_ObjectHideFlags: 0

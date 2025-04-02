@@ -33,6 +33,7 @@ public class TutorialController : MonoBehaviour {
 		userCar.SetSegments(trackGenerator.GetCurrentSegment(), trackGenerator.GetNextSegment(GenerateDir.Forward), GenerateDir.Forward);
 		userCar.SetStartPoints();
 		userCar.SetSoundEnabled(true);
+		userCar.GetComponent<AudioSource>().enabled = false;
 		userCar.SetEngineSoundToCamera(mainCamera);
 		userCar.OnRequireNewSegments = () => {
 			trackGenerator.Generate(GenerateDir.Forward, GenerateDir.Forward);
@@ -53,6 +54,7 @@ public class TutorialController : MonoBehaviour {
 		yield return new WaitForSeconds(2f);
 		
 		tutorialPanel.ShowText(tutorialTexts[0]);
+		userCar.GetComponent<AudioSource>().enabled = true;
 		
 		yield return new WaitForSeconds(3f);
 
