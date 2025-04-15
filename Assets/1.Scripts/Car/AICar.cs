@@ -87,10 +87,12 @@ public class AICar : Car, IPoolableObject<AICar> {
 		if (collision.gameObject.TryGetComponent(out AICar otherCar) && otherCar.targetPoint != null && otherCar.targetPoint.pass) {
 			Vector3 dir = otherCar.transform.position - transform.position;
 			TargetPoint stopTargetPoint = Vector3.Dot(transform.forward, dir) > 0 ? targetPoint : otherCar.targetPoint;
-			stopTargetPoint.pass = false;
-			this.Wait(2f, () => {
-				stopTargetPoint.pass = true;
-			});
+			if (stopTargetPoint != null) {
+				stopTargetPoint.pass = false;
+				this.Wait(2f, () => {
+					stopTargetPoint.pass = true;
+				});	
+			}
 		}
 	}
 }

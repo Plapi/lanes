@@ -63,6 +63,9 @@ public static class Utils {
 	}
 
 	public static bool IsOverUI() {
+		if (EventSystem.current == null) {
+			return false;
+		}
 		if (EventSystem.current.IsPointerOverGameObject()) {
 			return true;
 		}
