@@ -21,8 +21,8 @@ public class StartSegment : Segment {
 			}
 		}
 		
-		LeftEnvironment = CreateEnv("LeftEnv");
-		LeftEnvironment.transform.position = transform.position + transform.forward * Length;
-		LeftEnvironment.Generate(LeftEnvironment.transform.position - transform.forward * Length - transform.right * 10f, true);
+		// LeftEnvironment = CreateEnv("LeftEnv");
+		// LeftEnvironment.transform.position = transform.position + transform.forward * Length;
+		// LeftEnvironment.Generate(LeftEnvironment.transform.position - transform.forward * Length - transform.right * 10f, true);
 	}
 }

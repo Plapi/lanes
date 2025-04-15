@@ -5,7 +5,6 @@ using Unity.Cinemachine;
 using System.Collections.Generic;
 using DG.Tweening;
 using SkrilStudio;
-using Unity.VisualScripting;
 
 public class UserCar : Car {
 
@@ -32,7 +31,6 @@ public class UserCar : Car {
 	
 	private float currentHealth;
 	public int Price => price;
-	public float MaxSpeed => avc.MaxSpeed;
 	public int MaxHealth => maxHealth;
 
 	private Segment currentSegment;

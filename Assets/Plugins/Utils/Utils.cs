@@ -158,4 +158,8 @@ public static class Utils {
 
 		return angleToA < angleToB ? dirA : dirB; // Return the closest boundary direction
 	}
+	
+	public static bool CoinFlip() {
+		return UnityEngine.Random.Range(0, 2) == 1;
+	}
 }

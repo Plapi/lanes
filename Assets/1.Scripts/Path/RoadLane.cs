@@ -22,6 +22,10 @@ public class RoadLane : Lane<RoadLaneData> {
 		return nextRoadLanes.Count > 0;
 	}
 
+	public List<AICar> GetAICars() {
+		return aiCars;
+	}
+
 	public void SetStartPosAndEndPos() {
 		StartPos = transform.position + transform.right * Settings.Instance.laneSize / 2f;
 		EndPos = StartPos + transform.forward * Length;
@@ -72,7 +76,7 @@ public class RoadLane : Lane<RoadLaneData> {
 		aiCar.name = carPrefab.name;
 		aiCar.transform.position = pos;
 		aiCar.transform.LookAt(new Vector3(EndPos.x, aiCar.transform.position.y, EndPos.z));
-			
+		
 		aiCar.SetTargetPoint(new TargetPoint {
 			pos = EndPos,
 			onReach = OnAICarReachTargetPoint,

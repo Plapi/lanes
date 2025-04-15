@@ -6,9 +6,7 @@ public class Intersection : MonoBehaviour {
 
 	[SerializeField] private Element cornerPrefab;
 	[SerializeField] private TrafficLight trafficLightPrefab;
-	[SerializeField] private Element crossingPrefab;
 	[SerializeField] private Element sideWalkPrefab;
-	[SerializeField] private Element roadBarePrefab;
 
 	private readonly List<Element> elements = new();
 

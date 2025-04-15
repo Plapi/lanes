@@ -25,6 +25,11 @@ public class AICar : Car, IPoolableObject<AICar> {
 	}
 
 	public void SetTargetPoint(TargetPoint targetPoint) {
+		if (targetPoint == null) {
+			this.targetPoint = null;
+			avc.ProvideInputs(0f, 0f, 1f);
+			return;
+		}
 		targetPoint.pos.y = transform.position.y;
 		this.targetPoint = targetPoint;
 	}
@@ -50,9 +55,8 @@ public class AICar : Car, IPoolableObject<AICar> {
 			return;
 		}
 
-		const float rayDistance = 10f;
 		Car frontCar = null;
-		if (Physics.Raycast(FrontPos, transform.forward, out RaycastHit hit, rayDistance, raycastLayerMask)) {
+		if (Raycast(FrontPos, transform.forward, 10f, out RaycastHit hit)) {
 			frontCar = hit.transform.GetComponent<Car>();
 		}
 		
@@ -62,6 +66,10 @@ public class AICar : Car, IPoolableObject<AICar> {
 		float accelerateInput = Mathf.InverseLerp(3f, 10f, distToNearestObstacle) / 2f;
 		float breakInput = Mathf.InverseLerp(3f, brakeDistanceMin, distToNearestObstacle) / 2f;
 		avc.ProvideInputs(GetSteering(), accelerateInput, breakInput);
+	}
+
+	public bool Raycast(Vector3 origin, Vector3 direction, float distance, out RaycastHit hit) {
+		return Physics.Raycast(origin, direction, out hit, distance, raycastLayerMask);
 	}
 
 	private float ClosestDistance(Car other) {
@@ -76,7 +84,7 @@ public class AICar : Car, IPoolableObject<AICar> {
 			return;
 		}
 		
-		if (collision.gameObject.TryGetComponent(out AICar otherCar) && otherCar.targetPoint.pass) {
+		if (collision.gameObject.TryGetComponent(out AICar otherCar) && otherCar.targetPoint != null && otherCar.targetPoint.pass) {
 			Vector3 dir = otherCar.transform.position - transform.position;
 			TargetPoint stopTargetPoint = Vector3.Dot(transform.forward, dir) > 0 ? targetPoint : otherCar.targetPoint;
 			stopTargetPoint.pass = false;

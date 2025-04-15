@@ -13,6 +13,11 @@ public abstract class Car : MonoBehaviour {
 	[SerializeField] private BoxCollider boxCollider;
 
 	public BoxCollider BoxCollider => boxCollider;
+
+	public float MaxSpeed {
+		get => avc.MaxSpeed;
+		set => avc.MaxSpeed = value;
+	}
 	
 	public Bounds Bounds => boxCollider.bounds;
 	public Vector3 FrontPos => transform.position + transform.forward * boxCollider.size.z / 2f - transform.up * boxCollider.size.y * 0.3f;
@@ -62,7 +67,9 @@ public abstract class Car : MonoBehaviour {
 	}
 
 	public virtual void SetSoundEnabled(bool enabled) {
-		avc.SkidSound.enabled = enabled;
+		if (avc.SkidSound != null) {
+			avc.SkidSound.enabled = enabled;	
+		}
 	}
 
 	protected float GetSteering() {
@@ -81,11 +88,11 @@ public abstract class Car : MonoBehaviour {
 	}
 	
 	protected virtual void OnDrawGizmos() {
-		if (Application.isPlaying) {
-			Gizmos.color = Color.green;
-			Gizmos.DrawSphere(targetPos, 0.25f);
-			Gizmos.DrawLine(FrontPos, targetPos);
-		}
+		// if (Application.isPlaying) {
+		// 	Gizmos.color = Color.green;
+		// 	Gizmos.DrawSphere(targetPos, 0.25f);
+		// 	Gizmos.DrawLine(FrontPos, targetPos);
+		// }
 		Gizmos.color = Color.white;
 		Gizmos.DrawCube(FrontPos, Vector3.one * 0.2f);
 		Gizmos.color = Color.black;

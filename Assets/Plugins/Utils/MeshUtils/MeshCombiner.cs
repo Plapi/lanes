@@ -14,6 +14,10 @@ public class MeshCombiner : MonoBehaviour {
 	[SerializeField] [Range(0f, 1f)] private float quality = 0.5f;
 	
 	private void Combine(Transform tr) {
+		Vector3 prevPos = transform.position;
+		Quaternion prevRot = transform.rotation;
+		transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+		
 		GameObject obj = MeshUtils.Combine(tr);
 		
 		if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(objFolder, out string guid, out long _)) {
@@ -29,6 +33,8 @@ public class MeshCombiner : MonoBehaviour {
 		
 		PrefabUtility.SaveAsPrefabAsset(obj, $"{folderPath}/{objName}.prefab").GetComponent<LODGroup>();
 		DestroyImmediate(obj);
+		
+		transform.SetPositionAndRotation(prevPos, prevRot);
 	}
 
 	private void CombineOnParts() {
