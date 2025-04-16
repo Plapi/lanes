@@ -41,7 +41,7 @@ public static class PlayerPrefsManager {
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
 public class UserData {
 	public bool isTutorialDone;
-	public int coins;
+	public int coins = 1000;
 	public List<int> unlockedCars = new() { 0 };
 	public List<int> carColors = new() { 7, 4, 0, 0, 9, 1 };
 	public int carSelection;
@@ -49,4 +49,5 @@ public class UserData {
 	public int personsBest = -1;
 	public float[] volumes = { 1f, 0.3f, 0.4f };
 	public bool hapticFeedback = true;
+	public VaultRoomData vaultRoom = new() { tableMoneyLevel = 0 };
 }
