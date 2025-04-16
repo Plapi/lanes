@@ -5,8 +5,10 @@ public class CameraController : MonoBehaviour {
     [SerializeField] private Transform pivot;
     [SerializeField] private new Camera camera;
     [SerializeField] private BoxCollider bounds;
+    [SerializeField] private LayerMask tapableLayerMask;
 
     private Plane plane;
+    private GTouch firstTouch;
     private Vector3 futurePos;
     private bool overUI;
     private GTouch[] touches;
@@ -27,11 +29,20 @@ public class CameraController : MonoBehaviour {
 		    UpdateBoundsScale();
 		    ClampFuturePos();
 		    pivot.position = futurePos;
-	    } else if (touches[0] != null && (touches[0].phase == TouchPhase.Began || touches[0].phase == TouchPhase.Moved)) {
-		    plane.SetNormalAndPosition(transform.up, transform.position);
-		    futurePos += PlanePositionDelta(touches[0]);
-		    ClampFuturePos();
-	    }
+	    } else if (touches[0] != null) {
+		    firstTouch ??= touches[0];
+		    if (touches[0].phase == TouchPhase.Began || touches[0].phase == TouchPhase.Moved) {
+			    plane.SetNormalAndPosition(transform.up, transform.position);
+			    futurePos += PlanePositionDelta(touches[0]);
+			    ClampFuturePos();
+		    } else if (touches[0].phase == TouchPhase.Ended) {
+			    if (IsTap(touches[0]) && Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, Mathf.Infinity, tapableLayerMask) &&
+			        hit.collider.TryGetComponent(out TapableObj tapableObj)) {
+				    tapableObj.OnTap();
+			    }
+			    firstTouch = null;
+		    }
+	    } 
 	    
 	    float time = Time.deltaTime * 20f;
 	    pivot.position = new Vector3(pivot.position.x + (futurePos.x - pivot.position.x) * time, 0f, pivot.position.z + (futurePos.z - pivot.position.z) * time);
@@ -76,6 +87,13 @@ public class CameraController : MonoBehaviour {
     private Vector3 PlanePosition(Vector2 screenPos) {
 		var rayNow = camera.ScreenPointToRay(screenPos);
 		return plane.Raycast(rayNow, out var enterNow) ? rayNow.GetPoint(enterNow) : Vector3.zero;
+	}
+    
+	private bool IsTap(GTouch lastTouch) {
+		if (firstTouch != null) {
+			return lastTouch.time - firstTouch.time < 0.2f && Vector2.Distance(lastTouch.position, firstTouch.position) < 10;
+		}
+		return false;
 	}
 }
 

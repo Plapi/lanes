@@ -49,5 +49,5 @@ public class UserData {
 	public int personsBest = -1;
 	public float[] volumes = { 1f, 0.3f, 0.4f };
 	public bool hapticFeedback = true;
-	public VaultRoomData vaultRoom = new() { tableMoneyLevel = 0 };
+	public RoomData vaultRoom = new();
 }

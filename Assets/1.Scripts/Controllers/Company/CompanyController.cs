@@ -12,6 +12,8 @@ public class CompanyController : MonoBehaviour {
 		parkingController.Init(startSegment);
 		startSegment.SpawnAICars();
 		
-		vaultRoom.Init(PlayerPrefsManager.UserData.vaultRoom);
+		vaultRoom.Init(PlayerPrefsManager.UserData.vaultRoom, () => {
+			
+		});
 	}
 }
