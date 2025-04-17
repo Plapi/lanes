@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using ArcadeVP;
-using Unity.Mathematics;
 
 public class SelectCarController : MonoBehaviour {
 
@@ -142,10 +141,6 @@ public class SelectCarController : MonoBehaviour {
 	
 	private static bool CarIsUnlocked(int selection) {
 		return PlayerPrefsManager.UserData.unlockedCars.Contains(selection);
-	}
-
-	private void SetSpeedsAndHealths() {
-		
 	}
 	
 	private static void RemoveComponentsInChildren(Transform root, params Type[] componentTypes) {

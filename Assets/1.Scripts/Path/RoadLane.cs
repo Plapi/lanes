@@ -1,6 +1,6 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -13,6 +13,8 @@ public class RoadLane : Lane<RoadLaneData> {
 	public Vector3 EndPos { get; private set; }
 
 	public bool AllowPassing = true;
+
+	private bool canSpawnAiCars;
 	
 	protected override void OnInit() {
 		
@@ -40,6 +42,7 @@ public class RoadLane : Lane<RoadLaneData> {
 	}
 
 	public void SpawnAICars() {
+		canSpawnAiCars = true;
 		int randomSpawnDistance() {
 			return Mathf.RoundToInt(TrackGenerator.Instance.GetSpawnAICarDistance());
 		}
@@ -54,23 +57,25 @@ public class RoadLane : Lane<RoadLaneData> {
 			return;
 		}
 		
-		AICar carPrefab = Settings.Instance.aiCarPrefabs[Random.Range(0, Settings.Instance.aiCarPrefabs.Length)];
 		Vector3 dir = (EndPos - StartPos).normalized;
 		Vector3 pos = StartPos + dir * posZ;
-		pos.y = carPrefab.transform.position.y;
-
+		
 		if (checkAround) {
 			for (int i = 0; i < aiCars.Count; i++) {
 				if (Vector3.Distance(aiCars[i].transform.position, pos) < 20f) {
-					this.Wait(1f, () => SpawnAICar(posZ, checkAround));
+					StartCoroutine(TrySpawnWithDelay(posZ, checkAround));
 					return;
 				}
 			}
-			if (GameController.HasInstance() && Vector3.Distance(GameController.Instance.GetUserCar().transform.position, pos) < 100f) {
-				this.Wait(1f, () => SpawnAICar(posZ, checkAround));
+			UserCar userCar = RideController.HasInstance() ? RideController.Instance.GetUserCar() : null;
+			if (userCar != null && Vector3.Distance(userCar.transform.position, pos) < 100f) {
+				StartCoroutine(TrySpawnWithDelay(posZ, checkAround));
 				return;
 			}
 		}
+		
+		AICar carPrefab = Settings.Instance.aiCarPrefabs[Random.Range(0, Settings.Instance.aiCarPrefabs.Length)];
+		pos.y = carPrefab.transform.position.y;
 		
 		AICar aiCar = ObjectPoolManager.Get(carPrefab, TrackGenerator.Instance.transform);
 		aiCar.name = carPrefab.name;
@@ -85,6 +90,17 @@ public class RoadLane : Lane<RoadLaneData> {
 		aiCars.Add(aiCar);
 			
 		aiCar.gameObject.SetActive(true);
+	}
+
+	private IEnumerator TrySpawnWithDelay(float posZ, bool checkAround, float delay = 1f) {
+		while (delay > 0f) {
+			delay -= Time.deltaTime;
+			yield return null;
+			if (!canSpawnAiCars) {
+				yield break;
+			}
+		}
+		SpawnAICar(posZ, checkAround);
 	}
 
 	private void Transition(List<Vector3> points, AICar aiCar) {
@@ -145,6 +161,7 @@ public class RoadLane : Lane<RoadLaneData> {
 	}
 
 	public void ClearAICars() {
+		canSpawnAiCars = false;
 		foreach (AICar aiCar in aiCars) {
 			ObjectPoolManager.Release(aiCar);
 		}

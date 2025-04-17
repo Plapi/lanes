@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Parking : MonoBehaviour {
-    
+
 	[SerializeField] private AICarPath[] exitPath;
 	[SerializeField] private AICarPath[] enterPath;
 
@@ -18,6 +19,13 @@ public class Parking : MonoBehaviour {
 
 	public void Init(RoadLane roadLane) {
 		this.roadLane = roadLane;
+	}
+
+	public void ReleaseCarIfNeeded() {
+		if (aiCar != null) {
+			ObjectPoolManager.Release(aiCar);
+			aiCar = null;
+		}
 	}
 
 	public void SetCar() {
@@ -39,7 +47,7 @@ public class Parking : MonoBehaviour {
 		aiCar.EnableCar();
 		aiCar.gameObject.SetActive(true);
 	}
-	
+
 	public void ExitCar(Action onExit) {
 		if (aiCar == null) {
 			Debug.LogError("Ignore exit");
@@ -58,20 +66,18 @@ public class Parking : MonoBehaviour {
 			onExit?.Invoke();
 		});
 	}
-	
+
 	private void SetExitCarPath(int index, Action onComplete) {
 		if (index >= exitPath.Length) {
 			onComplete();
 			return;
 		}
-		exitPath[index].SetCar(aiCar, () => {
-			SetExitCarPath(index + 1, onComplete);
-		}, () => {
+		exitPath[index].SetCar(aiCar, () => { SetExitCarPath(index + 1, onComplete); }, () => {
 			if (index == exitPath.Length - 1) {
 				float progress = exitPath[^1].GetProgress();
 				if (progress > 0.4f && progress < 0.5f) {
 					Vector3 rayDir = (roadLane.StartPos - roadLane.EndPos).normalized;
-					Utils.GetIntersection(aiCar.FrontPos, aiCar.transform.forward, 
+					Utils.GetIntersection(aiCar.FrontPos, aiCar.transform.forward,
 						roadLane.EndPos, rayDir, out Vector3 intersection);
 					Debug.DrawRay(intersection, rayDir * 20f, Color.red);
 					return !aiCar.Raycast(intersection, rayDir, 20f, out _);
@@ -90,23 +96,36 @@ public class Parking : MonoBehaviour {
 		aiCar = CreateCar();
 		aiCar.transform.position = new Vector3(enterPath[0].transform.position.x, initCarPosY, enterPath[0].transform.position.z);
 		aiCar.transform.rotation = enterPath[0].transform.rotation;
-		this.WaitUntil(CanSpawnAICarOnRoadLane, () => {
+		StartCoroutine(WaitingForFreePath(() => {
 			aiCar.gameObject.SetActive(true);
 			SetEnterCarPath(0, () => {
 				aiCar.SetTargetPoint(null);
 				onComplete();
 			});
-		});
+		}));
+	}
+
+	private IEnumerator WaitingForFreePath(Action onComplete) {
+		while (!CanSpawnAICarOnRoadLane()) {
+			yield return null;
+			if (aiCar == null) {
+				yield break;
+			}
+		}
+		onComplete?.Invoke();
 	}
 
 	private bool CanSpawnAICarOnRoadLane() {
-		 List<AICar> aiCars = roadLane.GetAICars();
-		 for (int i = 0; i < aiCars.Count; i++) {
-		 	if (Vector3.Distance(aiCars[i].transform.position, aiCar.transform.position) < 20f) {
-		 		return false;
-		 	}
-		 }
-		 return true;
+		if (aiCar == null) {
+			return false;
+		}
+		List<AICar> aiCars = roadLane.GetAICars();
+		for (int i = 0; i < aiCars.Count; i++) {
+			if (Vector3.Distance(aiCars[i].transform.position, aiCar.transform.position) < 20f) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private void SetEnterCarPath(int index, Action onComplete) {
@@ -119,9 +138,7 @@ public class Parking : MonoBehaviour {
 				aiCar.MaxSpeed = 20f;
 			}
 			SetEnterCarPath(index + 1, onComplete);
-		}, () => {
-			return true;
-		});
+		}, () => true);
 	}
 
 	private AICar CreateCar() {

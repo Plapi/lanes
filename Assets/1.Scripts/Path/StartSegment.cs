@@ -12,6 +12,8 @@ public class StartSegment : Segment {
 		for (int i = 0; i < lanes.Count; i++) {
 			lanes[i].SetData(segmentData.lanes[i]);
 			if (lanes[i] is RoadLane roadLane) {
+				roadLane.ClearAICars();
+				roadLane.ClearNextRoadLanes();
 				RoadLanes.Add(roadLane);
 				if (roadLane.Data.hasFrontDirection) {
 					ForwardRoadLanes.Insert(0, roadLane);

@@ -20,7 +20,7 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 	private void Start() {
 		fadeToBlackImage.SetAlpha(1f);
 		fadeToBlackImage.gameObject.SetActive(true);
-		FadeOutToBlack();
+		FadeOutFromBlack();
 	}
 
 	public void Init() {
@@ -53,7 +53,7 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 		});
 	}
 	
-	public void FadeOutToBlack(Action onComplete = null) {
+	public void FadeOutFromBlack(Action onComplete = null) {
 		fadeToBlackImage.DOFade(0f, 0.2f).SetUpdate(true).OnComplete(() => {
 			fadeToBlackImage.gameObject.SetActive(false);
 			onComplete?.Invoke();

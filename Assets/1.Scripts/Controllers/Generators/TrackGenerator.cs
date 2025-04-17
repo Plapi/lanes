@@ -26,6 +26,8 @@ public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 	private float spawnAICarDistanceMin;
 	private float spawnAICarDistanceMax;
 
+	public Action<bool> OnStartSegmentSetActive;
+	
 	public void Init(GenerateDir dir) {
 		spawnAICarDistanceMin = spawnAICarDistanceStartMin;
 		spawnAICarDistanceMax = spawnAICarDistanceStartMax;
@@ -37,6 +39,13 @@ public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 			currentSegment.Init(Segment.GetSegmentData(new SegmentInputData { length = 200 }));
 		}
 		CreateNextSegments(dir);
+	}
+
+	public void SetSpawnAICarDistance(float startMin, float startMax, float endMin, float endMax) {
+		spawnAICarDistanceMin = startMin;
+		spawnAICarDistanceMax = startMax;
+		spawnAICarDistanceEndMin = endMin;
+		spawnAICarDistanceEndMax = endMax;
 	}
 
 	public Segment GetCurrentSegment() {
@@ -155,6 +164,7 @@ public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 	public void ClearAndReset(GenerateDir dir) {
 		ClearAllSegments();
 		startSegment.gameObject.SetActive(true);
+		OnStartSegmentSetActive?.Invoke(true);
 		Init(dir);
 	}
 
@@ -167,18 +177,6 @@ public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 		SpawnAICars();
 	}
 
-	private void GenerateForward() {
-		Generate(GenerateDir.Forward, GenerateDir.Forward);
-	}
-
-	private void GenerateLeft() {
-		Generate(GenerateDir.Left, GenerateDir.Left);
-	}
-
-	private void GenerateRight() {
-		Generate(GenerateDir.Right, GenerateDir.Right);
-	}
-
 	private void ClearAllSegmentsExcept(Segment exceptSegment) {
 		for (int i = 0; i < segments.Length; i++) {
 			if (segments[i] != exceptSegment && segments[i] != startSegment) {
@@ -189,10 +187,11 @@ public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 		if (startSegment != null) {
 			startSegment.ClearAICars();
 			startSegment.gameObject.SetActive(false);
+			OnStartSegmentSetActive?.Invoke(false);
 		}
 	}
 
-	private void ClearAllSegments() {
+	public void ClearAllSegments() {
 		for (int i = 0; i < segments.Length; i++) {
 			if (segments[i] != startSegment) {
 				segments[i].Clear();	
@@ -209,20 +208,20 @@ public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 		return Random.Range(spawnAICarDistanceMin, spawnAICarDistanceMax);
 	}
 	
-	private void Update() {
+	/*private void Update() {
 		if (Input.GetKeyDown(KeyCode.R)) {
 			ClearAndReset(GenerateDir.Forward);
 		}
 		if (Input.GetKeyDown(KeyCode.UpArrow)) {
-			GenerateForward();
+			Generate(GenerateDir.Forward, GenerateDir.Forward);
 		}
 		if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-			GenerateLeft();
+			Generate(GenerateDir.Left, GenerateDir.Left);
 		}
 		if (Input.GetKeyDown(KeyCode.RightArrow)) {
-			GenerateRight();
+			Generate(GenerateDir.Right, GenerateDir.Right);
 		}
-	}
+	}*/
 }
 
 public enum GenerateDir {

@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 using UnityEditor;
 #endif
 
-public class UITopPanel : UIPanel<UITopPanel.Data> {
+public class UIRideTopPanel : UIPanel<UIRideTopPanel.Data> {
 
 	[Space]
 	[SerializeField] private Button pauseButton;
@@ -198,22 +198,22 @@ public class UITopPanel : UIPanel<UITopPanel.Data> {
 }
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(UITopPanel))]
+[CustomEditor(typeof(UIRideTopPanel))]
 public class UITopPanelEditor : Editor {
 	public override void OnInspectorGUI() {
 		base.OnInspectorGUI();
 		
-		UITopPanel topPanel = (UITopPanel)target;
+		UIRideTopPanel rideTopPanel = (UIRideTopPanel)target;
 		
 		GUILayout.Space(10f);
 		if (GUILayout.Button("Show Persons")) {
-			topPanel.ShowPerson(Random.Range(1, 6), Settings.Instance.personSprites[0]);
+			rideTopPanel.ShowPerson(Random.Range(1, 6), Settings.Instance.personSprites[0]);
 		}
 		if (GUILayout.Button("Hide Persons Success")) {
-			topPanel.HidePerson(Random.Range(50, 500));
+			rideTopPanel.HidePerson(Random.Range(50, 500));
 		}
 		if (GUILayout.Button("Hide Persons Fail")) {
-			topPanel.HidePerson(-1);
+			rideTopPanel.HidePerson(-1);
 		}
 	}
 }

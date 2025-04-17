@@ -7,6 +7,7 @@ using TMPro;
 
 public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 
+	[Space]
 	[SerializeField] private RectTransform topContainer;
 	[SerializeField] private RectTransform bottomContainer;
 	[SerializeField] private CanvasGroup centerContainer;
@@ -20,6 +21,7 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	[SerializeField] private Button coinButton;
 
 	[Space]
+	[SerializeField] private Button closeButton;
 	[SerializeField] private Button settingsButton;
 	[SerializeField] private Button leftButton;
 	[SerializeField] private Button rightButton;
@@ -37,6 +39,7 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	[SerializeField] private UICoinsAnim coinsAnim;
 
 	protected override void OnInit() {
+		closeButton.onClick.AddListener(data.onCloseButton);
 		settingsButton.onClick.AddListener(data.onSettings);
 		leftButton.onClick.AddListener(data.onLeft);
 		rightButton.onClick.AddListener(data.onRight);
@@ -133,6 +136,7 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	}
 
 	public new class Data: UIPanelBase.Data {
+		public UnityAction onCloseButton;
 		public UnityAction onSettings;
 		public UnityAction onLeft;
 		public UnityAction onRight;

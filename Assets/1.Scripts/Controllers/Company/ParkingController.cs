@@ -3,15 +3,21 @@ using UnityEngine;
 public class ParkingController : MonoBehaviour {
 	
 	[SerializeField] private Parking[] parkingLots;
-	
-	public void Init(Segment segment) {
+
+	public void Activate(Segment segment) {
 		for (int i = 0; i < parkingLots.Length; i++) {
 			parkingLots[i].Init(segment.RoadLanes[^1]);
 			if (Utils.CoinFlip()) {
 				parkingLots[i].SetCar();
 			}
 		}
-		this.Wait(1f, TravelCar);
+		TravelCar();
+	}
+
+	public void Deactivate() {
+		for (int i = 0; i < parkingLots.Length; i++) {
+			parkingLots[i].ReleaseCarIfNeeded();
+		}
 	}
 
 	private void TravelCar() {
