@@ -17,13 +17,13 @@ public static class AudioSystem {
 		});
 	}
 	
-	public static AudioSource Play(AudioClip audioClip, MixerType mixerType = MixerType.Effects, Action onComplete = null) {
+	public static AudioSource Play(AudioClip audioClip, MixerType mixerType = MixerType.Effects, Action onComplete = null, float volume = 1f) {
 		if (audioClip == null) {
 			onComplete?.Invoke();
 			return null;
 		}
 		AudioSource audioSource = SetAudioSourceComponent(new GameObject($"OneShotSound_{audioClip.name}"), mixerType);
-		audioSource.volume = 1f;
+		audioSource.volume = volume;
 		audioSource.PlayOneShot(audioClip);
 		UnityEngine.Object.Destroy(audioSource.gameObject, audioClip.length + 0.5f);
 		if (onComplete != null) {

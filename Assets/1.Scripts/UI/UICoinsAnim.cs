@@ -37,8 +37,7 @@ public class UICoinsAnim : UIObject {
 
 	private IEnumerator PlayIEnumerator(int coinsCount, Action onComplete = null) {
 		for (int i = coins.Count - 1; i < coinsCount; i++) {
-			RectTransform coin = Instantiate(coins[^1].gameObject, coins[^1].transform.parent)
-				.GetComponent<RectTransform>();
+			RectTransform coin = Instantiate(coins[^1].gameObject, coins[^1].transform.parent).GetComponent<RectTransform>();
 			coin.localPosition = initCoinLocalPos;
 			coin.name = $"Coin{i}";
 			coins.Add(coin);

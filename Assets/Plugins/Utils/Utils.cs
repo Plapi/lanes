@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -14,6 +15,14 @@ public static class Utils {
 		for (int i = n - 1; i > 0; i--) {
 			int j = random.Next(i + 1);
 			(array[i], array[j]) = (array[j], array[i]);
+		}
+	}
+	
+	public static void ShuffleList<T>(List<T> list) {
+		int n = list.Count;
+		for (int i = n - 1; i > 0; i--) {
+			int j = random.Next(i + 1);
+			(list[i], list[j]) = (list[j], list[i]);
 		}
 	}
 

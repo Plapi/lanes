@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class GameController : MonoBehaviourSingleton<GameController> {
@@ -19,18 +21,24 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		
 		mainPanel = UIController.Instance.GetPanel<UIMainPanel>();
 		mainPanel.Init(new UIMainPanel.Data {
-			onDriversButton = () => {
+			coins = PlayerPrefsManager.UserData.coins,
+			income = 100,
+			onSettingsButton = () => {
+				
+			}, onDriversButton = () => {
 				
 			}, onMultipleCashButton = () => {
 				
-			}, ondriveButton = OnDriveButton
+			}, onDriveButton = OnDriveButton
 		});
 
 		TrackGenerator.Instance.OnStartSegmentSetActive += active => {
 			companyController.gameObject.SetActive(active);
 		};
+		
+		StartCoroutine(CoinsMechanic());
 	}
-
+	
 	private void OnDriveButton() {
 		UIController.Instance.FadeInToBlack(() => {
 			cameraController.gameObject.SetActive(false);
@@ -51,6 +59,22 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			rideController.Deactivate();
 			companyController.Activate();
 			UIController.Instance.FadeOutFromBlack();
+		});
+	}
+
+	private IEnumerator CoinsMechanic() {
+		const float time = 10f;
+		float rTime = 0f;
+		while (rTime < time) {
+			yield return null;
+			rTime += Time.deltaTime;
+			mainPanel.CoinsPanel.UpdateProgress(rTime / time);
+		}
+		mainPanel.CoinsPanel.UpdateProgress(1f);
+		PlayerPrefsManager.UserData.coins += 100;
+		mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => {
+			mainPanel.CoinsPanel.UpdateCoins(PlayerPrefsManager.UserData.coins, 100);
+			StartCoroutine(CoinsMechanic());
 		});
 	}
 }
