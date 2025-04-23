@@ -13,7 +13,9 @@ public class AICar : Car, IPoolableObject<AICar> {
 
 	private float brakeDistanceMin;
 
+	private Vector3 prevTargetPointPos;
 	private TargetPoint targetPoint;
+	private float steering;
 	
 	public string Id {
 		get => id;
@@ -22,6 +24,16 @@ public class AICar : Car, IPoolableObject<AICar> {
 	
 	public AICar GetMonoBehaviour() {
 		return this;
+	}
+
+	private void Awake() {
+		prevTargetPointPos = FrontPos;
+		steering = 0f;
+	}
+
+	public void SetStartPosition(Vector3 pos) {
+		transform.position = pos;
+		prevTargetPointPos = FrontPos;
 	}
 
 	public void SetTargetPoint(TargetPoint targetPoint) {
@@ -39,7 +51,7 @@ public class AICar : Car, IPoolableObject<AICar> {
 		meshMaterialRandomizer?.SetRandomMaterial();
 	}
 
-	private void Update() {
+	private void FixedUpdate() {
 		if (targetPoint == null) {
 			return;
 		}
@@ -47,24 +59,33 @@ public class AICar : Car, IPoolableObject<AICar> {
 		targetPos = targetPoint.pos;
 		targetPos.y = FrontPos.y;
 		
-		float distToTargetPos = Vector3.Distance(FrontPos, targetPos);
-		if (targetPoint.AllowPassing() && distToTargetPos < targetPoint.minDistToReach) {
-			TargetPoint tempPoint = targetPoint;
-			targetPoint = null;
-			tempPoint.onReach(this);
-			return;
+		if (targetPoint.AllowPassing()) {
+			TargetPoint prevTPoint = null;
+			while (targetPoint != null && HasPassedTarget()) {
+				prevTPoint = targetPoint;
+				targetPoint = null;
+				prevTPoint.onReach(this);
+			}
+			if (prevTPoint != null) {
+				prevTargetPointPos = prevTPoint.pos;
+				prevTargetPointPos.y = FrontPos.y;
+				FixedUpdate();
+				return;
+			}
 		}
-
+		
 		Car frontCar = null;
 		if (Raycast(FrontPos, transform.forward, 10f, out RaycastHit hit)) {
 			frontCar = hit.transform.GetComponent<Car>();
 		}
 		
+		float distToTargetPos = Vector3.Distance(FrontPos, targetPos);
 		float distToNextCar = frontCar != null ? ClosestDistance(frontCar) : float.MaxValue;
 		float distToNearestObstacle = targetPoint.AllowPassing() ? distToNextCar : Mathf.Min(distToTargetPos, distToNextCar);
 		
 		float accelerateInput = Mathf.InverseLerp(3f, 10f, distToNearestObstacle) / 2f;
 		float breakInput = Mathf.InverseLerp(3f, brakeDistanceMin, distToNearestObstacle) / 2f;
+		
 		avc.ProvideInputs(GetSteering(), accelerateInput, breakInput);
 	}
 
@@ -94,6 +115,31 @@ public class AICar : Car, IPoolableObject<AICar> {
 				});	
 			}
 		}
+	}
+
+	private bool HasPassedTarget() {
+		if (targetPoint == null) {
+			return false;
+		}
+		
+		Vector2 prev2D = new Vector2(prevTargetPointPos.x, prevTargetPointPos.z);
+		Vector2 current2D = new Vector2(FrontPos.x, FrontPos.z);
+		Vector2 target2D = new Vector2(targetPoint.pos.x, targetPoint.pos.z);
+		
+		Vector2 toTargetBefore = target2D - prev2D;
+		Vector2 toTargetNow = target2D - current2D;
+		bool hasPassedTarget = Vector2.Dot(toTargetBefore.normalized, toTargetNow.normalized) < 0;
+		
+		return hasPassedTarget;// || Vector2.Distance(current2D, target2D) < 0.1f;
+	}
+
+	protected override void OnDrawGizmos() {
+		base.OnDrawGizmos();
+		if (!drawGizmos || !Application.isPlaying) {
+			return;
+		}
+		Gizmos.color = HasPassedTarget() ? Color.magenta : Color.blue;
+		Gizmos.DrawSphere(prevTargetPointPos, gizmosSize);
 	}
 }
 

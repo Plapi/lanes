@@ -7,7 +7,6 @@ public class AICarPath : MonoBehaviour {
 	[SerializeField] private List<Transform> waypoints;
 	[SerializeField] private List<Vector3> points;
 	[SerializeField] private uint pointsCount = 100;
-	[SerializeField] private bool drawGizmos;
 
 	private AICar car;
 	private Action onComplete;
@@ -50,6 +49,9 @@ public class AICarPath : MonoBehaviour {
 		points = Bezier.GetBezierPoints(controlPoints, pointsCount);
 	}
 
+	[Space]
+	[SerializeField] protected float gizmosSize = 0.1f;
+	[SerializeField] private bool drawGizmos;
 	private void OnDrawGizmos() {
 		if (!drawGizmos) {
 			return;
@@ -66,7 +68,7 @@ public class AICarPath : MonoBehaviour {
 		}
 		Gizmos.color = Color.red;
 		for (int i = 0; i < waypoints.Count; i++) {
-			Gizmos.DrawSphere(waypoints[i].transform.position, 0.2f);
+			Gizmos.DrawSphere(waypoints[i].transform.position, gizmosSize);
 		}
 		Gizmos.DrawLine(transform.position, points[0]);
 		Gizmos.color = Color.yellow;

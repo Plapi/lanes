@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -11,6 +10,11 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	private UIMainPanel mainPanel;
 	
 	private void Start() {
+		Application.targetFrameRate = 60;
+		if (Settings.Instance.testMode) {
+			gameObject.AddComponent<DebugFPS>();
+		}
+		
 		AudioSystem.Init(this, PlayerPrefsManager.UserData.volumes);
 		HapticFeedback.SetEnabled(PlayerPrefsManager.UserData.hapticFeedback);
 		
@@ -71,6 +75,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			mainPanel.CoinsPanel.UpdateProgress(rTime / time);
 		}
 		mainPanel.CoinsPanel.UpdateProgress(1f);
+		yield return new WaitUntil(() => mainPanel.gameObject.activeSelf);
 		PlayerPrefsManager.UserData.coins += 100;
 		mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => {
 			mainPanel.CoinsPanel.UpdateCoins(PlayerPrefsManager.UserData.coins, 100);

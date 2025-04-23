@@ -151,13 +151,13 @@ public class TrackGenerator : MonoBehaviourSingleton<TrackGenerator> {
 			RoadLane lane0 = currentSegment.ForwardRoadLanes[i];
 			RoadLane lane1 = bottomSegment.ForwardRoadLanes[i];
 			Vector3 dir = (lane0.EndPos - lane0.StartPos).normalized * 2f;
-			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.EndPos + dir, lane1.StartPos });
+			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.EndPos, lane1.StartPos + dir });
 		}
 		for (int i = 0; i < bottomSegment.BackRoadLanes.Count; i++) {
 			RoadLane lane0 = bottomSegment.BackRoadLanes[i];
 			RoadLane lane1 = currentSegment.BackRoadLanes[i];
 			Vector3 dir = (lane0.EndPos - lane0.StartPos).normalized * 2f;
-			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.EndPos + dir, lane1.StartPos });
+			lane0.AddNextRoadLane(lane1, new List<Vector3> { lane0.EndPos, lane1.StartPos + dir });
 		}
 	}
 

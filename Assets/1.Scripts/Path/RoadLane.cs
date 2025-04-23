@@ -79,7 +79,7 @@ public class RoadLane : Lane<RoadLaneData> {
 		
 		AICar aiCar = ObjectPoolManager.Get(carPrefab, TrackGenerator.Instance.transform);
 		aiCar.name = carPrefab.name;
-		aiCar.transform.position = pos;
+		aiCar.SetStartPosition(pos);
 		aiCar.transform.LookAt(new Vector3(EndPos.x, aiCar.transform.position.y, EndPos.z));
 		
 		aiCar.SetTargetPoint(new TargetPoint {
@@ -168,7 +168,7 @@ public class RoadLane : Lane<RoadLaneData> {
 		aiCars.Clear();
 	}
 
-	/*private void OnDrawGizmos() {
+	private void OnDrawGizmos() {
 		
 		Gizmos.color = Color.green;
 		Gizmos.DrawSphere(StartPos, 0.5f);
@@ -193,7 +193,7 @@ public class RoadLane : Lane<RoadLaneData> {
 		Vector3 left = Quaternion.LookRotation(direction) * Quaternion.Euler(0, -35, 0) * Vector3.forward;
 		Gizmos.DrawLine(end, end - right * size);
 		Gizmos.DrawLine(end, end - left * size);
-	}*/
+	}
 	
 	[Serializable]
 	private class NextRoadLane {

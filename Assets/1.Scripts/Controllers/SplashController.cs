@@ -14,6 +14,6 @@ public class SplashController : MonoBehaviour {
 				AdsController.Instance.LoadAd();
 			});	
 		}
-		SceneManager.LoadSceneAsync(PlayerPrefsManager.UserData.isTutorialDone ? "Game" : "Tutorial");
+		SceneManager.LoadSceneAsync("Company");
 	}
 }

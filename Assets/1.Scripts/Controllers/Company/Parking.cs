@@ -42,7 +42,7 @@ public class Parking : MonoBehaviour {
 	private void SetCarPosStart() {
 		aiCar.gameObject.SetActive(false);
 		aiCar.DisableCar();
-		aiCar.transform.position = new Vector3(transform.position.x, initCarPosY, transform.position.z);
+		aiCar.SetStartPosition(new Vector3(transform.position.x, initCarPosY, transform.position.z));
 		aiCar.transform.rotation = transform.rotation;
 		aiCar.EnableCar();
 		aiCar.gameObject.SetActive(true);
@@ -75,7 +75,7 @@ public class Parking : MonoBehaviour {
 		exitPath[index].SetCar(aiCar, () => { SetExitCarPath(index + 1, onComplete); }, () => {
 			if (index == exitPath.Length - 1) {
 				float progress = exitPath[^1].GetProgress();
-				if (progress > 0.4f && progress < 0.5f) {
+				if (progress > 0.3f && progress < 0.4f) {
 					Vector3 rayDir = (roadLane.StartPos - roadLane.EndPos).normalized;
 					Utils.GetIntersection(aiCar.FrontPos, aiCar.transform.forward,
 						roadLane.EndPos, rayDir, out Vector3 intersection);
@@ -94,7 +94,7 @@ public class Parking : MonoBehaviour {
 			return;
 		}
 		aiCar = CreateCar();
-		aiCar.transform.position = new Vector3(enterPath[0].transform.position.x, initCarPosY, enterPath[0].transform.position.z);
+		aiCar.SetStartPosition(new Vector3(enterPath[0].transform.position.x, initCarPosY, enterPath[0].transform.position.z));
 		aiCar.transform.rotation = enterPath[0].transform.rotation;
 		StartCoroutine(WaitingForFreePath(() => {
 			aiCar.gameObject.SetActive(true);

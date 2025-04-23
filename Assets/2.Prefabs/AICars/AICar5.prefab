@@ -587,7 +587,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1880227690809707709
 Transform:
   m_ObjectHideFlags: 0
@@ -5496,7 +5496,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9218412220189991066
 Transform:
   m_ObjectHideFlags: 0
@@ -10689,6 +10689,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   boxCollider: {fileID: 1334370478187502973}
+  drawGizmos: 0
+  gizmosSize: 0.1
   id: AICar5
   raycastLayerMask:
     serializedVersion: 2
@@ -10962,7 +10964,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &746882847891335818
 Transform:
   m_ObjectHideFlags: 0
@@ -15925,7 +15927,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8144695703878359397
 Transform:
   m_ObjectHideFlags: 0

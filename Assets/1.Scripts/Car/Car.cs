@@ -73,7 +73,10 @@ public abstract class Car : MonoBehaviour {
 	}
 
 	protected float GetSteering() {
-		Vector3 targetDir = targetPos - FrontPos;
+		Vector3 fPos = FrontPos -transform.forward * 1f;
+		// GizmosController.Instance.DrawSphere("120", fPos, 0.1f, Color.magenta);
+		
+		Vector3 targetDir = targetPos - fPos;
 		float signedAngle = Vector3.SignedAngle(targetDir, transform.forward, Vector3.up);
 		float angle = Mathf.Abs(signedAngle);
 		
@@ -87,15 +90,21 @@ public abstract class Car : MonoBehaviour {
 		return steering;
 	}
 	
+	[Space]
+	[SerializeField] protected bool drawGizmos;
+	[SerializeField] protected float gizmosSize = 0.1f;
 	protected virtual void OnDrawGizmos() {
-		// if (Application.isPlaying) {
-		// 	Gizmos.color = Color.green;
-		// 	Gizmos.DrawSphere(targetPos, 0.25f);
-		// 	Gizmos.DrawLine(FrontPos, targetPos);
-		// }
+		if (!drawGizmos) {
+			return;
+		}
+		if (Application.isPlaying) {
+			Gizmos.color = Color.green;
+			Gizmos.DrawSphere(targetPos, gizmosSize);
+			Gizmos.DrawLine(FrontPos, targetPos);
+		}
 		Gizmos.color = Color.white;
-		Gizmos.DrawCube(FrontPos, Vector3.one * 0.2f);
+		Gizmos.DrawSphere(FrontPos, gizmosSize);
 		Gizmos.color = Color.black;
-		Gizmos.DrawCube(BackPos, Vector3.one * 0.2f);
+		Gizmos.DrawSphere(BackPos, gizmosSize);
 	}
 }
