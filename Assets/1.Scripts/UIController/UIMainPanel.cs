@@ -1,7 +1,7 @@
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 
@@ -22,6 +22,10 @@ public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 		driversButton.onClick.AddListener(data.onDriversButton);
 		multiplyCashButton.onClick.AddListener(data.onMultipleCashButton);
 		driveButton.onClick.AddListener(data.onDriveButton);
+	}
+
+	public void ShowSettingsButton(bool show) {
+		settingsButton.GetComponent<CanvasGroup>().DOFade(show ? 1f : 0f, UIController.defaultTime);
 	}
 
 	public new class Data : UIPanelBase.Data {

@@ -15,7 +15,6 @@ public class AICar : Car, IPoolableObject<AICar> {
 
 	private Vector3 prevTargetPointPos;
 	private TargetPoint targetPoint;
-	private float steering;
 	
 	public string Id {
 		get => id;
@@ -28,7 +27,6 @@ public class AICar : Car, IPoolableObject<AICar> {
 
 	private void Awake() {
 		prevTargetPointPos = FrontPos;
-		steering = 0f;
 	}
 
 	public void SetStartPosition(Vector3 pos) {

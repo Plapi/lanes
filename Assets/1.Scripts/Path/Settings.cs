@@ -22,11 +22,19 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 
 [Serializable]
 public class CompanyData {
+	public RoomDesignData waitingRoom;
 	public VaultRoomDesignData vaultRoom;
 }
 
 [Serializable]
-public class VaultRoomDesignData {
+public class RoomDesignData {
+	public string name;
+	public int[] upgradeCosts;
+	public int[] cashIncomes;
+}
+
+[Serializable]
+public class VaultRoomDesignData : RoomDesignData {
 	public int[] tableMoneyLevels;
 	public int maxTableMoney;
 }

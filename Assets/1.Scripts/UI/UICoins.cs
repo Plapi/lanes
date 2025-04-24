@@ -12,7 +12,7 @@ public class UICoins : UIObject {
 
 	public void UpdateCoins(int coins, int income) {
 		coinsText.text = coins.ToString("N0");
-		incomeText.text = income.ToString("N0");
+		incomeText.text = $"+{income:N0}";
 	}
 
 	public void UpdateProgress(float progress) {

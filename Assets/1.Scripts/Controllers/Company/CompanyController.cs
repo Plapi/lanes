@@ -1,17 +1,28 @@
+using System;
 using UnityEngine;
 
 public class CompanyController : MonoBehaviour {
 	
 	[SerializeField] private StartSegment startSegment;
 	[SerializeField] private ParkingController parkingController;
-	[SerializeField] private VaultRoom vaultRoom;
 
-	public void Init() {
+	[Space]
+	[SerializeField] private Room[] rooms;
+
+	public void Init(Action<Room> onRoomTap) {
 		Activate();
-		
-		vaultRoom.Init(PlayerPrefsManager.UserData.vaultRoom, () => {
-			
-		});
+		RoomData[] roomData = {
+			PlayerPrefsManager.UserData.waitingRoom,
+			PlayerPrefsManager.UserData.vaultRoom
+		};
+		roomData[0].design = Settings.Instance.company.waitingRoom;
+		roomData[1].design = Settings.Instance.company.vaultRoom;
+		for (int i = 0; i < rooms.Length; i++) {
+			int ii = i;
+			rooms[i].Init(roomData[i], () => {
+				onRoomTap(rooms[ii]);
+			});
+		}
 	}
 
 	public void Activate() {

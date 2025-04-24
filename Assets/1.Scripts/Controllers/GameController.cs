@@ -8,6 +8,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	[SerializeField] private RideController rideController;
 	
 	private UIMainPanel mainPanel;
+	private UIRoomPanel roomPanel;
 	
 	private void Start() {
 		Application.targetFrameRate = 60;
@@ -19,8 +20,25 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		HapticFeedback.SetEnabled(PlayerPrefsManager.UserData.hapticFeedback);
 		
 		UIController.Instance.Init();
-		
-		companyController.Init();
+
+		roomPanel = UIController.Instance.GetPanel<UIRoomPanel>();
+		companyController.Init(room => {
+			cameraController.SetEnabled(false);
+			cameraController.Zoom(room.GetCameraZoom());
+			mainPanel.ShowSettingsButton(false);
+			roomPanel.Show();
+			roomPanel.Init(new UIRoomPanel.Data {
+				roomData = room.RoomData,
+				onClose = () => {
+					cameraController.SetEnabled(true);
+					cameraController.ZoomBack();
+					mainPanel.ShowSettingsButton(true);
+				},
+				onUpgrade = () => {
+					
+				},
+			});
+		});
 		rideController.Init(OnCompanyButton);
 		
 		mainPanel = UIController.Instance.GetPanel<UIMainPanel>();

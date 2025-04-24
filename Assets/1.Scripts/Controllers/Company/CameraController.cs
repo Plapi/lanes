@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour {
@@ -7,45 +8,73 @@ public class CameraController : MonoBehaviour {
     [SerializeField] private BoxCollider bounds;
     [SerializeField] private LayerMask tapableLayerMask;
 
+    private new bool enabled = true;
     private Plane plane;
     private GTouch firstTouch;
     private Vector3 futurePos;
+    private Vector3 futureZoom;
+    private Vector3 prevPosZoom;
     private bool overUI;
     private GTouch[] touches;
 
     private void Awake() {
 	    futurePos = pivot.position;
+	    futureZoom = camera.transform.localPosition;
 	    UpdateBoundsScale();
 	    ClampFuturePos();
     }
+    
+    public void SetEnabled(bool enabled) {
+	    this.enabled = enabled;
+    }
+
+    public void Zoom(Vector3 pos) {
+	    prevPosZoom = new Vector3(futurePos.x, futureZoom.y, futurePos.z);
+	    futurePos = transform.TransformPoint(new Vector3(pos.x, 0f, pos.y));
+	    UpdateFutureZoom(pos.z);
+	    UpdateBoundsScale();
+    }
+
+    public void ZoomBack() {
+	    futurePos = new Vector3(prevPosZoom.x, 0f, prevPosZoom.z);
+	    UpdateFutureZoom(prevPosZoom.y);
+	    UpdateBoundsScale();
+    }
 
     private void Update() {
-	    touches = GTouch.GetTouches();
-	    
-	    float scrollDelta = GetScrollDelta();
-	    if (Mathf.Abs(scrollDelta) > Mathf.Epsilon) {
-		    camera.transform.SetLocalY(Mathf.Clamp(camera.transform.localPosition.y - scrollDelta, 10f, 100f));
-		    camera.transform.SetLocalZ(-camera.transform.localPosition.y + 10f);
-		    UpdateBoundsScale();
-		    ClampFuturePos();
-		    pivot.position = futurePos;
-	    } else if (touches[0] != null) {
-		    firstTouch ??= touches[0];
-		    if (touches[0].phase == TouchPhase.Began || touches[0].phase == TouchPhase.Moved) {
-			    plane.SetNormalAndPosition(transform.up, transform.position);
-			    futurePos += PlanePositionDelta(touches[0]);
+	    if (enabled) {
+		    touches = GTouch.GetTouches();
+		    float scrollDelta = GetScrollDelta();
+		    if (Mathf.Abs(scrollDelta) > Mathf.Epsilon) {
+			    UpdateFutureZoom(Mathf.Clamp(futureZoom.y - scrollDelta, 10f, 100f));
+			    UpdateBoundsScale();
 			    ClampFuturePos();
-		    } else if (touches[0].phase == TouchPhase.Ended) {
-			    if (IsTap(touches[0]) && Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, Mathf.Infinity, tapableLayerMask) &&
-			        hit.collider.TryGetComponent(out TapableObj tapableObj)) {
-				    tapableObj.OnTap();
-			    }
-			    firstTouch = null;
-		    }
-	    } 
+			    pivot.position = futurePos;
+		    } else if (touches[0] != null) {
+			    if (touches[0].phase == TouchPhase.Began) {
+				    firstTouch = Utils.IsOverUI() ? null : touches[0];
+			    } else if (firstTouch != null) {
+				    if (touches[0].phase == TouchPhase.Moved) {
+					    plane.SetNormalAndPosition(transform.up, transform.position);
+					    futurePos += PlanePositionDelta(touches[0]);
+					    ClampFuturePos();
+				    } else if (touches[0].phase == TouchPhase.Ended) {
+					    if (IsTap(touches[0]) && Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, Mathf.Infinity, tapableLayerMask) &&
+					        hit.collider.TryGetComponent(out TapableObj tapableObj)) {
+						    tapableObj.OnTap();
+					    }
+					    firstTouch = null;
+				    }
+			    }  
+		    } 
+	    }
 	    
 	    float time = Time.deltaTime * 20f;
-	    pivot.position = new Vector3(pivot.position.x + (futurePos.x - pivot.position.x) * time, 0f, pivot.position.z + (futurePos.z - pivot.position.z) * time);
+	    pivot.position = new Vector3(pivot.position.x + (futurePos.x - pivot.position.x) * time, 0f, 
+		    pivot.position.z + (futurePos.z - pivot.position.z) * time);
+	    camera.transform.localPosition = new Vector3(0f,
+		    camera.transform.localPosition.y + (futureZoom.y - camera.transform.localPosition.y) * time,
+		    camera.transform.localPosition.z + (futureZoom.z - camera.transform.localPosition.z) * time);
     }
 
     private float GetScrollDelta() {
@@ -57,6 +86,11 @@ public class CameraController : MonoBehaviour {
 		    return (Vector3.Distance(pos1, pos2) - Vector3.Distance(pos1b, pos2b)) * 10f;
 	    }
 	    return Input.mouseScrollDelta.y;
+    }
+
+    private void UpdateFutureZoom(float value) {
+	    futureZoom.y = value;
+	    futureZoom.z = -futureZoom.y + 10f;
     }
 
     private void UpdateBoundsScale() {
