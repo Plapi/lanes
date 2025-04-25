@@ -73,6 +73,13 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 				                       "<line-height=40>Great job! You've maximized\n<color=#30B8FF>cash income</color> from this room.";
 			}
 		}
+		UpdateUpgradeButton();
+	}
+
+	public void UpdateUpgradeButton() {
+		if (!upgradeButton.gameObject.activeSelf) {
+			return;
+		}
 		
 		int upgradeCost = data.roomData.UpgradeCost;
 		upgradeCostText.text = upgradeCost.ToString("N0");
@@ -81,10 +88,7 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 			horizontalLayoutGroup.enabled = false;
 			horizontalLayoutGroup.enabled = true;
 		});
-		UpdateUpgradeButton();
-	}
-
-	public void UpdateUpgradeButton() {
+		
 		int coins = PlayerPrefsManager.UserData.coins;
 		bool canUpgrade = !data.roomData.MaxLevelReached && coins >= data.roomData.UpgradeCost;
 		upgradeButton.interactable = canUpgrade;

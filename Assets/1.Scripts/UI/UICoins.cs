@@ -21,11 +21,7 @@ public class UICoins : UIObject {
 	public void UpdateCoins(int coins, int income) {
 		coinsText.text = coins.ToString("N0");
 		incomeText.text = $"+{income:N0}";
-		this.EndOfFrame(() => {
-			HorizontalLayoutGroup horizontalLayoutGroup = coinsText.transform.parent.GetComponent<HorizontalLayoutGroup>();
-			horizontalLayoutGroup.enabled = false;
-			horizontalLayoutGroup.enabled = true;
-		});
+		UpdateLayout();
 		bool vaultIsFull = PlayerPrefsManager.UserData.VaultIsFull();
 		if (vaultIsFull != vaultFull.gameObject.activeSelf) {
 			vaultFull.gameObject.SetActive(vaultIsFull);
@@ -39,6 +35,7 @@ public class UICoins : UIObject {
 		coinsText.DOColor(Color.red, 0.25f).OnComplete(() => {
 			coinsText.DOColor(Color.white, 0.25f);
 		});
+		UpdateLayout();
 	}
 
 	public void UpdateProgress(float progress) {
@@ -53,6 +50,14 @@ public class UICoins : UIObject {
 				coinsText.DOColor(Color.white, 0.25f);
 			});
 			onComplete?.Invoke();
+		});
+	}
+
+	private void UpdateLayout() {
+		this.EndOfFrame(() => {
+			HorizontalLayoutGroup horizontalLayoutGroup = coinsText.transform.parent.GetComponent<HorizontalLayoutGroup>();
+			horizontalLayoutGroup.enabled = false;
+			horizontalLayoutGroup.enabled = true;
 		});
 	}
 }

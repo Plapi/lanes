@@ -42,7 +42,7 @@ public class RoomData {
 	[NonSerialized] public RoomDesignData design;
 	public int level = 1;
 	public int MaxLevel => design.upgradeCosts.Length;
-	public bool MaxLevelReached => level >= MaxLevel;
+	public bool MaxLevelReached => level - 1 >= MaxLevel;
 	public int CoinsIncome => design.cashIncomes[level - 1];
 	public int UpgradeCost => design.upgradeCosts[level - 1];
 }

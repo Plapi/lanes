@@ -110,8 +110,10 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			rTime += Time.deltaTime;
 			mainPanel.CoinsPanel.UpdateProgress(rTime / time);
 		}
-		mainPanel.CoinsPanel.UpdateProgress(1f);
+		
 		yield return new WaitUntil(() => mainPanel.gameObject.activeSelf);
+		
+		mainPanel.CoinsPanel.UpdateProgress(1f);
 		PlayerPrefsManager.UserData.IncreaseCoins(income);
 		if (roomPanel.gameObject.activeSelf) {
 			roomPanel.UpdateUpgradeButton();
