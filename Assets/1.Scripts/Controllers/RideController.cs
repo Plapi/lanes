@@ -170,9 +170,9 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 	}
 
 	private void AddCoins(int coins) {
-		garagePanel.PlayCoinsAnim(PlayerPrefsManager.UserData.coins, PlayerPrefsManager.UserData.coins + coinsEarned);
-		PlayerPrefsManager.UserData.coins += coins;
-		PlayerPrefsManager.SaveUserData();
+		int prevCoins = PlayerPrefsManager.UserData.coins;
+		PlayerPrefsManager.UserData.IncreaseCoins(coins);
+		garagePanel.PlayCoinsAnim(prevCoins, PlayerPrefsManager.UserData.coins + coinsEarned);
 	}
 
 	private void InitUI(Action onClose) {
@@ -192,13 +192,6 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			onRight = () => selectCarController.UpdateSelection(1),
 			onGo = Go,
 			onBuy = selectCarController.BuyCar,
-			onCoin = () => {
-				if (Settings.Instance.testMode) {
-					PlayerPrefsManager.UserData.coins += 10000;
-					PlayerPrefsManager.SaveUserData();
-					garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);	
-				}
-			},
 			coins = PlayerPrefsManager.UserData.coins
 		});
 		garagePanel.gameObject.SetActive(false);

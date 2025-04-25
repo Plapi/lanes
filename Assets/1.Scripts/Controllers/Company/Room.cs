@@ -1,5 +1,4 @@
 using System;
-using JsonFx.Json;
 using UnityEngine;
 
 public class Room : MonoBehaviour {
@@ -8,19 +7,29 @@ public class Room : MonoBehaviour {
 	[SerializeField] private Element obj;
 	[SerializeField] private TapableObj tapable;
 	[SerializeField] private Vector3 cameraZoom;
+	[SerializeField] private GameObject upgradeParticles;
 
 	private int currentLevel = 1;
 	
 	public RoomData RoomData { get; private set; }
 
-	public virtual void Init(RoomData roomData, Action onTap) {
+	public void Init(RoomData roomData, Action onTap) {
 		RoomData = roomData;
-		if (roomData.level != currentLevel) {
-			Destroy(obj.gameObject);
-			obj = Instantiate(Resources.Load<Element>($"Company/{id}/{id}/${id}{roomData.level - 1}"), transform);
-			currentLevel = roomData.level;
-		}
+		UpdateRoomGraphic(false);
 		tapable.SetOnTap(onTap);
+	}
+
+	public virtual void UpdateRoomGraphic(bool playParticles = true) {
+		if (RoomData.level != currentLevel) {
+			Destroy(obj.gameObject);
+			string objName = $"{id}{RoomData.level - 1}";
+			obj = Instantiate(Resources.Load<Element>($"Company/{id}/{objName}/{objName}"), transform);
+			currentLevel = RoomData.level;
+			if (playParticles) {
+				upgradeParticles.SetActive(true);
+				this.Wait(1.7f, () => upgradeParticles.SetActive(false));
+			}
+		}
 	}
 
 	public Vector3 GetCameraZoom() {
@@ -28,14 +37,18 @@ public class Room : MonoBehaviour {
 	}
 }
 
+[Serializable]
 public class RoomData {
-	[JsonIgnore] public RoomDesignData design;
+	[NonSerialized] public RoomDesignData design;
 	public int level = 1;
 	public int MaxLevel => design.upgradeCosts.Length;
 	public bool MaxLevelReached => level >= MaxLevel;
+	public int CoinsIncome => design.cashIncomes[level - 1];
+	public int UpgradeCost => design.upgradeCosts[level - 1];
 }
 
+[Serializable]
 public class VaultRoomData : RoomData {
-	[JsonIgnore] public new VaultRoomDesignData design => (VaultRoomDesignData)base.design;
+	public new VaultRoomDesignData design => (VaultRoomDesignData)base.design;
 	public int Capacity => level * design.maxTableMoney;
 }

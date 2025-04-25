@@ -35,7 +35,12 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 					mainPanel.ShowSettingsButton(true);
 				},
 				onUpgrade = () => {
-					
+					UIController.Instance.ActivateTouchBlocker(2f);
+					PlayerPrefsManager.UserData.coins -= room.RoomData.UpgradeCost;
+					room.RoomData.level++;
+					PlayerPrefsManager.SaveUserData();
+					mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
+					room.UpdateRoomGraphic();
 				},
 			});
 		});
@@ -43,8 +48,6 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		
 		mainPanel = UIController.Instance.GetPanel<UIMainPanel>();
 		mainPanel.Init(new UIMainPanel.Data {
-			coins = PlayerPrefsManager.UserData.coins,
-			income = 100,
 			onSettingsButton = () => {
 				
 			}, onDriversButton = () => {
@@ -85,6 +88,21 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	}
 
 	private IEnumerator CoinsMechanic() {
+
+		int income;
+		while (!TryGetCoinsIncome(out income)) {
+			UpdateCoins(income);
+			yield return new WaitForSeconds(2f);
+		}
+
+		if (PlayerPrefsManager.UserData.VaultIsFull()) {
+			UpdateCoins(income);	
+			do {
+				yield return new WaitForSeconds(2f);
+			} while (PlayerPrefsManager.UserData.VaultIsFull());
+		}
+		UpdateCoins(income);
+		
 		const float time = 10f;
 		float rTime = 0f;
 		while (rTime < time) {
@@ -94,10 +112,28 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		}
 		mainPanel.CoinsPanel.UpdateProgress(1f);
 		yield return new WaitUntil(() => mainPanel.gameObject.activeSelf);
-		PlayerPrefsManager.UserData.coins += 100;
-		mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => {
-			mainPanel.CoinsPanel.UpdateCoins(PlayerPrefsManager.UserData.coins, 100);
-			StartCoroutine(CoinsMechanic());
-		});
+		PlayerPrefsManager.UserData.IncreaseCoins(income);
+		if (roomPanel.gameObject.activeSelf) {
+			roomPanel.UpdateUpgradeButton();
+		}
+		
+		mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => StartCoroutine(CoinsMechanic()));
+	}
+
+	private void UpdateCoins(int income) {
+		int coins = PlayerPrefsManager.UserData.coins;
+		mainPanel.CoinsPanel.UpdateCoins(coins, income);
+		companyController.VaultRoom.UpdateTables(coins);
+	}
+
+	private static bool TryGetCoinsIncome(out int income) {
+		RoomData[] roomData = {
+			PlayerPrefsManager.UserData.waitingRoom
+		};
+		income = 0;
+		for (int i = 0; i < roomData.Length; i++) {
+			income += roomData[i].CoinsIncome;
+		}
+		return income > 0;
 	}
 }

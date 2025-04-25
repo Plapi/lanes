@@ -5,12 +5,15 @@ public class VaultRoom : Room {
     
 	[SerializeField] private VaultTable[] tables;
 
-	public override void Init(RoomData roomData, Action onTap) {
-		base.Init(roomData, onTap);
-		int money = PlayerPrefsManager.UserData.coins;
-		for (int i = 0; i < roomData.level; i++) {
-			tables[i].Init(money);
-			money = Mathf.Max(money - Settings.Instance.company.vaultRoom.maxTableMoney, 0);
+	public override void UpdateRoomGraphic(bool playParticles = true) {
+		base.UpdateRoomGraphic(playParticles);
+		UpdateTables(PlayerPrefsManager.UserData.coins);
+	}
+
+	public void UpdateTables(int coins) {
+		for (int i = 0; i < RoomData.level; i++) {
+			tables[i].Init(coins);
+			coins = Mathf.Max(coins - ((VaultRoomData)RoomData).design.maxTableMoney, 0);
 		}
 	}
 }

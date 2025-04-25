@@ -40,8 +40,9 @@ public static class PlayerPrefsManager {
 
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
 public class UserData {
+	
 	public bool isTutorialDone;
-	public int coins = 1000;
+	public int coins = 500;
 	public List<int> unlockedCars = new() { 0 };
 	public List<int> carColors = new() { 7, 4, 0, 0, 9, 1 };
 	public int carSelection;
@@ -51,4 +52,14 @@ public class UserData {
 	public bool hapticFeedback = true;
 	public RoomData waitingRoom = new();
 	public VaultRoomData vaultRoom = new();
+
+	public void IncreaseCoins(int amount) {
+		coins += amount;
+		coins = Mathf.Min(coins, vaultRoom.Capacity);
+		PlayerPrefsManager.SaveUserData();
+	}
+
+	public bool VaultIsFull() {
+		return coins >= vaultRoom.Capacity;
+	}
 }

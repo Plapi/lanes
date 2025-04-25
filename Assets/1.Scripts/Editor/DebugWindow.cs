@@ -41,8 +41,7 @@ public class DebugWindow : EditorWindow {
 		}
 
 		if (GUILayout.Button("Add Coins")) {
-			PlayerPrefsManager.UserData.coins += 1000;
-			FindAnyObjectByType<UIGaragePanel>().UpdateCoins(PlayerPrefsManager.UserData.coins);
+			PlayerPrefsManager.UserData.IncreaseCoins(1000);
 		}
 
 		if (GUILayout.Button("Set Buttons Sound")) {

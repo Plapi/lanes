@@ -9,6 +9,8 @@ public class CompanyController : MonoBehaviour {
 	[Space]
 	[SerializeField] private Room[] rooms;
 
+	public VaultRoom VaultRoom => (VaultRoom)rooms[^1];
+
 	public void Init(Action<Room> onRoomTap) {
 		Activate();
 		RoomData[] roomData = {

@@ -23,6 +23,8 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 [Serializable]
 public class CompanyData {
 	public RoomDesignData waitingRoom;
+	public RoomDesignData breakRoom;
+	public RoomDesignData callCenterRoom;
 	public VaultRoomDesignData vaultRoom;
 }
 

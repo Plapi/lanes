@@ -59,4 +59,9 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 			onComplete?.Invoke();
 		});
 	}
+
+	public void ActivateTouchBlocker(float time) {
+		touchBlocker.SetActive(true);
+		this.Wait(time, () => touchBlocker.SetActive(false));
+	}
 }

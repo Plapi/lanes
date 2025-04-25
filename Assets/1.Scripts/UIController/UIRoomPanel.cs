@@ -1,4 +1,5 @@
 using System;
+using Coffee.UIExtensions;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -24,6 +25,10 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 	[SerializeField] private TextMeshProUGUI incomeText;
 	[SerializeField] private GameObject vaultObj;
 	[SerializeField] private TextMeshProUGUI vaultText;
+
+	[Space]
+	[SerializeField] private AudioClip upgradeClip;
+	[SerializeField] private UIParticle upgradeParticle;
 	
 	protected override void OnInit() {
 		
@@ -54,35 +59,51 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 				                       "You’ve unlocked the maximum\n<color=#30B8FF>storage capacity</color>!";
 			}
 		} else {
-			incomeText.text = $"+{data.roomData.design.cashIncomes[data.roomData.level - 1]:N0}";
+			incomeText.text = $"+{data.roomData.CoinsIncome:N0}";
+			this.EndOfFrame(() => {
+				HorizontalLayoutGroup horizontalLayoutGroup = incomeText.transform.parent.GetComponent<HorizontalLayoutGroup>();
+				horizontalLayoutGroup.enabled = false;
+				horizontalLayoutGroup.enabled = true;
+			});
 			if (!maxLevelReached) {
 				descriptionText.text = $"Upgrade {data.roomData.design.name} to <color=#30B8FF>Level {data.roomData.level + 1},</color>\n" +
 				                       "to increase <color=#30B8FF>cash income.</color>";
 			} else {
 				descriptionText.text = $"<size=40>{data.roomData.design.name} is <color=#30B8FF>fully upgraded!</color></size><line-height=80>\n" +
 				                       "<line-height=40>Great job! You've maximized\n<color=#30B8FF>cash income</color> from this room.";
-			}	
+			}
 		}
-
-		int coins = PlayerPrefsManager.UserData.coins;
-		int upgradeCost = data.roomData.design.upgradeCosts[data.roomData.level - 1];
+		
+		int upgradeCost = data.roomData.UpgradeCost;
 		upgradeCostText.text = upgradeCost.ToString("N0");
 		this.EndOfFrame(() => {
 			HorizontalLayoutGroup horizontalLayoutGroup = upgradeCostText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;
 			horizontalLayoutGroup.enabled = true;
 		});
-		bool canUpgrade = !maxLevelReached && coins >= upgradeCost;
-		
+		UpdateUpgradeButton();
+	}
+
+	public void UpdateUpgradeButton() {
+		int coins = PlayerPrefsManager.UserData.coins;
+		bool canUpgrade = !data.roomData.MaxLevelReached && coins >= data.roomData.UpgradeCost;
 		upgradeButton.interactable = canUpgrade;
 		upgradeButton.onClick.RemoveAllListeners();
 		upgradeButton.onClick.AddListener(() => {
-			PlayerPrefsManager.UserData.coins -= upgradeCost;
-			data.roomData.level++;
-			PlayerPrefsManager.SaveUserData();
 			data.onUpgrade?.Invoke();
+			OnInit();
+			PlayUpgrade();
 		});
 		upgradeButtonCanvasGroup.alpha = canUpgrade ? 1f : 0.5f;
+	}
+
+	private void PlayUpgrade() {
+		AudioSystem.Play(upgradeClip);
+		upgradeParticle.Play();
+		levelText.transform.parent.DOPunchScale(Vector3.one * 0.2f, UIController.defaultTime).SetUpdate(true);
+		levelText.DOColor(Color.green, 0.25f).OnComplete(() => {
+			levelText.DOColor(Color.white, 0.25f);
+		});
 	}
 
 	protected override void ShowAnim(Action onComplete) {
