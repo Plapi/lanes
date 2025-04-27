@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class RideController : MonoBehaviourSingleton<RideController> {
@@ -31,7 +30,6 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 	private UIGaragePanel garagePanel;
 	private UIPausePanel pausePanel;
 	private UIResultsPanel resultsPanel;
-	private UISettingsPanel settingsPanel;
 	
 	private PosAndRot initCameraPosAndRot;
 	private PosAndRot initUserCarPosAndRot;
@@ -180,19 +178,16 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		garagePanel = UIController.Instance.GetPanel<UIGaragePanel>();
 		pausePanel = UIController.Instance.GetPanel<UIPausePanel>();
 		resultsPanel = UIController.Instance.GetPanel<UIResultsPanel>();
-		settingsPanel = UIController.Instance.GetPanel<UISettingsPanel>();
 		
 		garagePanel.gameObject.SetActive(true);
 		garagePanel.Init(new UIGaragePanel.Data {
 			onCloseButton = () => {
 				onClose?.Invoke();
 			},
-			onSettings = settingsPanel.Show,
 			onLeft = () => selectCarController.UpdateSelection(-1),
 			onRight = () => selectCarController.UpdateSelection(1),
 			onGo = Go,
-			onBuy = selectCarController.BuyCar,
-			coins = PlayerPrefsManager.UserData.coins
+			onBuy = selectCarController.BuyCar
 		});
 		garagePanel.gameObject.SetActive(false);
 		
@@ -205,7 +200,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		});
 		
 		pausePanel.Init(new UIPausePanel.Data {
-			onSettings = settingsPanel.Show,
+			onSettings = () => UIController.Instance.GetPanel<UISettingsPanel>().Show(),
 			onRestart = () => {
 				if (coinsEarned > 0) {
 					ShowResults();
@@ -223,52 +218,6 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 				userCar.SetSoundEnabled(true);
 			}
 		});
-
-		settingsPanel.Init(new UISettingsPanel.Data {
-			volumes = PlayerPrefsManager.UserData.volumes,
-			onUpdateSlider = (index, volume) => {
-				MixerType mixerType = (MixerType)index;
-				if (mixerType == MixerType.CarEngine) {
-					if (userCar != null) {
-						userCar.SetAudioVolume(volume);
-					}
-				} else {
-					AudioSystem.UpdateVolume(mixerType, volume);	
-				}
-			},
-			hapticFeedback = PlayerPrefsManager.UserData.hapticFeedback,
-			onUpdateHapticFeedback = hapticFeedback => {
-				PlayerPrefsManager.UserData.hapticFeedback = hapticFeedback;
-				PlayerPrefsManager.SaveUserData();
-				HapticFeedback.SetEnabled(hapticFeedback);
-			}, onClose = volumes => {
-				PlayerPrefsManager.UserData.volumes = volumes;
-				PlayerPrefsManager.SaveUserData();
-				AnalyticsSystem.RecordSettingsEvent(Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[0] * 100),
-					Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[1] * 100),
-					Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[2] * 100), true);
-			}, onAbout = () => {
-				AnalyticsSystem.RecordOpenAboutEvent();
-				UIController.Instance.GetPanel<UIAboutPanel>().Init(new UIAboutPanel.Data {
-					onMail = () => {
-						AnalyticsSystem.RecordClickMailEvent();
-						const string email = "adrian.plapamaru@gmail.com";
-						string subject = EscapeURL("Feedback about Quick Lane Driver");
-						string body = EscapeURL("Hi, I’d like to share my thoughts about the game...");
-						string mailto = $"mailto:{email}?subject={subject}&body={body}";
-						Application.OpenURL(mailto);
-					}
-				}).Show();
-			}, onTutorial = () => {
-				UIController.Instance.FadeInToBlack(() => {
-					SceneManager.LoadScene("Tutorial");
-				});
-			}
-		});
-	}
-	
-	private static string EscapeURL(string text) {
-		return UnityEngine.Networking.UnityWebRequest.EscapeURL(text).Replace("+", "%20");
 	}
 
 	private void Go() {
@@ -393,7 +342,8 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 					
 			garagePanel.Show();
 			if (coinsEarned > 0) {
-				AddCoins(coinsEarned);	
+				UIController.Instance.ActivateTouchBlocker(1f);
+				this.WaitForFrames(1, () => AddCoins(coinsEarned));
 			}
 			UIController.Instance.FadeOutFromBlack();
 			Time.timeScale = 1f;

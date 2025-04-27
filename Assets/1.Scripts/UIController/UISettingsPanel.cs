@@ -10,7 +10,6 @@ public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 	[SerializeField] private Slider[] sliders;
 	[SerializeField] private Slider hapticSlider;
 	[SerializeField] private Button aboutButton;
-	[SerializeField] private Button tutorialButton;
 	
 	protected override void OnInit() {
 
@@ -44,7 +43,6 @@ public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 		};
 		
 		aboutButton.onClick.AddListener(data.onAbout);
-		tutorialButton.onClick.AddListener(data.onTutorial);
 	}
 	
 	public new class Data: UIPanelBase.Data {
@@ -54,7 +52,6 @@ public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 		public Action<bool> onUpdateHapticFeedback;
 		public new Action<float[]> onClose;
 		public UnityAction onAbout;
-		public UnityAction onTutorial;
 	}
 	
 }

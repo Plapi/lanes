@@ -80,6 +80,10 @@ public static class Utils {
 		}
 		return Input.touchCount > 0 && EventSystem.current.IsPointerOverGameObject(Input.touches[0].fingerId);
 	}
+	
+	public static string EscapeURL(string text) {
+		return UnityEngine.Networking.UnityWebRequest.EscapeURL(text).Replace("+", "%20");
+	}
 
 	public static bool GetIntersection(Vector3 p0, Vector3 dir0, Vector3 p1, Vector3 dir1, out Vector3 intersection) {
 		intersection = Vector2.zero;

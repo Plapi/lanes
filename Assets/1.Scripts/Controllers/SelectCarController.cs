@@ -106,7 +106,7 @@ public class SelectCarController : MonoBehaviour {
 			PlayerPrefsManager.UserData.coins -= userCars[selection].Price;
 			PlayerPrefsManager.UserData.unlockedCars.Add(selection);
 			PlayerPrefsManager.SaveUserData();
-			garagePanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
+			UIController.Instance.GetPanel<UIMainPanel>().CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
 			garagePanel.UpdateBottom(0);
 			rotateObjController.SetObj(templatesUserCar[selection].BoxCollider);
 			UpdateSelection(0);

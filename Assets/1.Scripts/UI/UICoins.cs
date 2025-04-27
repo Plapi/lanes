@@ -29,6 +29,11 @@ public class UICoins : UIObject {
 		}
 	}
 
+	public void UpdateCoins(int coins) {
+		coinsText.text = coins.ToString("N0");
+		UpdateLayout();
+	}
+
 	public void ConsumeCoins(int coins) {
 		coinsText.text = coins.ToString("N0");
 		DOTween.Kill(coinsText);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	
 	private UIMainPanel mainPanel;
 	private UIRoomPanel roomPanel;
+	private UISettingsPanel settingsPanel;
 	
 	private void Start() {
 		Application.targetFrameRate = 60;
@@ -19,9 +21,8 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		AudioSystem.Init(this, PlayerPrefsManager.UserData.volumes);
 		HapticFeedback.SetEnabled(PlayerPrefsManager.UserData.hapticFeedback);
 		
-		UIController.Instance.Init();
-
-		roomPanel = UIController.Instance.GetPanel<UIRoomPanel>();
+		InitUI();
+		
 		companyController.Init(room => {
 			cameraController.SetEnabled(false);
 			cameraController.Zoom(room.GetCameraZoom());
@@ -46,28 +47,73 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		});
 		rideController.Init(OnCompanyButton);
 		
-		mainPanel = UIController.Instance.GetPanel<UIMainPanel>();
-		mainPanel.Init(new UIMainPanel.Data {
-			onSettingsButton = () => {
-				
-			}, onDriversButton = () => {
-				
-			}, onMultipleCashButton = () => {
-				
-			}, onDriveButton = OnDriveButton
-		});
-
 		TrackGenerator.Instance.OnStartSegmentSetActive += active => {
 			companyController.gameObject.SetActive(active);
 		};
 		
 		StartCoroutine(CoinsMechanic());
 	}
+
+	private void InitUI() {
+		UIController.Instance.Init();
+		mainPanel = UIController.Instance.GetPanel<UIMainPanel>();
+		roomPanel = UIController.Instance.GetPanel<UIRoomPanel>();
+		settingsPanel = UIController.Instance.GetPanel<UISettingsPanel>();
+		
+		mainPanel.Init(new UIMainPanel.Data {
+			onSettingsButton = settingsPanel.Show, 
+			onDriversButton = () => {
+				
+			}, onMultiplyCashButton = () => {
+				
+			}, onDriveButton = OnDriveButton
+		});
+		
+		settingsPanel.Init(new UISettingsPanel.Data {
+			volumes = PlayerPrefsManager.UserData.volumes,
+			onUpdateSlider = (index, volume) => {
+				MixerType mixerType = (MixerType)index;
+				if (mixerType == MixerType.CarEngine) {
+					UserCar userCar = rideController.GetUserCar();
+					if (userCar != null) {
+						userCar.SetAudioVolume(volume);
+					}
+				} else {
+					AudioSystem.UpdateVolume(mixerType, volume);	
+				}
+			},
+			hapticFeedback = PlayerPrefsManager.UserData.hapticFeedback,
+			onUpdateHapticFeedback = hapticFeedback => {
+				PlayerPrefsManager.UserData.hapticFeedback = hapticFeedback;
+				PlayerPrefsManager.SaveUserData();
+				HapticFeedback.SetEnabled(hapticFeedback);
+			}, onClose = volumes => {
+				PlayerPrefsManager.UserData.volumes = volumes;
+				PlayerPrefsManager.SaveUserData();
+				AnalyticsSystem.RecordSettingsEvent(Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[0] * 100),
+					Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[1] * 100),
+					Mathf.RoundToInt(PlayerPrefsManager.UserData.volumes[2] * 100), true);
+			}, onAbout = () => {
+				AnalyticsSystem.RecordOpenAboutEvent();
+				UIController.Instance.GetPanel<UIAboutPanel>().Init(new UIAboutPanel.Data {
+					onMail = () => {
+						AnalyticsSystem.RecordClickMailEvent();
+						const string email = "adrian.plapamaru@gmail.com";
+						string subject = Utils.EscapeURL("Feedback about Rade Empire");
+						string body = Utils.EscapeURL("Hi, I’d like to share my thoughts about the game...");
+						string mailto = $"mailto:{email}?subject={subject}&body={body}";
+						Application.OpenURL(mailto);
+					}
+				}).Show();
+			}
+		});
+	}
 	
 	private void OnDriveButton() {
 		UIController.Instance.FadeInToBlack(() => {
 			cameraController.gameObject.SetActive(false);
 			TrackGenerator.Instance.SetSpawnAICarDistance(90, 110, 20, 40);
+			mainPanel.MoveToOtherPanel(UIController.Instance.GetPanel<UIGaragePanel>().TopContainer);
 			mainPanel.Close();
 			companyController.Deactivate();
 			rideController.Activate();
@@ -80,6 +126,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			cameraController.gameObject.SetActive(true);
 			TrackGenerator.Instance.SetSpawnAICarDistance(40, 80, 40, 80);
 			UIController.Instance.GetPanel<UIGaragePanel>().Close(false);
+			mainPanel.MoveBack();
 			mainPanel.Show();
 			rideController.Deactivate();
 			companyController.Activate();
@@ -111,7 +158,11 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			mainPanel.CoinsPanel.UpdateProgress(rTime / time);
 		}
 		
-		yield return new WaitUntil(() => mainPanel.gameObject.activeSelf);
+		DateTime startTime = DateTime.Now;
+		yield return new WaitUntil(() => mainPanel.CoinsPanel.gameObject.activeSelf && mainPanel.CoinsPanel.gameObject.activeInHierarchy);
+		float seconds = (float)(DateTime.Now - startTime).TotalSeconds;
+		int turns = Mathf.RoundToInt(seconds / 12);
+		income += turns * income;
 		
 		mainPanel.CoinsPanel.UpdateProgress(1f);
 		PlayerPrefsManager.UserData.IncreaseCoins(income);

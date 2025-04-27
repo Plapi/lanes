@@ -15,13 +15,9 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	[Space]
 	[SerializeField] private Slider speedSlider;
 	[SerializeField] private Slider healthSlider;
-	
-	[Space]
-	[SerializeField] private TextMeshProUGUI coinsText;
 
 	[Space]
 	[SerializeField] private Button closeButton;
-	[SerializeField] private Button settingsButton;
 	[SerializeField] private Button leftButton;
 	[SerializeField] private Button rightButton;
 
@@ -36,15 +32,15 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	
 	[Space]
 	[SerializeField] private UICoinsAnim coinsAnim;
+	
+	public RectTransform TopContainer => topContainer;
 
 	protected override void OnInit() {
 		closeButton.onClick.AddListener(data.onCloseButton);
-		settingsButton.onClick.AddListener(data.onSettings);
 		leftButton.onClick.AddListener(data.onLeft);
 		rightButton.onClick.AddListener(data.onRight);
 		goButton.onClick.AddListener(data.onGo);
 		buyButton.onClick.AddListener(data.onBuy);
-		UpdateCoins(data.coins);
 	}
 
 	public void SetLeftRightButtonInteractable(bool leftInteractable, bool rightInteractable) {
@@ -52,28 +48,20 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 		rightButton.interactable = rightInteractable;
 	}
 
-	public void UpdateCoins(int coins) {
-		coinsText.text = coins.ToString("N0");
-		this.EndOfFrame(() => {
-			HorizontalLayoutGroup horizontalLayoutGroup = coinsText.transform.parent.GetComponent<HorizontalLayoutGroup>();
-			horizontalLayoutGroup.enabled = false;
-			horizontalLayoutGroup.enabled = true;
-		});
-	}
-
 	public void PlayCoinsAnim(int from, int to, int count = 10) {
+		UICoins coinsPanel = UIController.Instance.GetPanel<UIMainPanel>().CoinsPanel;
 		int coins = from;
 		int add = (to - from) / count;
+		Vector3 scale = coinsPanel.transform.localScale;
 		coinsAnim.OnCoinReach = () => {
 			coins += add;
-			UpdateCoins(coins);
-			Transform coinsContainer = coinsText.transform.parent;
-			coinsContainer.DOKill();
-			coinsContainer.transform.localScale = Vector3.one;
-			coinsContainer.DOPunchScale(Vector3.one * 0.2f, UIController.defaultTime);
+			coinsPanel.UpdateCoins(coins);
+			coinsPanel.transform.DOKill();
+			coinsPanel.transform.localScale = scale;
+			coinsPanel.transform.DOPunchScale(scale * 0.2f, UIController.defaultTime);
 		};
 		coinsAnim.Play(10, () => {
-			UpdateCoins(to);
+			coinsPanel.UpdateCoins(to);
 		});
 	}
 
@@ -135,11 +123,9 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 
 	public new class Data: UIPanelBase.Data {
 		public UnityAction onCloseButton;
-		public UnityAction onSettings;
 		public UnityAction onLeft;
 		public UnityAction onRight;
 		public UnityAction onGo;
 		public UnityAction onBuy;
-		public int coins;
 	}
 }
