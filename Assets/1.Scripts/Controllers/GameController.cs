@@ -130,7 +130,8 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 
 	private static bool TryGetCoinsIncome(out int income) {
 		RoomData[] roomData = {
-			PlayerPrefsManager.UserData.waitingRoom
+			PlayerPrefsManager.UserData.waitingRoom,
+			PlayerPrefsManager.UserData.callCenterRoom
 		};
 		income = 0;
 		for (int i = 0; i < roomData.Length; i++) {

@@ -43,6 +43,15 @@ public class DebugWindow : EditorWindow {
 		if (GUILayout.Button("Add Coins")) {
 			PlayerPrefsManager.UserData.IncreaseCoins(1000);
 		}
+		
+		if (GUILayout.Button("Add Full Coins")) {
+			PlayerPrefsManager.UserData.coins = 0;
+			PlayerPrefsManager.UserData.IncreaseCoins(PlayerPrefsManager.UserData.vaultRoom.Capacity);
+		}
+
+		if (GUILayout.Button("Clear Coins")) {
+			PlayerPrefsManager.UserData.IncreaseCoins(-PlayerPrefsManager.UserData.coins);
+		}
 
 		if (GUILayout.Button("Set Buttons Sound")) {
 			SetButtonsSound();

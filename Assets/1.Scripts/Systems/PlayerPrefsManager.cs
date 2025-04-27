@@ -52,6 +52,8 @@ public class UserData {
 	public bool hapticFeedback = true;
 	public RoomData waitingRoom = new();
 	public VaultRoomData vaultRoom = new();
+	public RoomData callCenterRoom = new();
+	public RoomData breakRoom = new();
 
 	public void IncreaseCoins(int amount) {
 		coins += amount;

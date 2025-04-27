@@ -56,7 +56,7 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 				                       "to increase <color=#30B8FF>storage capacity.</color>";
 			} else {
 				descriptionText.text = $"<size=40>{data.roomData.design.name} is <color=#30B8FF>fully upgraded!</color></size><line-height=80>\n" +
-				                       "You’ve unlocked the maximum\n<color=#30B8FF>storage capacity</color>!";
+				                       "<line-height=40>You’ve unlocked the maximum\n<color=#30B8FF>storage capacity</color>!";
 			}
 		} else {
 			incomeText.text = $"+{data.roomData.CoinsIncome:N0}";
