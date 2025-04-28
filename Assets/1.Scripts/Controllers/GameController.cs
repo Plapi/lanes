@@ -66,12 +66,12 @@ public class GameController : MonoBehaviour {
 		UIController.Instance.ActivateTouchBlocker(2f);
 		PlayerPrefsManager.UserData.coins -= room.RoomData.UpgradeCost;
 		room.RoomData.level++;
-		PlayerPrefsManager.SaveUserData();
-		mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
 		if (room is ParkingRoom parkingRoom) {
 			parkingRoom.RoomData.UnlockNewSlot();
 		}
+		PlayerPrefsManager.SaveUserData();
 		room.UpdateRoomGraphic();
+		mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
 		OnCoinsUpdate?.Invoke();
 	}
 

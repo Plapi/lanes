@@ -22,6 +22,21 @@ public class UIParkingList : OSA<BaseParamsWithPrefab, ParkingListItemViewsHolde
 		this.onBuyTaxi = onBuyTaxi;
 		_Params.ItemPrefab.gameObject.SetActive(false);
 		data.NotifyListChangedExternally();
+
+		if (TryGetFirstEmptySlot(out int index) && index > 3) {
+			ScrollTo(index);	
+		}
+	}
+
+	private bool TryGetFirstEmptySlot(out int index) {
+		for (int i = 0; i < data.List.Count; i++) {
+			if (data.List[i].slotUnlocked && !data.List[i].taxiPurchased) {
+				index = i;
+				return true;
+			}
+		}
+		index = -1;
+		return false;
 	}
 	
 	protected override ParkingListItemViewsHolder CreateViewsHolder(int itemIndex) {
