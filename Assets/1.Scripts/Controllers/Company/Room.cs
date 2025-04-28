@@ -66,6 +66,16 @@ public class ParkingRoomData : RoomData {
 			}
 		}
 	}
+
+	public int GetTotalTaxiCount() {
+		int count = 0;
+		for (int i = 0; i < parkingSlots.Length; i++) {
+			if (parkingSlots[i].taxiPurchased) {
+				count++;
+			}
+		}
+		return count;
+	}
 }
 
 [Serializable]

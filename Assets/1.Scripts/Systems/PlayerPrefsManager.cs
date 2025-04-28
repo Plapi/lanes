@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using UnityEditor;
 using UnityEngine;
 
 public static class PlayerPrefsManager {
@@ -79,5 +80,21 @@ public class UserData {
 		}
 		userData.parkingRoom.UnlockNewSlot();
 		return userData;
+	}
+
+	public void ReachToMax() {
+		waitingRoom.level = 10;
+		vaultRoom.level = 10;
+		callCenterRoom.level = 10;
+		breakRoom.level = 10;
+		parkingRoom.level = 10;
+		for (int i = 0; i < parkingRoom.parkingSlots.Length; i++) {
+			parkingRoom.parkingSlots[i].slotUnlocked = true;
+			parkingRoom.parkingSlots[i].taxiPurchased = true;
+		}
+		PlayerPrefsManager.UserData.coins = 0;
+		IncreaseCoins(vaultRoom.Capacity);
+		PlayerPrefsManager.SaveUserData();
+		EditorApplication.isPlaying = false;
 	}
 }

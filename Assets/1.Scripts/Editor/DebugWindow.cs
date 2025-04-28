@@ -53,6 +53,10 @@ public class DebugWindow : EditorWindow {
 			PlayerPrefsManager.UserData.IncreaseCoins(-PlayerPrefsManager.UserData.coins);
 		}
 
+		if (GUILayout.Button("Reach To Max")) {
+			PlayerPrefsManager.UserData.ReachToMax();
+		}
+
 		if (GUILayout.Button("Set Buttons Sound")) {
 			SetButtonsSound();
 		}

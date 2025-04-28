@@ -40,7 +40,7 @@ public class UIParkingRoomPanel : UIPanel<UIParkingRoomPanel.Data> {
 			levelSlider.value = levelUpgradeSlider.value = 1f;
 		}
 
-		taxiText.text = $"0/{data.roomData.level}";
+		taxiText.text = $"{data.roomData.GetTotalTaxiCount()}/{data.roomData.level}";
 		GameController.Instance.EndOfFrame(() => {
 			HorizontalLayoutGroup horizontalLayoutGroup = taxiText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;
