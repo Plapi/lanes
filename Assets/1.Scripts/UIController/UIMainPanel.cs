@@ -29,14 +29,14 @@ public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 	}
 
 	public void MoveToOtherPanel(Transform parent) {
-		coinsPanel.transform.parent = parent;
-		settingsButton.transform.parent = parent;
+		coinsPanel.transform.SetParent(parent);
+		settingsButton.transform.SetParent(parent);
 		settingsButton.GetComponent<RectTransform>().SetAnchorPosY(-140f);
 	}
 
 	public void MoveBack() {
-		coinsPanel.transform.parent = topContainer;
-		settingsButton.transform.parent = topContainer;
+		coinsPanel.transform.SetParent(topContainer);
+		settingsButton.transform.SetParent(topContainer);
 		settingsButton.GetComponent<RectTransform>().SetAnchorPosY(-40f);
 	}
 

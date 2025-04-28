@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
@@ -15,7 +16,7 @@ public static class PlayerPrefsManager {
 					userData = JsonUtility.FromJson<UserData>(json);
 				} else {
 					SetNoBackup();
-					userData = new UserData();
+					userData = UserData.GetDefault();
 				}
 			}
 			return userData;
@@ -39,6 +40,7 @@ public static class PlayerPrefsManager {
 }
 
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
+[Serializable]
 public class UserData {
 	
 	public bool isTutorialDone;
@@ -54,6 +56,7 @@ public class UserData {
 	public VaultRoomData vaultRoom = new();
 	public RoomData callCenterRoom = new();
 	public RoomData breakRoom = new();
+	public ParkingRoomData parkingRoom = new();
 
 	public void IncreaseCoins(int amount) {
 		coins += amount;
@@ -63,5 +66,18 @@ public class UserData {
 
 	public bool VaultIsFull() {
 		return coins >= vaultRoom.Capacity;
+	}
+
+	public static UserData GetDefault() {
+		UserData userData = new() {
+			parkingRoom = {
+				parkingSlots = new ParkingSlotData[10]
+			}
+		};
+		for (int i = 0; i < userData.parkingRoom.parkingSlots.Length; i++) {
+			userData.parkingRoom.parkingSlots[i] = new ParkingSlotData();
+		}
+		userData.parkingRoom.UnlockNewSlot();
+		return userData;
 	}
 }

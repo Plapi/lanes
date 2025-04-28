@@ -38,7 +38,6 @@ public class CameraController : MonoBehaviour {
     public void ZoomBack() {
 	    futurePos = new Vector3(prevPosZoom.x, 0f, prevPosZoom.z);
 	    UpdateFutureZoom(prevPosZoom.y);
-	    UpdateBoundsScale();
     }
 
     private void Update() {
@@ -47,7 +46,6 @@ public class CameraController : MonoBehaviour {
 		    float scrollDelta = GetScrollDelta();
 		    if (Mathf.Abs(scrollDelta) > Mathf.Epsilon) {
 			    UpdateFutureZoom(Mathf.Clamp(futureZoom.y - scrollDelta, 10f, 100f));
-			    UpdateBoundsScale();
 			    ClampFuturePos();
 			    pivot.position = futurePos;
 		    } else if (touches[0] != null) {
@@ -66,7 +64,8 @@ public class CameraController : MonoBehaviour {
 					    firstTouch = null;
 				    }
 			    }  
-		    } 
+		    }
+		    UpdateBoundsScale();
 	    }
 	    
 	    float time = Time.deltaTime * 20f;

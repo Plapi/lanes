@@ -9,7 +9,7 @@ public abstract class MonoBehaviourSingleton<T> : MonoBehaviour where T : MonoBe
 			if (instance == null) {
 				instance = FindFirstObjectByType<T>();
 				if (instance == null) {
-					instance = new GameObject(typeof(T).ToString()).AddComponent<T>();	
+					instance = new GameObject(typeof(T).ToString()).AddComponent<T>();
 				}
 			}
 			return instance;

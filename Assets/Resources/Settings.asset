@@ -52,6 +52,12 @@ MonoBehaviour:
       cashIncomes: 
       tableMoneyLevels: 0000000064000000c8000000f4010000e8030000dc050000d0070000b80b0000881300004c1d000010270000983a0000204e0000
       maxTableMoney: 20000
+    parkingRoom:
+      name: Parking Room
+      upgradeCosts: 10270000204e0000409c000060ea000080380100a0860100c0d40100e022020000710200
+      cashIncomes: 
+      taxiCost: 12000
+      taxiIncome: 400
   testMode: 1
   enableAdds: 0
   enableAnalytics: 0

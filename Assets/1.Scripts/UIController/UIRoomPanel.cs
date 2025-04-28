@@ -1,9 +1,9 @@
 using System;
-using Coffee.UIExtensions;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using Coffee.UIExtensions;
 
 public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 
@@ -76,8 +76,8 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 		UpdateUpgradeButton();
 	}
 
-	public void UpdateUpgradeButton() {
-		if (!upgradeButton.gameObject.activeSelf) {
+	private void UpdateUpgradeButton() {
+		if (!upgradeButton.gameObject.activeSelf || data.roomData.MaxLevelReached) {
 			return;
 		}
 		
@@ -115,12 +115,14 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 		RectTransform contentRect = content.GetComponent<RectTransform>();
 		contentRect.SetAnchorPosY(-800f);
 		contentRect.DOAnchorPosY(-70f, UIController.defaultTime).SetEase(Ease.OutQuad).OnComplete(() => onComplete());
+		GameController.Instance.OnCoinsUpdate += UpdateUpgradeButton;
 	}
 
 	protected override void CloseAnim(bool anim, Action onComplete) {
 		RectTransform contentRect = content.GetComponent<RectTransform>();
 		contentRect.DOAnchorPosY(-800f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
 			gameObject.SetActive(false);
+			GameController.Instance.OnCoinsUpdate -= UpdateUpgradeButton;
 		});
 		onComplete();
 	}

@@ -26,6 +26,7 @@ public class CompanyData {
 	public RoomDesignData breakRoom;
 	public RoomDesignData callCenterRoom;
 	public VaultRoomDesignData vaultRoom;
+	public ParkingRoomDesignData parkingRoom;
 }
 
 [Serializable]
@@ -39,4 +40,10 @@ public class RoomDesignData {
 public class VaultRoomDesignData : RoomDesignData {
 	public int[] tableMoneyLevels;
 	public int maxTableMoney;
+}
+
+[Serializable]
+public class ParkingRoomDesignData : RoomDesignData {
+	public int taxiCost;
+	public int taxiIncome;
 }

@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-public class GameController : MonoBehaviourSingleton<GameController> {
+public class GameController : MonoBehaviour {
+
+	public static GameController Instance { get; private set; }
 
 	[SerializeField] private CameraController cameraController;
 	[SerializeField] private CompanyController companyController;
@@ -10,7 +12,14 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 	
 	private UIMainPanel mainPanel;
 	private UIRoomPanel roomPanel;
+	private UIParkingRoomPanel parkingRoomPanel;
 	private UISettingsPanel settingsPanel;
+
+	public Action OnCoinsUpdate;
+
+	private void Awake() {
+		Instance = this;
+	}
 	
 	private void Start() {
 		Application.targetFrameRate = 60;
@@ -27,23 +36,22 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 			cameraController.SetEnabled(false);
 			cameraController.Zoom(room.GetCameraZoom());
 			mainPanel.ShowSettingsButton(false);
-			roomPanel.Show();
-			roomPanel.Init(new UIRoomPanel.Data {
-				roomData = room.RoomData,
-				onClose = () => {
-					cameraController.SetEnabled(true);
-					cameraController.ZoomBack();
-					mainPanel.ShowSettingsButton(true);
-				},
-				onUpgrade = () => {
-					UIController.Instance.ActivateTouchBlocker(2f);
-					PlayerPrefsManager.UserData.coins -= room.RoomData.UpgradeCost;
-					room.RoomData.level++;
-					PlayerPrefsManager.SaveUserData();
-					mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
-					room.UpdateRoomGraphic();
-				},
-			});
+			if (room is ParkingRoom) {
+				parkingRoomPanel.Show();
+				parkingRoomPanel.Init(new UIParkingRoomPanel.Data {
+					roomData = (ParkingRoomData)room.RoomData,
+					onClose = OnCloseFromRoomPanel,
+					onUpgrade = () => UpgradeRoom(room),
+					onBuyTaxi = BuyTaxi
+				});
+			} else {
+				roomPanel.Show();
+				roomPanel.Init(new UIRoomPanel.Data {
+					roomData = room.RoomData,
+					onClose = OnCloseFromRoomPanel,
+					onUpgrade = () => UpgradeRoom(room),
+				});
+			}
 		});
 		rideController.Init(OnCompanyButton);
 		
@@ -54,10 +62,39 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		StartCoroutine(CoinsMechanic());
 	}
 
+	private void UpgradeRoom(Room room) {
+		UIController.Instance.ActivateTouchBlocker(2f);
+		PlayerPrefsManager.UserData.coins -= room.RoomData.UpgradeCost;
+		room.RoomData.level++;
+		PlayerPrefsManager.SaveUserData();
+		mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
+		if (room is ParkingRoom parkingRoom) {
+			parkingRoom.RoomData.UnlockNewSlot();
+		}
+		room.UpdateRoomGraphic();
+		OnCoinsUpdate?.Invoke();
+	}
+
+	private void BuyTaxi(ParkingSlotData parkingSlotData) {
+		PlayerPrefsManager.UserData.coins -= Settings.Instance.company.parkingRoom.taxiCost;
+		mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
+		parkingSlotData.taxiPurchased = true;
+		PlayerPrefsManager.SaveUserData();
+		companyController.ParkingRoom.SetCar(parkingSlotData);
+		OnCoinsUpdate?.Invoke();
+	}
+
+	private void OnCloseFromRoomPanel() {
+		cameraController.SetEnabled(true);
+		cameraController.ZoomBack();
+		mainPanel.ShowSettingsButton(true);
+	}
+
 	private void InitUI() {
 		UIController.Instance.Init();
 		mainPanel = UIController.Instance.GetPanel<UIMainPanel>();
 		roomPanel = UIController.Instance.GetPanel<UIRoomPanel>();
+		parkingRoomPanel = UIController.Instance.GetPanel<UIParkingRoomPanel>();
 		settingsPanel = UIController.Instance.GetPanel<UISettingsPanel>();
 		
 		mainPanel.Init(new UIMainPanel.Data {
@@ -166,9 +203,7 @@ public class GameController : MonoBehaviourSingleton<GameController> {
 		
 		mainPanel.CoinsPanel.UpdateProgress(1f);
 		PlayerPrefsManager.UserData.IncreaseCoins(income);
-		if (roomPanel.gameObject.activeSelf) {
-			roomPanel.UpdateUpgradeButton();
-		}
+		OnCoinsUpdate?.Invoke();
 		
 		mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => StartCoroutine(CoinsMechanic()));
 	}

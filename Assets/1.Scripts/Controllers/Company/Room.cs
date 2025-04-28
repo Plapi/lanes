@@ -52,3 +52,25 @@ public class VaultRoomData : RoomData {
 	public new VaultRoomDesignData design => (VaultRoomDesignData)base.design;
 	public int Capacity => level * design.maxTableMoney;
 }
+
+[Serializable]
+public class ParkingRoomData : RoomData {
+	public new ParkingRoomDesignData design => (ParkingRoomDesignData)base.design;
+	public ParkingSlotData[] parkingSlots;
+
+	public void UnlockNewSlot() {
+		for (int i = 0; i < parkingSlots.Length; i++) {
+			if (!parkingSlots[i].slotUnlocked) {
+				parkingSlots[i].slotUnlocked = true;
+				return;
+			}
+		}
+	}
+}
+
+[Serializable]
+public class ParkingSlotData {
+	public bool slotUnlocked;
+	public bool taxiPurchased;
+	public int taxiId;
+}
