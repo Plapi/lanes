@@ -77,10 +77,3 @@ public class ParkingRoomData : RoomData {
 		return count;
 	}
 }
-
-[Serializable]
-public class ParkingSlotData {
-	public bool slotUnlocked;
-	public bool taxiPurchased;
-	public int taxiId;
-}

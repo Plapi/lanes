@@ -49,6 +49,8 @@ public class UIParkingRoomPanel : UIPanel<UIParkingRoomPanel.Data> {
 		
 		parkingList.Init(data.roomData.parkingSlots, parkingSlotData => {
 			data.onBuyTaxi?.Invoke(parkingSlotData);
+		}, parkingSlotData => {
+			data.onAssignDriver?.Invoke(parkingSlotData);
 		});
 		
 		if (!maxLevelReached) {
@@ -118,5 +120,6 @@ public class UIParkingRoomPanel : UIPanel<UIParkingRoomPanel.Data> {
 		public ParkingRoomData roomData;
 		public Action onUpgrade;
 		public Action<ParkingSlotData> onBuyTaxi;
+		public Action<ParkingSlotData> onAssignDriver;
 	}
 }

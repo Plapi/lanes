@@ -80,7 +80,7 @@ MonoBehaviour:
       income: 90
       stars: 1
     - id: 4
-      name: Tina
+      name: Dusty
       hireCost: 3000
       income: 110
       stars: 1
@@ -135,7 +135,7 @@ MonoBehaviour:
       income: 300
       stars: 3
     - id: 15
-      name: Dusty
+      name: Tina
       hireCost: 8500
       income: 320
       stars: 3

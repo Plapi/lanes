@@ -54,6 +54,8 @@ public class DriverDesignData {
 	public string id;
 	public string name;
 	public int hireCost;
+	public int fireCost => hireCost / 2;
 	public int income;
 	public int stars;
+	public string spritePath => $"Company/Drivers/Driver{id}";
 }

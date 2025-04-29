@@ -41,8 +41,16 @@ public class UICoins : UIObject {
 	}
 
 	public void PlayConsumeCoinsAnim() {
+		PlayUpdateCoinsAnim(Color.red);
+	}
+
+	public void PlayReceiveCoinsAnim() {
+		PlayUpdateCoinsAnim(Color.green);
+	}
+
+	public void PlayUpdateCoinsAnim(Color color) {
 		DOTween.Kill(coinsText);
-		coinsText.DOColor(Color.red, 0.25f).OnComplete(() => {
+		coinsText.DOColor(color, 0.25f).OnComplete(() => {
 			coinsText.DOColor(Color.white, 0.25f);
 		});
 	}
@@ -55,9 +63,7 @@ public class UICoins : UIObject {
 		incomeAnim.Play(() => {
 			coinsText.transform.DOPunchScale(Vector3.one * 0.5f, 0.2f).SetEase(Ease.OutBounce);
 			DOTween.Kill(coinsText);
-			coinsText.DOColor(Color.green, 0.25f).OnComplete(() => {
-				coinsText.DOColor(Color.white, 0.25f);
-			});
+			PlayReceiveCoinsAnim();
 			onComplete?.Invoke();
 		});
 	}

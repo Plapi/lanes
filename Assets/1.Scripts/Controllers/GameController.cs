@@ -43,7 +43,8 @@ public class GameController : MonoBehaviour {
 					roomData = (ParkingRoomData)room.RoomData,
 					onClose = OnCloseFromRoomPanel,
 					onUpgrade = () => UpgradeRoom(room),
-					onBuyTaxi = BuyTaxi
+					onBuyTaxi = BuyTaxi,
+					onAssignDriver = OnAssignDriver
 				});
 			} else {
 				roomPanel.Show();
@@ -72,7 +73,7 @@ public class GameController : MonoBehaviour {
 		}
 		PlayerPrefsManager.SaveUserData();
 		room.UpdateRoomGraphic();
-		TryGetCoinsIncome(out int income);
+		PlayerPrefsManager.UserData.TryGetCoinsIncome(out int income);
 		UpdateCoins(income);
 		mainPanel.CoinsPanel.PlayConsumeCoinsAnim();
 		OnCoinsUpdate?.Invoke();
@@ -84,6 +85,35 @@ public class GameController : MonoBehaviour {
 		parkingSlotData.taxiPurchased = true;
 		PlayerPrefsManager.SaveUserData();
 		companyController.ParkingRoom.SetCar(parkingSlotData);
+		OnCoinsUpdate?.Invoke();
+	}
+
+	private void OnAssignDriver(ParkingSlotData parkingSlotData) {
+		driversPanel.Show();
+		UIDriversPanel.Data data = GetDriversPanelData();
+		data.onSelect = driver => {
+			driversPanel.Close();
+			parkingSlotData.driverId = driver.design.id;
+			PlayerPrefsManager.SaveUserData();
+			PlayerPrefsManager.UserData.TryGetCoinsIncome(out int income);
+			UpdateCoins(income);
+		};
+		driversPanel.Init(data);
+	}
+
+	private void HireFireDriver(DriverData driver) {
+		driver.hired = !driver.hired;
+		PlayerPrefsManager.UserData.coins += driver.hired ? -driver.design.hireCost : driver.design.fireCost;
+		mainPanel.CoinsPanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
+		if (driver.hired) {
+			mainPanel.CoinsPanel.PlayConsumeCoinsAnim();
+		} else {
+			mainPanel.CoinsPanel.PlayReceiveCoinsAnim();
+			if (PlayerPrefsManager.UserData.TryGetParkingSlotIndex(driver, out int index)) {
+				PlayerPrefsManager.UserData.parkingRoom.parkingSlots[index].driverId = null;
+			}
+		}
+		PlayerPrefsManager.SaveUserData();
 		OnCoinsUpdate?.Invoke();
 	}
 
@@ -105,9 +135,7 @@ public class GameController : MonoBehaviour {
 			onSettingsButton = settingsPanel.Show, 
 			onDriversButton = () => {
 				driversPanel.Show();
-				driversPanel.Init(new UIDriversPanel.Data {
-					drivers = Settings.Instance.company.drivers
-				});
+				driversPanel.Init(GetDriversPanelData());
 			},
 			onMultiplyCashButton = () => {
 				
@@ -153,6 +181,14 @@ public class GameController : MonoBehaviour {
 			}
 		});
 	}
+
+	private UIDriversPanel.Data GetDriversPanelData() {
+		return new UIDriversPanel.Data {
+			drivers = PlayerPrefsManager.UserData.drivers,
+			onHire = HireFireDriver,
+			onFire = HireFireDriver
+		};
+	}
 	
 	private void OnDriveButton() {
 		UIController.Instance.FadeInToBlack(() => {
@@ -182,7 +218,7 @@ public class GameController : MonoBehaviour {
 	private IEnumerator CoinsMechanic() {
 
 		int income;
-		while (!TryGetCoinsIncome(out income)) {
+		while (!PlayerPrefsManager.UserData.TryGetCoinsIncome(out income)) {
 			UpdateCoins(income);
 			yield return new WaitForSeconds(2f);
 		}
@@ -207,7 +243,7 @@ public class GameController : MonoBehaviour {
 		yield return new WaitUntil(() => mainPanel.CoinsPanel.gameObject.activeSelf && mainPanel.CoinsPanel.gameObject.activeInHierarchy);
 		float seconds = (float)(DateTime.Now - startTime).TotalSeconds;
 		int turns = Mathf.RoundToInt(seconds / 12);
-		TryGetCoinsIncome(out income);
+		PlayerPrefsManager.UserData.TryGetCoinsIncome(out income);
 		income += turns * income;
 		
 		mainPanel.CoinsPanel.UpdateProgress(1f);
@@ -221,18 +257,5 @@ public class GameController : MonoBehaviour {
 		int coins = PlayerPrefsManager.UserData.coins;
 		mainPanel.CoinsPanel.UpdateCoins(coins, income);
 		companyController.VaultRoom.UpdateTables(coins);
-	}
-
-	private static bool TryGetCoinsIncome(out int income) {
-		RoomData[] roomData = {
-			PlayerPrefsManager.UserData.waitingRoom,
-			PlayerPrefsManager.UserData.callCenterRoom,
-			PlayerPrefsManager.UserData.breakRoom
-		};
-		income = 0;
-		for (int i = 0; i < roomData.Length; i++) {
-			income += roomData[i].CoinsIncome;
-		}
-		return income > 0;
 	}
 }

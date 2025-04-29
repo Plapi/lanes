@@ -24,6 +24,9 @@ public class CompanyController : MonoBehaviour {
 		roomData[2].design = Settings.Instance.company.callCenterRoom;
 		roomData[3].design = Settings.Instance.company.breakRoom;
 		roomData[4].design = Settings.Instance.company.parkingRoom;
+		for (int i = 0; i < PlayerPrefsManager.UserData.drivers.Length; i++) {
+			PlayerPrefsManager.UserData.drivers[i].design = Settings.Instance.company.drivers[i];
+		}
 		for (int i = 0; i < rooms.Length; i++) {
 			int ii = i;
 			rooms[i].Init(roomData[i], () => {
@@ -44,4 +47,10 @@ public class CompanyController : MonoBehaviour {
 		startSegment.ClearAICars();
 		ParkingRoom.Deactivate();
 	}
+}
+
+[Serializable]
+public class DriverData {
+	[NonSerialized] public DriverDesignData design;
+	public bool hired;
 }

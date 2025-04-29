@@ -57,6 +57,7 @@ public class UserData {
 	public RoomData callCenterRoom = new();
 	public RoomData breakRoom = new();
 	public ParkingRoomData parkingRoom = new();
+	public DriverData[] drivers;
 
 	public void IncreaseCoins(int amount) {
 		coins += amount;
@@ -78,7 +79,49 @@ public class UserData {
 			userData.parkingRoom.parkingSlots[i] = new ParkingSlotData();
 		}
 		userData.parkingRoom.UnlockNewSlot();
+		userData.drivers = new DriverData[Settings.Instance.company.drivers.Length];
+		for (int i = 0; i < userData.drivers.Length; i++) {
+			userData.drivers[i] = new DriverData();
+		}
 		return userData;
+	}
+
+	public bool TryGetCoinsIncome(out int income) {
+		RoomData[] roomData = {
+			PlayerPrefsManager.UserData.waitingRoom,
+			PlayerPrefsManager.UserData.callCenterRoom,
+			PlayerPrefsManager.UserData.breakRoom
+		};
+		income = 0;
+		for (int i = 0; i < roomData.Length; i++) {
+			income += roomData[i].CoinsIncome;
+		}
+		for (int i = 0; i < parkingRoom.parkingSlots.Length; i++) {
+			if (parkingRoom.parkingSlots[i].HasDriver) {
+				income += GetDriver(parkingRoom.parkingSlots[i].driverId).design.income;
+			}
+		}
+		return income > 0;
+	}
+	
+	public DriverData GetDriver(string id) {
+		for (int i = 0; i < drivers.Length; i++) {
+			if (drivers[i].design.id == id) {
+				return drivers[i];
+			}
+		}
+		return null;
+	}
+
+	public bool TryGetParkingSlotIndex(DriverData driver, out int index) {
+		index = -1;
+		for (int i = 0; i < parkingRoom.parkingSlots.Length; i++) {
+			if (parkingRoom.parkingSlots[i].driverId == driver.design.id) {
+				index = i;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void ReachToMax() {
