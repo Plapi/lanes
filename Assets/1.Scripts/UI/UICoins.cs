@@ -36,11 +36,15 @@ public class UICoins : UIObject {
 
 	public void ConsumeCoins(int coins) {
 		coinsText.text = coins.ToString("N0");
+		PlayConsumeCoinsAnim();
+		UpdateLayout();
+	}
+
+	public void PlayConsumeCoinsAnim() {
 		DOTween.Kill(coinsText);
 		coinsText.DOColor(Color.red, 0.25f).OnComplete(() => {
 			coinsText.DOColor(Color.white, 0.25f);
 		});
-		UpdateLayout();
 	}
 
 	public void UpdateProgress(float progress) {
@@ -59,7 +63,7 @@ public class UICoins : UIObject {
 	}
 
 	private void UpdateLayout() {
-		this.EndOfFrame(() => {
+		GameController.Instance.EndOfFrame(() => {
 			HorizontalLayoutGroup horizontalLayoutGroup = coinsText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;
 			horizontalLayoutGroup.enabled = true;

@@ -1,7 +1,5 @@
-using System;
 using System.IO;
 using UnityEngine;
-using UnityEditor;
 
 public class DriversScreenshotTaker : MonoBehaviour {
     
@@ -10,6 +8,7 @@ public class DriversScreenshotTaker : MonoBehaviour {
 	[SerializeField] private new Camera camera;
 
 	private void Update() {
+#if UNITY_EDITOR
 		if (Input.GetKeyDown(KeyCode.T)) {
 
 			int driverIndex = 0;
@@ -20,7 +19,7 @@ public class DriversScreenshotTaker : MonoBehaviour {
 					Transform child = characters[i].transform.GetChild(j);
 					child.gameObject.SetActive(true);
 					
-					string path = $"{Application.dataPath.Replace("Assets", string.Empty)}{AssetDatabase.GetAssetPath(objFolder)}/Driver{driverIndex}.png";
+					string path = $"{Application.dataPath.Replace("Assets", string.Empty)}{UnityEditor.AssetDatabase.GetAssetPath(objFolder)}/Driver{driverIndex}.png";
 					File.WriteAllBytes(path, TakeScreenshot());
 					
 					driverIndex++;
@@ -30,9 +29,11 @@ public class DriversScreenshotTaker : MonoBehaviour {
 				}
 			}
 			
-			AssetDatabase.Refresh();
+			
+			UnityEditor.AssetDatabase.Refresh();
 			Debug.LogError(s);
 		}
+#endif
 	}
 	
 	private byte[] TakeScreenshot() {

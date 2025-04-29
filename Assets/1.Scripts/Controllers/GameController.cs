@@ -72,7 +72,9 @@ public class GameController : MonoBehaviour {
 		}
 		PlayerPrefsManager.SaveUserData();
 		room.UpdateRoomGraphic();
-		mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
+		TryGetCoinsIncome(out int income);
+		UpdateCoins(income);
+		mainPanel.CoinsPanel.PlayConsumeCoinsAnim();
 		OnCoinsUpdate?.Invoke();
 	}
 
@@ -205,6 +207,7 @@ public class GameController : MonoBehaviour {
 		yield return new WaitUntil(() => mainPanel.CoinsPanel.gameObject.activeSelf && mainPanel.CoinsPanel.gameObject.activeInHierarchy);
 		float seconds = (float)(DateTime.Now - startTime).TotalSeconds;
 		int turns = Mathf.RoundToInt(seconds / 12);
+		TryGetCoinsIncome(out income);
 		income += turns * income;
 		
 		mainPanel.CoinsPanel.UpdateProgress(1f);
@@ -223,7 +226,8 @@ public class GameController : MonoBehaviour {
 	private static bool TryGetCoinsIncome(out int income) {
 		RoomData[] roomData = {
 			PlayerPrefsManager.UserData.waitingRoom,
-			PlayerPrefsManager.UserData.callCenterRoom
+			PlayerPrefsManager.UserData.callCenterRoom,
+			PlayerPrefsManager.UserData.breakRoom
 		};
 		income = 0;
 		for (int i = 0; i < roomData.Length; i++) {
