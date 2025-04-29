@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using UnityEditor;
 using UnityEngine;
 
 public static class PlayerPrefsManager {
@@ -95,6 +94,8 @@ public class UserData {
 		PlayerPrefsManager.UserData.coins = 0;
 		IncreaseCoins(vaultRoom.Capacity);
 		PlayerPrefsManager.SaveUserData();
-		EditorApplication.isPlaying = false;
+#if UNITY_EDITOR
+		UnityEditor.EditorApplication.isPlaying = false;
+#endif
 	}
 }

@@ -27,6 +27,7 @@ public class CompanyData {
 	public RoomDesignData callCenterRoom;
 	public VaultRoomDesignData vaultRoom;
 	public ParkingRoomDesignData parkingRoom;
+	public DriverDesignData[] drivers;
 }
 
 [Serializable]
@@ -46,4 +47,13 @@ public class VaultRoomDesignData : RoomDesignData {
 public class ParkingRoomDesignData : RoomDesignData {
 	public int taxiCost;
 	public int taxiIncome;
+}
+
+[Serializable]
+public class DriverDesignData {
+	public string id;
+	public string name;
+	public int hireCost;
+	public int income;
+	public int stars;
 }

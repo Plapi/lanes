@@ -13,6 +13,7 @@ public class GameController : MonoBehaviour {
 	private UIMainPanel mainPanel;
 	private UIRoomPanel roomPanel;
 	private UIParkingRoomPanel parkingRoomPanel;
+	private UIDriversPanel driversPanel;
 	private UISettingsPanel settingsPanel;
 
 	public Action OnCoinsUpdate;
@@ -95,13 +96,18 @@ public class GameController : MonoBehaviour {
 		mainPanel = UIController.Instance.GetPanel<UIMainPanel>();
 		roomPanel = UIController.Instance.GetPanel<UIRoomPanel>();
 		parkingRoomPanel = UIController.Instance.GetPanel<UIParkingRoomPanel>();
+		driversPanel = UIController.Instance.GetPanel<UIDriversPanel>();
 		settingsPanel = UIController.Instance.GetPanel<UISettingsPanel>();
 		
 		mainPanel.Init(new UIMainPanel.Data {
 			onSettingsButton = settingsPanel.Show, 
 			onDriversButton = () => {
-				
-			}, onMultiplyCashButton = () => {
+				driversPanel.Show();
+				driversPanel.Init(new UIDriversPanel.Data {
+					drivers = Settings.Instance.company.drivers
+				});
+			},
+			onMultiplyCashButton = () => {
 				
 			}, onDriveButton = OnDriveButton
 		});

@@ -58,6 +58,117 @@ MonoBehaviour:
       cashIncomes: 
       taxiCost: 12000
       taxiIncome: 400
+    drivers:
+    - id: 0
+      name: Clark
+      hireCost: 1000
+      income: 50
+      stars: 0
+    - id: 1
+      name: Victor
+      hireCost: 1500
+      income: 60
+      stars: 0
+    - id: 2
+      name: Nina
+      hireCost: 2000
+      income: 70
+      stars: 0
+    - id: 3
+      name: Stella
+      hireCost: 2000
+      income: 90
+      stars: 1
+    - id: 4
+      name: Tina
+      hireCost: 3000
+      income: 110
+      stars: 1
+    - id: 5
+      name: Leo
+      hireCost: 3500
+      income: 120
+      stars: 1
+    - id: 6
+      name: Derek
+      hireCost: 4000
+      income: 150
+      stars: 1
+    - id: 7
+      name: Spike
+      hireCost: 4500
+      income: 180
+      stars: 2
+    - id: 8
+      name: Max
+      hireCost: 5000
+      income: 190
+      stars: 2
+    - id: 9
+      name: Pixel
+      hireCost: 5500
+      income: 210
+      stars: 2
+    - id: 10
+      name: Rico
+      hireCost: 6000
+      income: 220
+      stars: 2
+    - id: 11
+      name: Martha
+      hireCost: 6500
+      income: 260
+      stars: 3
+    - id: 12
+      name: Walter
+      hireCost: 7000
+      income: 280
+      stars: 3
+    - id: 13
+      name: Luna
+      hireCost: 7500
+      income: 290
+      stars: 3
+    - id: 14
+      name: Jax
+      hireCost: 8000
+      income: 300
+      stars: 3
+    - id: 15
+      name: Dusty
+      hireCost: 8500
+      income: 320
+      stars: 3
+    - id: 16
+      name: Chad
+      hireCost: 9000
+      income: 340
+      stars: 3
+    - id: 17
+      name: Blake
+      hireCost: 9500
+      income: 350
+      stars: 3
+    - id: 18
+      name: Roxy
+      hireCost: 10000
+      income: 400
+      stars: 4
+    - id: 19
+      name: Axel
+      hireCost: 10500
+      income: 410
+      stars: 4
+    - id: 20
+      name: Sunny
+      hireCost: 11000
+      income: 450
+      stars: 5
+    - id: 21
+      name: Hank
+      hireCost: 11500
+      income: 480
+      stars: 5
   testMode: 1
   enableAdds: 0
   enableAnalytics: 0

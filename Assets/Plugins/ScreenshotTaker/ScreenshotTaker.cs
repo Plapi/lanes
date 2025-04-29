@@ -3,6 +3,7 @@ using System.IO;
 using UnityEngine;
 
 public class ScreenshotTaker : MonoBehaviour {
+	
 	[SerializeField] private Camera mainCamera;
 
 	private void Update() {
