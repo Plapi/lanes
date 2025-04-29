@@ -12,7 +12,7 @@ public class SplashController : MonoBehaviour {
 		if (Settings.Instance.enableAdds) {
 			AdsController.Instance.Init(() => {
 				AdsController.Instance.LoadAd();
-			});	
+			});
 		}
 		SceneManager.LoadSceneAsync("Company");
 	}

@@ -52,13 +52,17 @@ public class UserData {
 	public int personsBest = -1;
 	public float[] volumes = { 1f, 0.3f, 0.4f };
 	public bool hapticFeedback = true;
+
+	public WatchAdBoostIncome watchAdBoostIncome;
+	
+	// company
 	public RoomData waitingRoom = new();
 	public VaultRoomData vaultRoom = new();
 	public RoomData callCenterRoom = new();
 	public RoomData breakRoom = new();
 	public ParkingRoomData parkingRoom = new();
 	public DriverData[] drivers;
-
+	
 	public void IncreaseCoins(int amount) {
 		coins += amount;
 		coins = Mathf.Min(coins, vaultRoom.Capacity);
@@ -100,6 +104,9 @@ public class UserData {
 			if (parkingRoom.parkingSlots[i].HasDriver) {
 				income += GetDriver(parkingRoom.parkingSlots[i].driverId).design.income;
 			}
+		}
+		if (watchAdBoostIncome != null && watchAdBoostIncome.endTime.Date >= DateTime.Now) {
+			income *= 2;
 		}
 		return income > 0;
 	}

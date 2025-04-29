@@ -25,11 +25,20 @@ public class UIDriversList : GridAdapter<GridParams, UIDriverItem> {
 		}
 		_Params.Grid.CellPrefab.gameObject.SetActive(false);
 		data.NotifyListChangedExternally();
-		ScrollTo(0);
+		ScrollTo(GetLastHiredDriver(drivers));
 	}
 
 	protected override void UpdateCellViewsHolder(UIDriverItem newOrRecycled) {
 		newOrRecycled.Init(data[newOrRecycled.ItemIndex], onHire, onFire, onSelect);
+	}
+	
+	private static int GetLastHiredDriver(DriverData[] drivers) {
+		for (int i = drivers.Length - 1; i > 0; i--) {
+			if (drivers[i].hired) {
+				return i;
+			}
+		}
+		return 0;
 	}
 }
 

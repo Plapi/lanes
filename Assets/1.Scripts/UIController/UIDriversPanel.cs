@@ -1,13 +1,16 @@
 using System;
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 public class UIDriversPanel : UIPanel<UIDriversPanel.Data> {
 
 	[SerializeField] private UIDriversList driversList;
+	[SerializeField] private TextMeshProUGUI title;
 	
 	protected override void OnInit() {
 		driversList.Init(data.drivers, data.onHire, data.onFire, data.onSelect);
+		title.text = data.onSelect != null ? "Select Driver" : "Drivers";
 	}
 	
 	protected override void ShowAnim(Action onComplete) {

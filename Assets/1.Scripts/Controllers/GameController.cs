@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour {
 	private UIRoomPanel roomPanel;
 	private UIParkingRoomPanel parkingRoomPanel;
 	private UIDriversPanel driversPanel;
+	private UIWatchAdPanel watchAdPanel;
 	private UISettingsPanel settingsPanel;
 
 	public Action OnCoinsUpdate;
@@ -129,6 +130,7 @@ public class GameController : MonoBehaviour {
 		roomPanel = UIController.Instance.GetPanel<UIRoomPanel>();
 		parkingRoomPanel = UIController.Instance.GetPanel<UIParkingRoomPanel>();
 		driversPanel = UIController.Instance.GetPanel<UIDriversPanel>();
+		watchAdPanel = UIController.Instance.GetPanel<UIWatchAdPanel>();
 		settingsPanel = UIController.Instance.GetPanel<UISettingsPanel>();
 		
 		mainPanel.Init(new UIMainPanel.Data {
@@ -138,8 +140,10 @@ public class GameController : MonoBehaviour {
 				driversPanel.Init(GetDriversPanelData());
 			},
 			onMultiplyCashButton = () => {
-				
-			}, onDriveButton = OnDriveButton
+				watchAdPanel.Show();
+				watchAdPanel.Init(new UIWatchAdPanel.Data());
+			},
+			onDriveButton = OnDriveButton
 		});
 		
 		settingsPanel.Init(new UISettingsPanel.Data {
@@ -250,7 +254,11 @@ public class GameController : MonoBehaviour {
 		PlayerPrefsManager.UserData.IncreaseCoins(income);
 		OnCoinsUpdate?.Invoke();
 		
-		mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => StartCoroutine(CoinsMechanic()));
+		mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => {
+			if (this != null) {
+				StartCoroutine(CoinsMechanic());
+			}
+		});
 	}
 
 	private void UpdateCoins(int income) {
