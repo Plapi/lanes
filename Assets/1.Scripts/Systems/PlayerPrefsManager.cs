@@ -52,8 +52,9 @@ public class UserData {
 	public int personsBest = -1;
 	public float[] volumes = { 1f, 0.3f, 0.4f };
 	public bool hapticFeedback = true;
-
+	
 	public WatchAdBoostIncome watchAdBoostIncome;
+	public SerializedDateTime lastCollectTime;
 	
 	// company
 	public RoomData waitingRoom = new();
@@ -63,9 +64,13 @@ public class UserData {
 	public ParkingRoomData parkingRoom = new();
 	public DriverData[] drivers;
 	
-	public void IncreaseCoins(int amount) {
-		coins += amount;
-		coins = Mathf.Min(coins, vaultRoom.Capacity);
+	public void IncreaseCoins(int amount, bool useVaultCapacity = true) {
+		if (useVaultCapacity) {
+			amount = Mathf.Min(amount, vaultRoom.Capacity - coins);
+		}
+		if (amount > 0) {
+			coins += amount;	
+		}
 		PlayerPrefsManager.SaveUserData();
 	}
 
@@ -88,6 +93,18 @@ public class UserData {
 			userData.drivers[i] = new DriverData();
 		}
 		return userData;
+	}
+	
+	public bool TryGetTotalIncomeFromLastCollect(out int income, out int seconds) {
+		if (lastCollectTime == null || !TryGetCoinsIncome(out income)) {
+			income = 0;
+			seconds = 0;
+			return false;
+		}
+		seconds = Mathf.RoundToInt((float)(DateTime.Now - lastCollectTime.Date).TotalSeconds);
+		int totalTurns = seconds / Settings.Instance.company.incomeTurnDuration;
+		income = Mathf.Min(income * totalTurns, vaultRoom.Capacity - coins);
+		return true;
 	}
 
 	public bool TryGetCoinsIncome(out int income) {

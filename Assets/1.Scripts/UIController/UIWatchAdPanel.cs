@@ -11,6 +11,11 @@ public class UIWatchAdPanel : UIPanel<UIWatchAdPanel.Data> {
 	[SerializeField] private TextMeshProUGUI timeText;
 	[SerializeField] private TextMeshProUGUI endTimeText;
 	[SerializeField] private Button watchButton;
+
+	[Space]
+	[SerializeField] private Image sliderFill;
+	[SerializeField] private Sprite activeSlideSprite;
+	[SerializeField] private Sprite inactiveSlideSprite;
 	
 	protected override void OnInit() {
 
@@ -55,9 +60,11 @@ public class UIWatchAdPanel : UIPanel<UIWatchAdPanel.Data> {
 				timeText.text = timeSpan.Hours > 1 ? $"{timeSpan.Hours}h {timeSpan.Minutes}m" :
 					$"{timeSpan.Minutes}m {timeSpan.Seconds}s";
 				
+				sliderFill.sprite = activeSlideSprite;
 			} else {
 				slider.value = 1f;
 				timeText.text = "0m 0s";
+				sliderFill.sprite = inactiveSlideSprite;
 			}
 			
 			yield return wait;

@@ -34,6 +34,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 95a7560fae6624681a7669bb5e21ba77, type: 3}
   - {fileID: 21300000, guid: 924b1f22941f248e3aeb1cf8b67527df, type: 3}
   company:
+    incomeTurnDuration: 10
     waitingRoom:
       name: Waiting Room
       upgradeCosts: c8000000900100002003000040060000b80b0000881300004c1d00001c250000e02e0000

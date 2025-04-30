@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class Settings : ScriptableObjectSingleton<Settings> {
 	
@@ -22,6 +23,7 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 
 [Serializable]
 public class CompanyData {
+	public int incomeTurnDuration;
 	public RoomDesignData waitingRoom;
 	public RoomDesignData breakRoom;
 	public RoomDesignData callCenterRoom;

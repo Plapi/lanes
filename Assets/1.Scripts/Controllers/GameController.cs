@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour {
 	private UIParkingRoomPanel parkingRoomPanel;
 	private UIDriversPanel driversPanel;
 	private UIWatchAdPanel watchAdPanel;
+	private UIWelcomeBackPanel welcomeBackPanel;
 	private UISettingsPanel settingsPanel;
 
 	public Action OnCoinsUpdate;
@@ -61,7 +62,14 @@ public class GameController : MonoBehaviour {
 		TrackGenerator.Instance.OnStartSegmentSetActive += active => {
 			companyController.gameObject.SetActive(active);
 		};
-		
+
+		if (PlayerPrefsManager.UserData.TryGetTotalIncomeFromLastCollect(out int income, out int seconds)) {
+			TryShowWelcomeBackPanel(income, seconds);
+		}
+		PlayerPrefsManager.UserData.lastCollectTime = new SerializedDateTime(DateTime.Now);
+		if (income > 0) {
+			PlayerPrefsManager.UserData.IncreaseCoins(income);
+		}
 		StartCoroutine(CoinsMechanic());
 	}
 
@@ -132,6 +140,7 @@ public class GameController : MonoBehaviour {
 		driversPanel = UIController.Instance.GetPanel<UIDriversPanel>();
 		watchAdPanel = UIController.Instance.GetPanel<UIWatchAdPanel>();
 		settingsPanel = UIController.Instance.GetPanel<UISettingsPanel>();
+		welcomeBackPanel = UIController.Instance.GetPanel<UIWelcomeBackPanel>();
 		
 		mainPanel.Init(new UIMainPanel.Data {
 			onSettingsButton = settingsPanel.Show, 
@@ -219,46 +228,71 @@ public class GameController : MonoBehaviour {
 		});
 	}
 
+	private void TryShowWelcomeBackPanel(int income, int seconds) {
+		if (income < 500 || seconds < 180) {
+			return;
+		}
+		UIController.Instance.ActivateTouchBlocker(1f);
+		this.Wait(1f, () => {
+			welcomeBackPanel.Show();
+			welcomeBackPanel.Init(new UIWelcomeBackPanel.Data {
+				income = income,
+				seconds = seconds,
+				onWatchAd = () => {
+					AdsController.Instance.ShowAd(success => {
+						if (success) {
+							PlayerPrefsManager.UserData.IncreaseCoins(income, false);
+							mainPanel.CoinsPanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
+							mainPanel.CoinsPanel.PlayReceiveCoinsAnim();
+						}
+					});
+				}
+			});
+		});
+	}
+
 	private IEnumerator CoinsMechanic() {
-
-		int income;
-		while (!PlayerPrefsManager.UserData.TryGetCoinsIncome(out income)) {
-			UpdateCoins(income);
-			yield return new WaitForSeconds(2f);
-		}
-
-		if (PlayerPrefsManager.UserData.VaultIsFull()) {
-			UpdateCoins(income);	
-			do {
-				yield return new WaitForSeconds(2f);
-			} while (PlayerPrefsManager.UserData.VaultIsFull());
-		}
+		PlayerPrefsManager.UserData.TryGetCoinsIncome(out int income);
 		UpdateCoins(income);
 		
-		const float time = 10f;
-		float rTime = 0f;
-		while (rTime < time) {
-			yield return null;
-			rTime += Time.deltaTime;
-			mainPanel.CoinsPanel.UpdateProgress(rTime / time);
-		}
-		
-		DateTime startTime = DateTime.Now;
-		yield return new WaitUntil(() => mainPanel.CoinsPanel.gameObject.activeSelf && mainPanel.CoinsPanel.gameObject.activeInHierarchy);
-		float seconds = (float)(DateTime.Now - startTime).TotalSeconds;
-		int turns = Mathf.RoundToInt(seconds / 12);
-		PlayerPrefsManager.UserData.TryGetCoinsIncome(out income);
-		income += turns * income;
-		
-		mainPanel.CoinsPanel.UpdateProgress(1f);
-		PlayerPrefsManager.UserData.IncreaseCoins(income);
-		OnCoinsUpdate?.Invoke();
-		
-		mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => {
-			if (this != null) {
-				StartCoroutine(CoinsMechanic());
+		while (true) {
+			while (!PlayerPrefsManager.UserData.TryGetCoinsIncome(out income)) {
+				yield return new WaitForSeconds(2f);
+				UpdateCoins(income);
 			}
-		});
+			
+			while (PlayerPrefsManager.UserData.VaultIsFull()) {
+				yield return new WaitForSeconds(2f);
+				PlayerPrefsManager.UserData.TryGetCoinsIncome(out income);
+				UpdateCoins(income);
+			}
+
+			DateTime startTime = DateTime.Now;
+			DateTime endTime = startTime.AddSeconds(Settings.Instance.company.incomeTurnDuration);
+			DateTime now = startTime;
+
+			PlayerPrefsManager.UserData.lastCollectTime = new SerializedDateTime(DateTime.Now);
+			PlayerPrefsManager.SaveUserData();
+
+			while (now < endTime) {
+				yield return null;
+				yield return new WaitUntil(() => mainPanel.CoinsPanel.gameObject.activeSelf && mainPanel.CoinsPanel.gameObject.activeInHierarchy);
+				now = DateTime.Now;
+				mainPanel.CoinsPanel.UpdateProgress(Mathf.Min(1f, (float)(now - startTime).TotalSeconds / Settings.Instance.company.incomeTurnDuration));
+			}
+			
+			if (PlayerPrefsManager.UserData.TryGetTotalIncomeFromLastCollect(out income, out int seconds)) {
+				mainPanel.CoinsPanel.UpdateProgress(1f);
+				PlayerPrefsManager.UserData.IncreaseCoins(income);
+				OnCoinsUpdate?.Invoke();
+				mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => {
+					if (this != null) {
+						UpdateCoins(income);
+					}
+				});
+				TryShowWelcomeBackPanel(income, seconds);
+			}
+		}
 	}
 
 	private void UpdateCoins(int income) {
