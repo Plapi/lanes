@@ -1,4 +1,3 @@
-using TMPro;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour {
@@ -16,6 +15,8 @@ public class CameraController : MonoBehaviour {
     private Vector3 prevPosZoom;
     private bool overUI;
     private GTouch[] touches;
+
+    public Camera Camera => camera;
 
     private void Awake() {
 	    futurePos = pivot.position;

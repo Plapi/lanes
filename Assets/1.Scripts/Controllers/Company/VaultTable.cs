@@ -16,7 +16,8 @@ public class VaultTable : MonoBehaviour {
 			if (table != null) {
 				ObjectPoolManager.Release(table);
 			}
-			table = ObjectPoolManager.Get(Resources.Load<Element>($"Company/VaultRoom/VaultTable/Table{level}/Table{level}"));
+			table = Application.isPlaying ? ObjectPoolManager.Get(Resources.Load<Element>($"Company/VaultRoom/VaultTable/Table{level}/Table{level}")) : 
+				Instantiate(Resources.Load<Element>($"Company/VaultRoom/VaultTable/Table{level}/Table{level}"));
 			table.transform.parent = transform;
 			table.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
 			table.gameObject.SetActive(true);
@@ -31,6 +32,6 @@ public class VaultTable : MonoBehaviour {
 				return i;
 			}
 		}
-		return levels.Length - 1;
+		return Mathf.Max(0, levels.Length - 1);
 	}
 }

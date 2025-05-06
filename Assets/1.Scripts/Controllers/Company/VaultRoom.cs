@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class VaultRoom : Room {
@@ -16,4 +15,19 @@ public class VaultRoom : Room {
 			coins = Mathf.Max(coins - ((VaultRoomData)RoomData).design.maxTableMoney, 0);
 		}
 	}
+	
+#if UNITY_EDITOR
+	[ContextMenu("Set Tables")]
+	private void SetTables() {
+		for (int i = 0; i < tables.Length; i++) {
+			tables[i].Init(int.MaxValue);
+		}
+	}
+	[ContextMenu("Remove Tables")]
+	private void RemoveTables() {
+		for (int i = 0; i < tables.Length; i++) {
+			DestroyImmediate(tables[i].transform.GetChild(0).gameObject);
+		}
+	}
+#endif
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 public class CompanyController : MonoBehaviour {
 	
 	[SerializeField] private StartSegment startSegment;
+	[SerializeField] private GameObject roof;
+	[SerializeField] private Transform building;
 
 	[Space]
 	[SerializeField] private Room[] rooms;
@@ -46,6 +48,18 @@ public class CompanyController : MonoBehaviour {
 	public void Deactivate() {
 		startSegment.ClearAICars();
 		ParkingRoom.Deactivate();
+	}
+
+	public void UpdateRoof(Transform camera) {
+		Vector3 pos = new Vector3(building.position.x, building.position.y, camera.position.z);
+		// GizmosController.Instance.DrawLine("20", camera.position, camera.position + Vector3.right * 100f, Color.red);
+		// GizmosController.Instance.DrawLine("21", pos, pos + Vector3.up * 100f, Color.green);
+		Utils.GetIntersection(camera.position, camera.position + Vector3.right * 100f, pos, pos + Vector3.up * 100f, out Vector3 intersection);
+		float dist = Vector3.Distance(intersection, camera.position);
+		bool roofActive = dist > 80f;
+		if (roof.activeSelf != roofActive) {
+			roof.SetActive(roofActive);
+		}
 	}
 }
 

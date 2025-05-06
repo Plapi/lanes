@@ -300,4 +300,8 @@ public class GameController : MonoBehaviour {
 		mainPanel.CoinsPanel.UpdateCoins(coins, income);
 		companyController.VaultRoom.UpdateTables(coins);
 	}
+
+	private void Update() {
+		companyController.UpdateRoof(cameraController.Camera.transform);
+	}
 }

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7332439946302405641
+--- !u!1 &3445915082620866205
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,10 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 519375502945062058}
-  - component: {fileID: 6041982899684498537}
-  - component: {fileID: 6069864289161697944}
-  - component: {fileID: 6777716719417245525}
+  - component: {fileID: 8459245517279189498}
+  - component: {fileID: 2350489326086573310}
+  - component: {fileID: 7940161312547465360}
   m_Layer: 0
   m_Name: VaultRoom5
   m_TagString: Untagged
@@ -19,13 +18,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &519375502945062058
+--- !u!4 &8459245517279189498
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7332439946302405641}
+  m_GameObject: {fileID: 3445915082620866205}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -34,13 +33,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &6041982899684498537
+--- !u!23 &2350489326086573310
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7332439946302405641}
+  m_GameObject: {fileID: 3445915082620866205}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -58,7 +57,6 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 28646867ddcf90a4989276acd313ea43, type: 2}
-  - {fileID: 2100000, guid: 3c84a5e49d07c6f44afb39cfc297aac1, type: 2}
   - {fileID: 2100000, guid: 281a4c418aae1104eaf0626b78d547ed, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -81,24 +79,11 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &6069864289161697944
+--- !u!33 &7940161312547465360
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7332439946302405641}
+  m_GameObject: {fileID: 3445915082620866205}
   m_Mesh: {fileID: 4300000, guid: 1f84267ed9c434c22b7c7fd34b2d823e, type: 2}
---- !u!114 &6777716719417245525
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7332439946302405641}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 385b9e24a98a3437e9f4e4060c4c31f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: VaultRoom5

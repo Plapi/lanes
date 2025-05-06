@@ -12,8 +12,13 @@ public class MeshCombiner : MonoBehaviour {
 	
 	[Space]
 	[SerializeField] [Range(0f, 1f)] private float quality = 0.5f;
+
+	public void SetOutput(Object objFolder, string objName) {
+		this.objFolder = objFolder;
+		this.objName = objName;
+	}
 	
-	private void Combine(Transform tr) {
+	public void Combine(Transform tr) {
 		Vector3 prevPos = transform.position;
 		Quaternion prevRot = transform.rotation;
 		transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);

@@ -4,7 +4,7 @@ using UnityEngine;
 public class Room : MonoBehaviour {
 
 	[SerializeField] private string id;
-	[SerializeField] private Element obj;
+	[SerializeField] private GameObject obj;
 	[SerializeField] private TapableObj tapable;
 	[SerializeField] private Vector3 cameraZoom;
 	[SerializeField] private GameObject upgradeParticles;
@@ -21,9 +21,11 @@ public class Room : MonoBehaviour {
 
 	public virtual void UpdateRoomGraphic(bool playParticles = true) {
 		if (RoomData.level != currentLevel) {
-			Destroy(obj.gameObject);
+			if (obj != null) {
+				Destroy(obj);	
+			}
 			string objName = $"{id}{RoomData.level - 1}";
-			obj = Instantiate(Resources.Load<Element>($"Company/{id}/{objName}/{objName}"), transform);
+			obj = Instantiate(Resources.Load<GameObject>($"Company/{id}/{objName}/{objName}"), transform);
 			currentLevel = RoomData.level;
 			if (playParticles) {
 				upgradeParticles.SetActive(true);
