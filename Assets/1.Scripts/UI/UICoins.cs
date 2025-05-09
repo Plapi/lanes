@@ -19,8 +19,8 @@ public class UICoins : UIObject {
 	}
 
 	public void UpdateCoins(int coins, int income) {
-		coinsText.text = coins.ToString("N0");
-		incomeText.text = $"+{income:N0}";
+		coinsText.text = Utils.FormatInt(coins);
+		incomeText.text = $"+{Utils.FormatInt(income)}";
 		UpdateLayout();
 		bool vaultIsFull = PlayerPrefsManager.UserData.VaultIsFull();
 		if (vaultIsFull != vaultFull.gameObject.activeSelf) {
@@ -30,12 +30,12 @@ public class UICoins : UIObject {
 	}
 
 	public void UpdateCoins(int coins) {
-		coinsText.text = coins.ToString("N0");
+		coinsText.text = Utils.FormatInt(coins);
 		UpdateLayout();
 	}
 
 	public void ConsumeCoins(int coins) {
-		coinsText.text = coins.ToString("N0");
+		coinsText.text = Utils.FormatInt(coins);
 		PlayConsumeCoinsAnim();
 		UpdateLayout();
 	}

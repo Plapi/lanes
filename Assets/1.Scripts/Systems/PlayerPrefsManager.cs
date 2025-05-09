@@ -57,16 +57,44 @@ public class UserData {
 	public SerializedDateTime lastCollectTime;
 	
 	// company
-	public RoomData waitingRoom = new();
-	public VaultRoomData vaultRoom = new();
-	public RoomData callCenterRoom = new();
-	public RoomData breakRoom = new();
+	public FloorData[] floors;
+	public SerializedDateTime floorUpgradeTime;
+	public bool inFloorUpgradeTime;
 	public ParkingRoomData parkingRoom = new();
 	public DriverData[] drivers;
+
+	public int GetFlorReached() {
+		return floors.Length - 1;
+	}
+
+	public void StartUpgradeFloor() {
+		coins -= GetCurrentFloorUpgradeCost();
+		floorUpgradeTime = new SerializedDateTime(DateTime.Now);
+		inFloorUpgradeTime = true;
+		PlayerPrefsManager.SaveUserData();
+	}
+
+	public int GetCurrentFloorUpgradeCost() {
+		return Settings.Instance.company.floorUpgradeCost * (floors.Length + 1);
+	}
+
+	public void UpgradeFloor() {
+		inFloorUpgradeTime = false;
+		floors = new List<FloorData>(floors) { new() }.ToArray();
+		PlayerPrefsManager.SaveUserData();
+	}
+
+	public int CalculateCapacity() {
+		int capacity = 0;
+		for (int i = 0; i < floors.Length; i++) {
+			capacity += floors[i].vaultRoom.Capacity;
+		}
+		return capacity;
+	}
 	
 	public void IncreaseCoins(int amount, bool useVaultCapacity = true) {
 		if (useVaultCapacity) {
-			amount = Mathf.Min(amount, vaultRoom.Capacity - coins);
+			amount = Mathf.Min(amount, CalculateCapacity() - coins);
 		}
 		if (amount > 0) {
 			coins += amount;	
@@ -75,11 +103,12 @@ public class UserData {
 	}
 
 	public bool VaultIsFull() {
-		return coins >= vaultRoom.Capacity;
+		return coins >= CalculateCapacity();
 	}
 
 	public static UserData GetDefault() {
 		UserData userData = new() {
+			floors = new[] { new FloorData() },
 			parkingRoom = {
 				parkingSlots = new ParkingSlotData[10]
 			}
@@ -103,19 +132,20 @@ public class UserData {
 		}
 		seconds = Mathf.RoundToInt((float)(DateTime.Now - lastCollectTime.Date).TotalSeconds);
 		int totalTurns = seconds / Settings.Instance.company.incomeTurnDuration;
-		income = Mathf.Min(income * totalTurns, vaultRoom.Capacity - coins);
+		income = Mathf.Min(income * totalTurns, CalculateCapacity() - coins);
 		return true;
 	}
 
 	public bool TryGetCoinsIncome(out int income) {
-		RoomData[] roomData = {
-			PlayerPrefsManager.UserData.waitingRoom,
-			PlayerPrefsManager.UserData.callCenterRoom,
-			PlayerPrefsManager.UserData.breakRoom
-		};
+		List<RoomData> rooms = new();
+		for (int i = 0; i < floors.Length; i++) {
+			rooms.Add(floors[i].waitingRoom);
+			rooms.Add(floors[i].callCenterRoom);
+			rooms.Add(floors[i].breakRoom);
+		}
 		income = 0;
-		for (int i = 0; i < roomData.Length; i++) {
-			income += roomData[i].CoinsIncome;
+		for (int i = 0; i < rooms.Count; i++) {
+			income += rooms[i].CoinsIncome;
 		}
 		for (int i = 0; i < parkingRoom.parkingSlots.Length; i++) {
 			if (parkingRoom.parkingSlots[i].HasDriver) {
@@ -149,17 +179,19 @@ public class UserData {
 	}
 
 	public void ReachToMax() {
-		waitingRoom.level = 10;
-		vaultRoom.level = 10;
-		callCenterRoom.level = 10;
-		breakRoom.level = 10;
+		for (int i = 0; i < floors.Length; i++) {
+			floors[i].waitingRoom.level = 10;
+			floors[i].vaultRoom.level = 10;
+			floors[i].callCenterRoom.level = 10;
+			floors[i].breakRoom.level = 10;
+		}
 		parkingRoom.level = 10;
 		for (int i = 0; i < parkingRoom.parkingSlots.Length; i++) {
 			parkingRoom.parkingSlots[i].slotUnlocked = true;
 			parkingRoom.parkingSlots[i].taxiPurchased = true;
 		}
 		PlayerPrefsManager.UserData.coins = 0;
-		IncreaseCoins(vaultRoom.Capacity);
+		IncreaseCoins(CalculateCapacity());
 		PlayerPrefsManager.SaveUserData();
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;

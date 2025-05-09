@@ -35,28 +35,8 @@ public class GameController : MonoBehaviour {
 		
 		InitUI();
 		
-		companyController.Init(room => {
-			cameraController.SetEnabled(false);
-			cameraController.Zoom(room.GetCameraZoom());
-			mainPanel.ShowSettingsButton(false);
-			if (room is ParkingRoom) {
-				parkingRoomPanel.Show();
-				parkingRoomPanel.Init(new UIParkingRoomPanel.Data {
-					roomData = (ParkingRoomData)room.RoomData,
-					onClose = OnCloseFromRoomPanel,
-					onUpgrade = () => UpgradeRoom(room),
-					onBuyTaxi = BuyTaxi,
-					onAssignDriver = OnAssignDriver
-				});
-			} else {
-				roomPanel.Show();
-				roomPanel.Init(new UIRoomPanel.Data {
-					roomData = room.RoomData,
-					onClose = OnCloseFromRoomPanel,
-					onUpgrade = () => UpgradeRoom(room),
-				});
-			}
-		});
+		cameraController.SetHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
+		companyController.Init(OnRoomTap);
 		rideController.Init(OnCompanyButton);
 		
 		TrackGenerator.Instance.OnStartSegmentSetActive += active => {
@@ -73,15 +53,38 @@ public class GameController : MonoBehaviour {
 		StartCoroutine(CoinsMechanic());
 	}
 
+	private void OnRoomTap(Room room) {
+		cameraController.SetEnabled(false);
+		cameraController.Zoom(room.GetCameraZoom());
+		mainPanel.ShowSettingsButton(false);
+		if (room is ParkingRoom) {
+			parkingRoomPanel.Show();
+			parkingRoomPanel.Init(new UIParkingRoomPanel.Data {
+				roomData = (ParkingRoomData)room.RoomData,
+				onClose = OnCloseFromRoomPanel,
+				onUpgrade = () => UpgradeRoom(room),
+				onBuyTaxi = BuyTaxi,
+				onAssignDriver = OnAssignDriver
+			});
+		} else {
+			roomPanel.Show();
+			roomPanel.Init(new UIRoomPanel.Data {
+				roomData = room.RoomData,
+				onClose = OnCloseFromRoomPanel,
+				onUpgrade = () => UpgradeRoom(room),
+			});
+		}
+	}
+
 	private void UpgradeRoom(Room room) {
-		UIController.Instance.ActivateTouchBlocker(2f);
 		PlayerPrefsManager.UserData.coins -= room.RoomData.UpgradeCost;
 		room.RoomData.level++;
 		if (room is ParkingRoom parkingRoom) {
 			parkingRoom.RoomData.UnlockNewSlot();
 		}
 		PlayerPrefsManager.SaveUserData();
-		room.UpdateRoomGraphic();
+		room.SetRoomGraphic();
+		room.PlayParticles();
 		PlayerPrefsManager.UserData.TryGetCoinsIncome(out int income);
 		UpdateCoins(income);
 		mainPanel.CoinsPanel.PlayConsumeCoinsAnim();
@@ -153,6 +156,21 @@ public class GameController : MonoBehaviour {
 				watchAdPanel.Init(new UIWatchAdPanel.Data());
 			},
 			onDriveButton = OnDriveButton
+		});
+		
+		mainPanel.FloorPanel.Init(PlayerPrefsManager.UserData.GetFlorReached(), floor => {
+			companyController.UpdateFloorLevel(floor);
+			companyController.UpdateFloorGraphic(floor);
+			cameraController.UpdateHeight(GetFloorHeight(Mathf.Min(PlayerPrefsManager.UserData.GetFlorReached(), floor)));
+		}, () => {
+			PlayerPrefsManager.UserData.StartUpgradeFloor();
+			mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
+			OnCoinsUpdate?.Invoke();
+		}, () => {
+			PlayerPrefsManager.UserData.UpgradeFloor();
+			companyController.UpgradeFloor(OnRoomTap);
+			companyController.UpdateVaultTables(PlayerPrefsManager.UserData.coins);
+			cameraController.UpdateHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
 		});
 		
 		settingsPanel.Init(new UISettingsPanel.Data {
@@ -298,10 +316,20 @@ public class GameController : MonoBehaviour {
 	private void UpdateCoins(int income) {
 		int coins = PlayerPrefsManager.UserData.coins;
 		mainPanel.CoinsPanel.UpdateCoins(coins, income);
-		companyController.VaultRoom.UpdateTables(coins);
+		companyController.UpdateVaultTables(coins);
 	}
 
 	private void Update() {
-		companyController.UpdateRoof(cameraController.Camera.transform);
+		companyController.UpdateVisibility(cameraController.Camera.transform, visible => {
+			mainPanel.FloorPanel.UpdateVisibility(!visible);
+			if (!visible) {
+				cameraController.SetHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
+				// companyController.UpdateVaultTables(PlayerPrefsManager.UserData.coins);
+			}
+		});
+	}
+
+	private static float GetFloorHeight(int level) {
+		return Settings.Instance.company.floorHeight * level;
 	}
 }

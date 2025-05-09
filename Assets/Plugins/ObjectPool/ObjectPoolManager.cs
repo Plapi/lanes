@@ -60,8 +60,7 @@ public class ObjectPoolManager : MonoBehaviourSingleton<ObjectPoolManager> {
 
 	private void ReleasePrivate<T>(IPoolableObject<T> poolableObject) where T : MonoBehaviour {
 		if (!pools.TryGetValue(poolableObject.Id, out Queue<MonoBehaviour> queue)) {
-			Debug.LogError($"The pool for {poolableObject.Id} does not exist.");
-			return;
+			queue = CreatePoolPrivate(poolableObject);
 		}
 		T obj = poolableObject.GetMonoBehaviour();
 		obj.transform.parent = transform;

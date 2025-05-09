@@ -24,6 +24,10 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 [Serializable]
 public class CompanyData {
 	public int incomeTurnDuration;
+	public int maxFloors;
+	public int floorUpgradeCost;
+	public int floorUpgradeDurationMinutes;
+	public float floorHeight;
 	public RoomDesignData waitingRoom;
 	public RoomDesignData breakRoom;
 	public RoomDesignData callCenterRoom;

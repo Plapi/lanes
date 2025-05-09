@@ -39,6 +39,12 @@ public class DebugWindow : EditorWindow {
 			PlayerPrefs.DeleteAll();
 			PlayerPrefs.Save();
 		}
+		
+		if (GUILayout.Button("Show Player Prefs")) {
+			string json = JsonUtility.ToJson(PlayerPrefsManager.UserData);
+			Debug.LogError(json);
+			GUIUtility.systemCopyBuffer = json;
+		}
 
 		if (GUILayout.Button("Add Coins")) {
 			PlayerPrefsManager.UserData.IncreaseCoins(1000);
@@ -46,11 +52,12 @@ public class DebugWindow : EditorWindow {
 		
 		if (GUILayout.Button("Add Full Coins")) {
 			PlayerPrefsManager.UserData.coins = 0;
-			PlayerPrefsManager.UserData.IncreaseCoins(PlayerPrefsManager.UserData.vaultRoom.Capacity);
+			PlayerPrefsManager.UserData.IncreaseCoins(PlayerPrefsManager.UserData.CalculateCapacity());
 		}
 
 		if (GUILayout.Button("Clear Coins")) {
-			PlayerPrefsManager.UserData.IncreaseCoins(-PlayerPrefsManager.UserData.coins);
+			PlayerPrefsManager.UserData.coins = 0;
+			PlayerPrefsManager.SaveUserData();
 		}
 
 		if (GUILayout.Button("Reach To Max")) {
@@ -74,8 +81,12 @@ public class DebugWindow : EditorWindow {
 	}
 
 	private static void SetButtonsSound() {
-		const string path = "Assets/Free UI Click Sound Effects Pack/AUDIO/Crispy/SFX_UI_Click_Organic_Crispy_Generic_Select_1.wav";
+		const string path = "Assets/10.Sounds/Free UI Click Sound Effects Pack/Crispy/SFX_UI_Click_Organic_Crispy_Generic_Select_1.wav";
 		AudioClip audioClip = AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+		if (audioClip == null) {
+			Debug.LogError("Audio Clips Not Found");
+			return;
+		}
 
 		Button[] buttons = Resources.FindObjectsOfTypeAll<Button>();
 		foreach (Button button in buttons) {

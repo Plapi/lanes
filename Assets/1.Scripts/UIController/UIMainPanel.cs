@@ -15,6 +15,11 @@ public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 	[SerializeField] private Button multiplyCashButton;
 	[SerializeField] private Button driveButton;
 	
+	[Space]
+	[SerializeField] private UIFloor floorPanel;
+	
+	public UIFloor FloorPanel => floorPanel;
+	
 	public UICoins CoinsPanel => coinsPanel;
 	
 	protected override void OnInit() {

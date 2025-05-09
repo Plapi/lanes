@@ -71,7 +71,7 @@ public class UIParkingRoomPanel : UIPanel<UIParkingRoomPanel.Data> {
 		}
 		
 		int upgradeCost = data.roomData.UpgradeCost;
-		upgradeCostText.text = upgradeCost.ToString("N0");
+		upgradeCostText.text = Utils.FormatInt(upgradeCost);
 		this.EndOfFrame(() => {
 			HorizontalLayoutGroup horizontalLayoutGroup = upgradeCostText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;

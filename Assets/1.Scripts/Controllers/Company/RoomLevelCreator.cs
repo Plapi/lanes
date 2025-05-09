@@ -31,7 +31,10 @@ public class RoomLevelCreator : MonoBehaviour {
 			string levelName = $"{name}{levels[i].name[^1]}";
 			guid = AssetDatabase.CreateFolder(folderPath, levelName);
 			meshCombiner.SetOutput(AssetDatabase.LoadAssetAtPath<Object>(AssetDatabase.GUIDToAssetPath(guid)), levelName);
-			meshCombiner.Combine(transform);
+			meshCombiner.Combine(transform, obj => {
+				Element element = obj.AddComponent<Element>();
+				element.Id = levelName;
+			});
 		}
 		
 		DestroyImmediate(meshCombiner);

@@ -71,7 +71,7 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 		buyButton.gameObject.SetActive(showBuy);
 		lockObj.SetActive(showBuy);
 		if (showBuy) {
-			buyPriceText.text = price.ToString("N0");
+			buyPriceText.text = Utils.FormatInt(price);
 			this.EndOfFrame(() => {
 				HorizontalLayoutGroup horizontalLayoutGroup = buyPriceText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 				horizontalLayoutGroup.enabled = false;

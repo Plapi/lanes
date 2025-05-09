@@ -35,6 +35,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 924b1f22941f248e3aeb1cf8b67527df, type: 3}
   company:
     incomeTurnDuration: 10
+    maxFloors: 8
+    floorUpgradeCost: 100000
+    floorUpgradeDurationMinutes: 60
+    floorHeight: 3
     waitingRoom:
       name: Waiting Room
       upgradeCosts: c8000000900100002003000040060000b80b0000881300004c1d00001c250000e02e0000

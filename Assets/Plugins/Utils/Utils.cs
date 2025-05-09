@@ -178,4 +178,13 @@ public static class Utils {
 	public static bool CoinFlip() {
 		return UnityEngine.Random.Range(0, 2) == 1;
 	}
+
+	public static string FormatInt(int value) {
+		return value switch {
+			>= 1_000_000_000 => (value / 1_000_000_000D).ToString("0.#") + "B",
+			>= 1_000_000 => (value / 1_000_000D).ToString("0.#") + "M",
+			>= 1_000 => (value / 1_000D).ToString("0.#") + "K",
+			_ => value.ToString("N0")
+		};
+	}
 }

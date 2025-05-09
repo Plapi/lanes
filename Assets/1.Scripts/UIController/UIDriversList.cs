@@ -133,7 +133,7 @@ public class UIDriverItem : CellViewsHolder {
 	}
 	
 	private void UpdateHireButton() {
-		hireButtonText.text = driverData.design.hireCost.ToString("N0");
+		hireButtonText.text = Utils.FormatInt(driverData.design.hireCost);
 		GameController.Instance.EndOfFrame(() => {
 			HorizontalLayoutGroup horizontalLayoutGroup = hireButtonText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;

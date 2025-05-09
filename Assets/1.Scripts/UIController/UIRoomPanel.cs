@@ -50,7 +50,7 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 		incomeObj.SetActive(!isVaultRoom);
 		vaultObj.SetActive(isVaultRoom);
 		if (isVaultRoom) {
-			vaultText.text = $"{PlayerPrefsManager.UserData.coins:N0}/\n{vaultRoomData.Capacity:N0}";
+			vaultText.text = $"{Utils.FormatInt(PlayerPrefsManager.UserData.coins)}/\n{Utils.FormatInt(vaultRoomData.Capacity)}";
 			if (!maxLevelReached) {
 				descriptionText.text = $"Upgrade {data.roomData.design.name} to <color=#30B8FF>Level {data.roomData.level + 1},</color>\n" +
 				                       "to increase <color=#30B8FF>storage capacity.</color>";
@@ -59,7 +59,7 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 				                       "<line-height=40>You’ve unlocked the maximum\n<color=#30B8FF>storage capacity</color>!";
 			}
 		} else {
-			incomeText.text = $"+{data.roomData.CoinsIncome:N0}";
+			incomeText.text = $"+{Utils.FormatInt(data.roomData.CoinsIncome)}";
 			this.EndOfFrame(() => {
 				HorizontalLayoutGroup horizontalLayoutGroup = incomeText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 				horizontalLayoutGroup.enabled = false;
@@ -82,7 +82,7 @@ public class UIRoomPanel : UIPanel<UIRoomPanel.Data> {
 		}
 		
 		int upgradeCost = data.roomData.UpgradeCost;
-		upgradeCostText.text = upgradeCost.ToString("N0");
+		upgradeCostText.text = Utils.FormatInt(upgradeCost);
 		this.EndOfFrame(() => {
 			HorizontalLayoutGroup horizontalLayoutGroup = upgradeCostText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;

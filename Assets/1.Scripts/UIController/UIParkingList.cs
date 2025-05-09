@@ -140,7 +140,7 @@ public class ParkingListItemViewsHolder : BaseItemViewsHolder {
 
 	private void UpdateBuyButton() {
 		int cost = Settings.Instance.company.parkingRoom.taxiCost;
-		buyButtonText.text = cost.ToString("N0");
+		buyButtonText.text = Utils.FormatInt(cost);
 		GameController.Instance.EndOfFrame(() => {
 			HorizontalLayoutGroup horizontalLayoutGroup = buyButtonText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;

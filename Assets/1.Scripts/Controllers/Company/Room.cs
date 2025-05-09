@@ -4,36 +4,56 @@ using UnityEngine;
 public class Room : MonoBehaviour {
 
 	[SerializeField] private string id;
-	[SerializeField] private GameObject obj;
+	[SerializeField] private Element roomElement;
 	[SerializeField] private TapableObj tapable;
 	[SerializeField] private Vector3 cameraZoom;
 	[SerializeField] private GameObject upgradeParticles;
 
-	private int currentLevel = 1;
+	private int currentLevel = -1;
 	
 	public RoomData RoomData { get; private set; }
 
 	public void Init(RoomData roomData, Action onTap) {
 		RoomData = roomData;
-		UpdateRoomGraphic(false);
 		tapable.SetOnTap(onTap);
 	}
 
-	public virtual void UpdateRoomGraphic(bool playParticles = true) {
-		if (RoomData.level != currentLevel) {
-			if (obj != null) {
-				Destroy(obj);	
-			}
-			string objName = $"{id}{RoomData.level - 1}";
-			obj = Instantiate(Resources.Load<GameObject>($"Company/{id}/{objName}/{objName}"), transform);
-			currentLevel = RoomData.level;
-			if (playParticles) {
-				upgradeParticles.SetActive(true);
-				this.Wait(1.7f, () => upgradeParticles.SetActive(false));
-			}
+	public void SetRoomGraphic() {
+		if (RoomData.level == currentLevel) {
+			tapable.gameObject.SetActive(true);
+			return;
 		}
+		
+		ClearRoomGraphic();
+		tapable.gameObject.SetActive(true);
+		
+		string objName = $"{id}{RoomData.level - 1}";
+		Element elementPrefab = Resources.Load<Element>($"Company/{id}/{objName}/{objName}");
+		if (elementPrefab == null) {
+			return;
+		}
+		roomElement = ObjectPoolManager.Get(elementPrefab, transform);
+		roomElement.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+		roomElement.gameObject.SetActive(true);
+		
+		currentLevel = RoomData.level;
+	}
+	
+	public void ClearRoomGraphic() {
+		if (roomElement != null) {
+			ObjectPoolManager.Release(roomElement);
+			roomElement = null;
+		}
+		tapable.gameObject.SetActive(false);
+		currentLevel = -1;
 	}
 
+	public void PlayParticles() {
+		GameObject particles = Instantiate(upgradeParticles, upgradeParticles.transform.parent);
+		particles.SetActive(true);
+		Destroy(particles.gameObject, 1.7f);
+	}
+	
 	public Vector3 GetCameraZoom() {
 		return cameraZoom;
 	}
@@ -57,7 +77,10 @@ public class VaultRoomData : RoomData {
 
 [Serializable]
 public class ParkingRoomData : RoomData {
-	public new ParkingRoomDesignData design => (ParkingRoomDesignData)base.design;
+	public new ParkingRoomDesignData design {
+		get => (ParkingRoomDesignData)base.design;
+		set => base.design = value;
+	}
 	public ParkingSlotData[] parkingSlots;
 
 	public void UnlockNewSlot() {

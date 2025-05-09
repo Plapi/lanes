@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3555556483958871309
+--- !u!1 &4339875425978353037
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,9 +8,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5733740469018461464}
-  - component: {fileID: 9045107168336663371}
-  - component: {fileID: 3598418535590555124}
+  - component: {fileID: 1531627334660424735}
+  - component: {fileID: 4922402543693613409}
+  - component: {fileID: 900318771543435467}
+  - component: {fileID: 2961853625508808493}
   m_Layer: 0
   m_Name: CallCenterRoom8
   m_TagString: Untagged
@@ -18,13 +19,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5733740469018461464
+--- !u!4 &1531627334660424735
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3555556483958871309}
+  m_GameObject: {fileID: 4339875425978353037}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -33,13 +34,13 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &9045107168336663371
+--- !u!23 &4922402543693613409
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3555556483958871309}
+  m_GameObject: {fileID: 4339875425978353037}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -79,11 +80,24 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &3598418535590555124
+--- !u!33 &900318771543435467
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3555556483958871309}
+  m_GameObject: {fileID: 4339875425978353037}
   m_Mesh: {fileID: 4300000, guid: 092f4349bf6d542ec960e931b5da85a8, type: 2}
+--- !u!114 &2961853625508808493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4339875425978353037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 385b9e24a98a3437e9f4e4060c4c31f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: CallCenterRoom8

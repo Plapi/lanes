@@ -13,6 +13,9 @@ public class CameraController : MonoBehaviour {
     private Vector3 futurePos;
     private Vector3 futureZoom;
     private Vector3 prevPosZoom;
+    
+    private float futureHeight;
+    
     private bool overUI;
     private GTouch[] touches;
 
@@ -41,6 +44,15 @@ public class CameraController : MonoBehaviour {
 	    UpdateFutureZoom(prevPosZoom.y);
     }
 
+    public void SetHeight(float height) {
+	    futureHeight = height;
+	    pivot.SetY(height);
+    }
+
+    public void UpdateHeight(float height) {
+	    futureHeight = height;
+    }
+
     private void Update() {
 	    if (enabled) {
 		    touches = GTouch.GetTouches();
@@ -48,7 +60,7 @@ public class CameraController : MonoBehaviour {
 		    if (Mathf.Abs(scrollDelta) > Mathf.Epsilon) {
 			    UpdateFutureZoom(Mathf.Clamp(futureZoom.y - scrollDelta, 10f, 100f));
 			    ClampFuturePos();
-			    pivot.position = futurePos;
+			    pivot.SetXZ(futurePos.x, futurePos.z);
 		    } else if (touches[0] != null) {
 			    if (touches[0].phase == TouchPhase.Began) {
 				    firstTouch = Utils.IsOverUI() ? null : touches[0];
@@ -70,7 +82,8 @@ public class CameraController : MonoBehaviour {
 	    }
 	    
 	    float time = Time.deltaTime * 20f;
-	    pivot.position = new Vector3(pivot.position.x + (futurePos.x - pivot.position.x) * time, 0f, 
+	    pivot.position = new Vector3(pivot.position.x + (futurePos.x - pivot.position.x) * time, 
+		    pivot.position.y + (futureHeight - pivot.position.y) * time, 
 		    pivot.position.z + (futurePos.z - pivot.position.z) * time);
 	    camera.transform.localPosition = new Vector3(0f,
 		    camera.transform.localPosition.y + (futureZoom.y - camera.transform.localPosition.y) * time,

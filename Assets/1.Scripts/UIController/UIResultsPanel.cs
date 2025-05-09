@@ -39,7 +39,7 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         personText.text = data.persons.Count.ToString();
         personText.transform.GetChild(0).gameObject.SetActive(data.personBest);
         UpdatePersons(data.persons, personText.transform.parent.GetChild(0));
-        coinsText.text = data.coins.ToString("N0");
+        coinsText.text = Utils.FormatInt(data.coins);
         adCollectButton.onClick.RemoveAllListeners();
         adCollectButton.onClick.AddListener(data.onAdCollect);
         collectButton.onClick.RemoveAllListeners();

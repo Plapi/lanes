@@ -18,7 +18,7 @@ public class MeshCombiner : MonoBehaviour {
 		this.objName = objName;
 	}
 	
-	public void Combine(Transform tr) {
+	public void Combine(Transform tr, System.Action<GameObject> onObjCreated = null) {
 		Vector3 prevPos = transform.position;
 		Quaternion prevRot = transform.rotation;
 		transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
@@ -35,6 +35,8 @@ public class MeshCombiner : MonoBehaviour {
 		string meshPath = $"{folderPath}/{objName}.mesh";
 		AssetDatabase.CreateAsset(meshFilter.sharedMesh, meshPath);
 		meshFilter.sharedMesh = (Mesh)AssetDatabase.LoadAssetAtPath(meshPath, typeof(Mesh));
+		
+		onObjCreated?.Invoke(obj);
 		
 		PrefabUtility.SaveAsPrefabAsset(obj, $"{folderPath}/{objName}.prefab").GetComponent<LODGroup>();
 		DestroyImmediate(obj);
