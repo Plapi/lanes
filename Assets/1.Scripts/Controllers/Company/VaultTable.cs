@@ -2,12 +2,14 @@ using UnityEngine;
 
 public class VaultTable : MonoBehaviour {
 
+	[SerializeField] private Element table;
+	
 	private int[] levels;
-	private Element table;
 	private int currentLevel = -1;
 
 	private void Awake() {
 		levels = Settings.Instance.company.vaultRoom.tableMoneyLevels;
+		ReleaseTableIfNeeded();
 	}
 
 	public void Init(int money) {
@@ -16,10 +18,7 @@ public class VaultTable : MonoBehaviour {
 		if (currentLevel == level) {
 			return;
 		}
-		if (table != null) {
-			ObjectPoolManager.Release(table);
-			table = null;
-		}
+		ReleaseTableIfNeeded();
 		table = Application.isPlaying
 			? ObjectPoolManager.Get(Resources.Load<Element>($"Company/VaultRoom/VaultTable/Table{level}/Table{level}"))
 			: Instantiate(Resources.Load<Element>($"Company/VaultRoom/VaultTable/Table{level}/Table{level}"));
@@ -28,6 +27,13 @@ public class VaultTable : MonoBehaviour {
 		table.gameObject.SetActive(true);
 		table.name = table.name.Replace("(Clone)", "");
 		currentLevel = level;
+	}
+
+	private void ReleaseTableIfNeeded() {
+		if (table != null) {
+			ObjectPoolManager.Release(table);
+			table = null;
+		}
 	}
 
 	private int GetLevel(int money) {

@@ -302,11 +302,12 @@ public class GameController : MonoBehaviour {
 			if (PlayerPrefsManager.UserData.TryGetTotalIncomeFromLastCollect(out income, out int seconds)) {
 				mainPanel.CoinsPanel.UpdateProgress(1f);
 				PlayerPrefsManager.UserData.IncreaseCoins(income);
-				OnCoinsUpdate?.Invoke();
 				mainPanel.CoinsPanel.PlayCoinsIncomeAnim(() => {
-					if (this != null) {
-						UpdateCoins(income);
+					if (this == null) {
+						return;
 					}
+					UpdateCoins(income);
+					OnCoinsUpdate?.Invoke();
 				});
 				TryShowWelcomeBackPanel(income, seconds);
 			}

@@ -61,26 +61,40 @@ public class Room : MonoBehaviour {
 
 [Serializable]
 public class RoomData {
-	[NonSerialized] public RoomDesignData design;
+	
 	public int level = 1;
-	public int MaxLevel => design.upgradeCosts.Length;
+	public int MaxLevel => Design.upgradeCosts.Length;
 	public bool MaxLevelReached => level - 1 >= MaxLevel;
-	public int CoinsIncome => design.cashIncomes[level - 1];
-	public int UpgradeCost => design.upgradeCosts[level - 1];
+	public int CoinsIncome => Design.cashIncomes[level - 1];
+	
+	private int floorLevel;
+	
+	public RoomDesignData Design { get; private set; }
+	public int UpgradeCost => Design.upgradeCosts[level - 1] * (floorLevel + 1);
+	
+	public void Init(RoomDesignData design, int floorLevel) {
+		Design = design;
+		this.floorLevel = floorLevel;
+	}
 }
 
 [Serializable]
 public class VaultRoomData : RoomData {
-	public new VaultRoomDesignData design => (VaultRoomDesignData)base.design;
-	public int Capacity => level * design.maxTableMoney;
+	public new VaultRoomDesignData Design => (VaultRoomDesignData)base.Design;
+	public int Capacity => level * Design.maxTableMoney;
+	
+	[NonSerialized] public int depositedCoins;
 }
 
 [Serializable]
 public class ParkingRoomData : RoomData {
-	public new ParkingRoomDesignData design {
-		get => (ParkingRoomDesignData)base.design;
-		set => base.design = value;
+	
+	public new ParkingRoomDesignData Design { get; private set; }
+	
+	public void Init(ParkingRoomDesignData design) {
+		Design = design;
 	}
+	
 	public ParkingSlotData[] parkingSlots;
 
 	public void UnlockNewSlot() {

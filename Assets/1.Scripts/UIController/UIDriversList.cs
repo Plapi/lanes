@@ -87,7 +87,7 @@ public class UIDriverItem : CellViewsHolder {
 		this.onSelect = onSelect;
 		
 		nameText.text = driverData.design.name;
-		incomeText.text = $"+{driverData.design.income:N0}";
+		incomeText.text = $"+{Utils.FormatInt(driverData.design.income)}";
 		GameController.Instance.EndOfFrame(() => {
 			HorizontalLayoutGroup horizontalLayoutGroup = incomeText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;
@@ -117,7 +117,7 @@ public class UIDriverItem : CellViewsHolder {
 					horizontalLayoutGroup.enabled = true;
 				});
 			} else {
-				fireButtonText.text = $"+{driverData.design.fireCost:N0}";
+				fireButtonText.text = $"+{Utils.FormatInt(driverData.design.fireCost)}";
 				GameController.Instance.EndOfFrame(() => {
 					HorizontalLayoutGroup horizontalLayoutGroup = fireButtonText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 					horizontalLayoutGroup.enabled = false;

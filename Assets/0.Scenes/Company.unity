@@ -161777,8 +161777,6 @@ MonoBehaviour:
   parkingRoom: {fileID: 123000114}
   floors:
   - {fileID: 2036345444}
-  showRoofAudioClip: {fileID: 8300000, guid: 429d14ce47b7ae0479d3873360da0e15, type: 3}
-  hideRoofAudioClip: {fileID: 8300000, guid: e0059067e3654c1498ede9e7449df2e1, type: 3}
 --- !u!1 &1488999184
 GameObject:
   m_ObjectHideFlags: 0
@@ -237935,6 +237933,7 @@ MonoBehaviour:
   - {fileID: 421659254}
   - {fileID: 204575426}
   - {fileID: 1804507294}
+  depositedCoins: 0
 --- !u!1 &2064404689
 GameObject:
   m_ObjectHideFlags: 0

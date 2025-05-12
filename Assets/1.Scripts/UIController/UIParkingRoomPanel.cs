@@ -79,7 +79,7 @@ public class UIParkingRoomPanel : UIPanel<UIParkingRoomPanel.Data> {
 		});
 		
 		int coins = PlayerPrefsManager.UserData.coins;
-		bool canUpgrade = !data.roomData.MaxLevelReached && coins >= data.roomData.UpgradeCost;
+		bool canUpgrade = !data.roomData.MaxLevelReached && coins >= upgradeCost;
 		upgradeButton.interactable = canUpgrade;
 		upgradeButton.onClick.RemoveAllListeners();
 		upgradeButton.onClick.AddListener(() => {

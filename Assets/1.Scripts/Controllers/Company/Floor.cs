@@ -23,10 +23,10 @@ public class Floor : MonoBehaviour {
 			PlayerPrefsManager.UserData.floors[level].callCenterRoom,
 			PlayerPrefsManager.UserData.floors[level].breakRoom,
 		};
-		roomData[0].design = Settings.Instance.company.waitingRoom;
-		roomData[1].design = Settings.Instance.company.vaultRoom;
-		roomData[2].design = Settings.Instance.company.callCenterRoom;
-		roomData[3].design = Settings.Instance.company.breakRoom;
+		roomData[0].Init(Settings.Instance.company.waitingRoom, level);
+		roomData[1].Init(Settings.Instance.company.vaultRoom, level);
+		roomData[2].Init(Settings.Instance.company.callCenterRoom, level);
+		roomData[3].Init(Settings.Instance.company.breakRoom, level);
 		for (int i = 0; i < rooms.Length; i++) {
 			int ii = i;
 			rooms[i].Init(roomData[i], () => {
@@ -34,7 +34,6 @@ public class Floor : MonoBehaviour {
 			});
 		}
 	}
-
 	public void SetRoomsGraphic() {
 		for (int i = 0; i < rooms.Length; i++) {
 			rooms[i].SetRoomGraphic();

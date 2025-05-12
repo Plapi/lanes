@@ -99,24 +99,14 @@ public class UIFloor : UIObject {
 		floorGlow.SetActive(floorUnlocked);
 		floorLock.SetActive(!floorUnlocked);
 		
+		GameController.Instance.OnCoinsUpdate -= UpdateUpgradeButton;
 		if (!floorUnlocked) {
 			if (!inFloorUpgradeTime) {
 				if (!upgradeButton.gameObject.activeSelf) {
 					ShowButtonAnim(upgradeButton.GetComponent<RectTransform>());
 				}
-			
-				int coins = PlayerPrefsManager.UserData.coins;
-				int upgradeCost = PlayerPrefsManager.UserData.GetCurrentFloorUpgradeCost();
-				bool canUpgrade = coins >= upgradeCost;
-			
-				upgradeButtonText.text = Utils.FormatInt(upgradeCost);
-				upgradeButton.interactable = canUpgrade;
-				upgradeButtonCanvasGroup.alpha = canUpgrade ? 1f : 0.7f;
-				GameController.Instance.EndOfFrame(() => {
-					HorizontalLayoutGroup horizontalLayoutGroup = upgradeButtonText.transform.parent.GetComponent<HorizontalLayoutGroup>();
-					horizontalLayoutGroup.enabled = false;
-					horizontalLayoutGroup.enabled = true;
-				});
+				UpdateUpgradeButton();
+				GameController.Instance.OnCoinsUpdate += UpdateUpgradeButton;
 			} else {
 				if (!upgradeButton.gameObject.activeSelf) {
 					ShowButtonAnim(skipTimeButton.GetComponent<RectTransform>());
@@ -134,6 +124,20 @@ public class UIFloor : UIObject {
 		}
 		upgradeButton.gameObject.SetActive(!floorUnlocked && !inFloorUpgradeTime);
 		skipTimeButton.gameObject.SetActive(!floorUnlocked && inFloorUpgradeTime);
+	}
+
+	private void UpdateUpgradeButton() {
+		int coins = PlayerPrefsManager.UserData.coins;
+		int upgradeCost = PlayerPrefsManager.UserData.GetCurrentFloorUpgradeCost();
+		bool canUpgrade = coins >= upgradeCost;
+		upgradeButtonText.text = Utils.FormatInt(upgradeCost);
+		upgradeButton.interactable = canUpgrade;
+		upgradeButtonCanvasGroup.alpha = canUpgrade ? 1f : 0.7f;
+		GameController.Instance.EndOfFrame(() => {
+			HorizontalLayoutGroup horizontalLayoutGroup = upgradeButtonText.transform.parent.GetComponent<HorizontalLayoutGroup>();
+			horizontalLayoutGroup.enabled = false;
+			horizontalLayoutGroup.enabled = true;
+		});
 	}
 
 	private void UpgradeComplete() {

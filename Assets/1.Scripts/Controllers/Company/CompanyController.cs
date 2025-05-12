@@ -9,13 +9,11 @@ public class CompanyController : MonoBehaviour {
 	[SerializeField] private Transform building;
 	[SerializeField] private ParkingRoom parkingRoom;
 	[SerializeField] private List<Floor> floors;
-	[SerializeField] private AudioClip showRoofAudioClip;
-	[SerializeField] private AudioClip hideRoofAudioClip;
 	
 	public ParkingRoom ParkingRoom => parkingRoom;
 
 	public void Init(Action<Room> onRoomTap) {
-		PlayerPrefsManager.UserData.parkingRoom.design = Settings.Instance.company.parkingRoom;
+		PlayerPrefsManager.UserData.parkingRoom.Init(Settings.Instance.company.parkingRoom);
 		for (int i = 0; i < PlayerPrefsManager.UserData.drivers.Length; i++) {
 			PlayerPrefsManager.UserData.drivers[i].design = Settings.Instance.company.drivers[i];
 		}
@@ -101,7 +99,6 @@ public class CompanyController : MonoBehaviour {
 			} else {
 				floors[^1].SetRoomsGraphic();
 			}
-			AudioSystem.Play(roofActive ? showRoofAudioClip : hideRoofAudioClip);
 			HapticFeedback.VibrateHaptic(HapticFeedback.Type.Light);
 		}
 	}
