@@ -59,7 +59,11 @@ public class DebugWindow : EditorWindow {
 			PlayerPrefsManager.UserData.coins = 0;
 			PlayerPrefsManager.SaveUserData();
 		}
-
+		
+		if (GUILayout.Button("Reach To Max First Floor")) {
+			PlayerPrefsManager.UserData.ReachToMaxFirstFloor();
+		}
+		
 		if (GUILayout.Button("Reach To Max")) {
 			PlayerPrefsManager.UserData.ReachToMax();
 		}

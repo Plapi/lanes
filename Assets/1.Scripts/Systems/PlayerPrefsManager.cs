@@ -178,23 +178,46 @@ public class UserData {
 		return false;
 	}
 
-	public void ReachToMax() {
+	public void ReachToMaxFirstFloor() {
 		for (int i = 0; i < floors.Length; i++) {
 			floors[i].waitingRoom.level = 10;
 			floors[i].vaultRoom.level = 10;
 			floors[i].callCenterRoom.level = 10;
 			floors[i].breakRoom.level = 10;
 		}
-		parkingRoom.level = 10;
-		for (int i = 0; i < parkingRoom.parkingSlots.Length; i++) {
-			parkingRoom.parkingSlots[i].slotUnlocked = true;
-			parkingRoom.parkingSlots[i].taxiPurchased = true;
-		}
+		ReachParkingRoomToMax();
 		PlayerPrefsManager.UserData.coins = 0;
 		IncreaseCoins(CalculateCapacity());
 		PlayerPrefsManager.SaveUserData();
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
 #endif
+	}
+
+	public void ReachToMax() {
+		FloorData firstFloor = floors[0];
+		floors = new FloorData[Settings.Instance.company.maxFloors];
+		firstFloor.waitingRoom.level = 10;
+		firstFloor.vaultRoom.level = 10;
+		firstFloor.callCenterRoom.level = 10;
+		firstFloor.breakRoom.level = 10;
+		for (int i = 0; i < floors.Length; i++) {
+			floors[i] = firstFloor;
+		}
+		ReachParkingRoomToMax();
+		PlayerPrefsManager.UserData.coins = 0;
+		IncreaseCoins(CalculateCapacity());
+		PlayerPrefsManager.SaveUserData();
+#if UNITY_EDITOR
+		UnityEditor.EditorApplication.isPlaying = false;
+#endif
+	}
+
+	private void ReachParkingRoomToMax() {
+		parkingRoom.level = 10;
+		for (int i = 0; i < parkingRoom.parkingSlots.Length; i++) {
+			parkingRoom.parkingSlots[i].slotUnlocked = true;
+			parkingRoom.parkingSlots[i].taxiPurchased = true;
+		}
 	}
 }

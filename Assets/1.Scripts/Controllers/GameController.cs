@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour {
 	[SerializeField] private CameraController cameraController;
 	[SerializeField] private CompanyController companyController;
 	[SerializeField] private RideController rideController;
+	[SerializeField] private GameObject leftEnvBuildings;
 	
 	private UIMainPanel mainPanel;
 	private UIRoomPanel roomPanel;
@@ -223,6 +224,7 @@ public class GameController : MonoBehaviour {
 	
 	private void OnDriveButton() {
 		UIController.Instance.FadeInToBlack(() => {
+			leftEnvBuildings.gameObject.SetActive(true);
 			cameraController.gameObject.SetActive(false);
 			TrackGenerator.Instance.SetSpawnAICarDistance(90, 110, 20, 40);
 			mainPanel.MoveToOtherPanel(UIController.Instance.GetPanel<UIGaragePanel>().TopContainer);
@@ -235,6 +237,7 @@ public class GameController : MonoBehaviour {
 
 	private void OnCompanyButton() {
 		UIController.Instance.FadeInToBlack(() => {
+			leftEnvBuildings.gameObject.SetActive(false);
 			cameraController.gameObject.SetActive(true);
 			TrackGenerator.Instance.SetSpawnAICarDistance(40, 80, 40, 80);
 			UIController.Instance.GetPanel<UIGaragePanel>().Close(false);
