@@ -23,6 +23,7 @@ public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 	public UICoins CoinsPanel => coinsPanel;
 	
 	protected override void OnInit() {
+		coinsPanel.GetComponent<Button>().onClick.AddListener(data.onCoinsButton);
 		settingsButton.onClick.AddListener(data.onSettingsButton);
 		driversButton.onClick.AddListener(data.onDriversButton);
 		multiplyCashButton.onClick.AddListener(data.onMultiplyCashButton);
@@ -46,6 +47,7 @@ public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 	}
 
 	public new class Data : UIPanelBase.Data {
+		public UnityAction onCoinsButton;
 		public UnityAction onSettingsButton;
 		public UnityAction onDriversButton;
 		public UnityAction onMultiplyCashButton;

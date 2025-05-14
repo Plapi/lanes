@@ -72,7 +72,7 @@ public class RoomData {
 	public RoomDesignData Design { get; private set; }
 	public int UpgradeCost => Design.upgradeCosts[level - 1] * (floorLevel + 1);
 	
-	public void Init(RoomDesignData design, int floorLevel) {
+	public void Init(RoomDesignData design, int floorLevel = 0) {
 		Design = design;
 		this.floorLevel = floorLevel;
 	}
@@ -89,11 +89,7 @@ public class VaultRoomData : RoomData {
 [Serializable]
 public class ParkingRoomData : RoomData {
 	
-	public new ParkingRoomDesignData Design { get; private set; }
-	
-	public void Init(ParkingRoomDesignData design) {
-		Design = design;
-	}
+	public new ParkingRoomDesignData Design => (ParkingRoomDesignData)base.Design;
 	
 	public ParkingSlotData[] parkingSlots;
 

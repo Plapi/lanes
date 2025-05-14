@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour {
 	private UIParkingRoomPanel parkingRoomPanel;
 	private UIDriversPanel driversPanel;
 	private UIWatchAdPanel watchAdPanel;
+	private UIIncomePanel incomePanel;
 	private UIWelcomeBackPanel welcomeBackPanel;
 	private UISettingsPanel settingsPanel;
 
@@ -143,18 +144,30 @@ public class GameController : MonoBehaviour {
 		parkingRoomPanel = UIController.Instance.GetPanel<UIParkingRoomPanel>();
 		driversPanel = UIController.Instance.GetPanel<UIDriversPanel>();
 		watchAdPanel = UIController.Instance.GetPanel<UIWatchAdPanel>();
+		incomePanel = UIController.Instance.GetPanel<UIIncomePanel>();
 		settingsPanel = UIController.Instance.GetPanel<UISettingsPanel>();
 		welcomeBackPanel = UIController.Instance.GetPanel<UIWelcomeBackPanel>();
 		
 		mainPanel.Init(new UIMainPanel.Data {
+			onCoinsButton = () => {
+				mainPanel.ShowSettingsButton(false);
+				incomePanel.Show();
+				incomePanel.Init(new UIIncomePanel.Data {
+					onClose = () => mainPanel.ShowSettingsButton(true)
+				});
+			},
 			onSettingsButton = settingsPanel.Show, 
 			onDriversButton = () => {
+				mainPanel.ShowSettingsButton(false);
 				driversPanel.Show();
 				driversPanel.Init(GetDriversPanelData());
 			},
 			onMultiplyCashButton = () => {
+				mainPanel.ShowSettingsButton(false);
 				watchAdPanel.Show();
-				watchAdPanel.Init(new UIWatchAdPanel.Data());
+				watchAdPanel.Init(new UIWatchAdPanel.Data {
+					onClose = () => mainPanel.ShowSettingsButton(true)
+				});
 			},
 			onDriveButton = OnDriveButton
 		});
@@ -216,6 +229,7 @@ public class GameController : MonoBehaviour {
 
 	private UIDriversPanel.Data GetDriversPanelData() {
 		return new UIDriversPanel.Data {
+			onClose = () => mainPanel.ShowSettingsButton(true),
 			drivers = PlayerPrefsManager.UserData.drivers,
 			onHire = HireFireDriver,
 			onFire = HireFireDriver
