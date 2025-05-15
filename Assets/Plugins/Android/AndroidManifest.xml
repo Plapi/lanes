@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <!-- Required for Android versions below API 31 -->
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="com.android.vending.BILLING" />
     <application>
         <meta-data android:name="unity.ads" android:value="true"/>
         <!--Used when Application Entry is set to Activity, otherwise remove this activity block-->

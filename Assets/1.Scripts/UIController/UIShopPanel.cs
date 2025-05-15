@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
-using Unity.VisualScripting;
 using UnityEngine.Events;
+using UnityEngine.Purchasing;
+using TMPro;
+using DG.Tweening;
 
 public class UIShopPanel : UIPanel<UIShopPanel.Data> {
 
@@ -16,19 +17,59 @@ public class UIShopPanel : UIPanel<UIShopPanel.Data> {
 	
 	protected override void OnInit() {
 		UpdateRemoveAdsButton(PlayerPrefsManager.UserData.removeAdsPurchased);
+		UIController.Instance.ShowLoading();
+		InAppPurchasingController.Instance.InitIfNeeded(InitUI);
 	}
 
+	private void InitUI(ProductCollection products) {
+		UIController.Instance.HideLoading();
+		
+		if (products == null) {
+			return;
+		}
+		
+		InAppPurchaseProduct[] localProducts = Settings.Instance.inAppPurchaseProducts;
+		GameObject[] productObjects = new GameObject[localProducts.Length];
+		productObjects[0] = removeAdsButton.gameObject;
+		for (int i = 0; i < coinsButtons.Length; i++) {
+			productObjects[i + 1] = coinsButtons[i].gameObject;
+		}
+		
+		for (int i = 0; i < productObjects.Length; i++) {
+			Product product = products.WithID(localProducts[i].id);
+			if (product != null) {
+				TextMeshProUGUI costText = productObjects[i].transform.Find("CostText").GetComponent<TextMeshProUGUI>();
+				costText.text = product.metadata.localizedPriceString;
+			} else {
+				Debug.LogError($"Product not found {localProducts[i].id}");
+			}
+		}
+	}
+	
 	private void Start() {
 		removeAdsButton.onClick.AddListener(() => {
-			PlayerPrefsManager.UserData.removeAdsPurchased = true;
-			PlayerPrefsManager.SaveUserData();
-			UpdateRemoveAdsButton(true);
+			UIController.Instance.ShowLoading();
+			InAppPurchasingController.Instance.Purchase(Settings.Instance.inAppPurchaseProducts[0], success => {
+				if (success) {
+					PlayerPrefsManager.UserData.removeAdsPurchased = true;
+					PlayerPrefsManager.SaveUserData();
+					UpdateRemoveAdsButton(true);		
+				}
+				UIController.Instance.HideLoading();
+			});
 		});
-		coinsButtons[0].onClick.AddListener(() => data.addCoins(100000));
-		coinsButtons[1].onClick.AddListener(() => data.addCoins(300000));
-		coinsButtons[2].onClick.AddListener(() => data.addCoins(1000000));
-		coinsButtons[3].onClick.AddListener(() => data.addCoins(2000000));
-		coinsButtons[4].onClick.AddListener(() => data.addCoins(10000000));
+		for (int i = 0; i < coinsButtons.Length; i++) {
+			int ii = i;
+			coinsButtons[i].onClick.AddListener(() => {
+				UIController.Instance.ShowLoading();
+				InAppPurchasingController.Instance.Purchase(Settings.Instance.inAppPurchaseProducts[ii + 1], success => {
+					if (success) {
+						data.addCoins(Settings.Instance.inAppPurchaseProducts[ii + 1].value);
+					}
+					UIController.Instance.HideLoading();
+				});
+			});
+		}
 	}
 
 	private void UpdateRemoveAdsButton(bool removeAdsPurchased) {

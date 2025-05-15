@@ -11,6 +11,7 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 	[SerializeField] private CanvasScaler canvasScaler;
 	[SerializeField] private UIPanelBase[] panels;
 	[SerializeField] private GameObject touchBlocker;
+	[SerializeField] private GameObject loading;
 	[SerializeField] private Image fadeToBlackImage;
 	
 	private readonly Dictionary<Type, UIPanelBase> dictPanels = new();
@@ -63,5 +64,13 @@ public class UIController : MonoBehaviourSingleton<UIController> {
 	public void ActivateTouchBlocker(float time) {
 		touchBlocker.SetActive(true);
 		this.Wait(time, () => touchBlocker.SetActive(false));
+	}
+
+	public void ShowLoading() {
+		loading.SetActive(true);
+	}
+
+	public void HideLoading() {
+		loading.SetActive(false);
 	}
 }

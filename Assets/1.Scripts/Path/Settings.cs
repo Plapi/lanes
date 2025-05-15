@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.Purchasing;
 
 public class Settings : ScriptableObjectSingleton<Settings> {
 	
@@ -14,6 +14,9 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 
 	[Space]
 	public CompanyData company;
+	
+	[Space]
+	public InAppPurchaseProduct[] inAppPurchaseProducts;
 	
 	[Space]
 	public bool testMode;
@@ -64,4 +67,11 @@ public class DriverDesignData {
 	public int income;
 	public int stars;
 	public string spritePath => $"Company/Drivers/Driver{id}";
+}
+
+[Serializable]
+public class InAppPurchaseProduct {
+	public string id;
+	public int value;
+	public ProductType productType;
 }

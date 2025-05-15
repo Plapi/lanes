@@ -11,9 +11,6 @@ public class AdsController : MonoBehaviourSingleton<AdsController>, IUnityAdsIni
 	[SerializeField] private string androidAdUnitId = "Interstitial_Android";
 	[SerializeField] private string iOSAdUnitId = "Interstitial_iOS";
 
-	[Space] 
-	[SerializeField] private bool testMode = true;
-
 	private Status status;
 	private string gameId;
 	private string addUnitId;
@@ -33,7 +30,7 @@ public class AdsController : MonoBehaviourSingleton<AdsController>, IUnityAdsIni
 		gameId = Application.platform == RuntimePlatform.IPhonePlayer ? iOSGameId : androidGameId;
 		addUnitId = Application.platform == RuntimePlatform.IPhonePlayer ? iOSAdUnitId : androidAdUnitId;
 		if (!Advertisement.isInitialized && Advertisement.isSupported) {
-			Advertisement.Initialize(gameId, testMode, this);
+			Advertisement.Initialize(gameId, Settings.Instance.testMode, this);
 		} else {
 			onCompleteInit?.Invoke();
 			onCompleteInit = null;
@@ -65,6 +62,10 @@ public class AdsController : MonoBehaviourSingleton<AdsController>, IUnityAdsIni
 	}
 	
 	public void ShowAd(Action<bool> onComplete) {
+		if (Application.isEditor) {
+			onComplete?.Invoke(true);
+			return;
+		}
 		if (CanShowAd()) {
 			onCompleteShowAd = onComplete;
 			Advertisement.Show(addUnitId, this);

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using Newtonsoft.Json;
 
 public class UIWatchAdPanel : UIPanel<UIWatchAdPanel.Data> {
 
@@ -28,7 +29,7 @@ public class UIWatchAdPanel : UIPanel<UIWatchAdPanel.Data> {
 					const int minutes = 15;
 					DateTime now = DateTime.Now;
 					WatchAdBoostIncome watchAdBoostIncome = PlayerPrefsManager.UserData.watchAdBoostIncome;
-					if (watchAdBoostIncome == null || watchAdBoostIncome.endTime.Date > now) {
+					if (watchAdBoostIncome != null && watchAdBoostIncome.endTime.Date > now) {
 						watchAdBoostIncome.endTime.Date = watchAdBoostIncome.endTime.Date.AddMinutes(minutes);
 					} else {
 						watchAdBoostIncome = new WatchAdBoostIncome {
