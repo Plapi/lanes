@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour {
 	private UIMainPanel mainPanel;
 	private UIRoomPanel roomPanel;
 	private UIParkingRoomPanel parkingRoomPanel;
+	private UIShopPanel shopPanel;
 	private UIDriversPanel driversPanel;
 	private UIWatchAdPanel watchAdPanel;
 	private UIIncomePanel incomePanel;
@@ -58,7 +59,6 @@ public class GameController : MonoBehaviour {
 	private void OnRoomTap(Room room) {
 		cameraController.SetEnabled(false);
 		cameraController.Zoom(room.GetCameraZoom());
-		mainPanel.ShowSettingsButton(false);
 		if (room is ParkingRoom) {
 			parkingRoomPanel.Show();
 			parkingRoomPanel.Init(new UIParkingRoomPanel.Data {
@@ -134,7 +134,6 @@ public class GameController : MonoBehaviour {
 	private void OnCloseFromRoomPanel() {
 		cameraController.SetEnabled(true);
 		cameraController.ZoomBack();
-		mainPanel.ShowSettingsButton(true);
 	}
 
 	private void InitUI() {
@@ -142,6 +141,7 @@ public class GameController : MonoBehaviour {
 		mainPanel = UIController.Instance.GetPanel<UIMainPanel>();
 		roomPanel = UIController.Instance.GetPanel<UIRoomPanel>();
 		parkingRoomPanel = UIController.Instance.GetPanel<UIParkingRoomPanel>();
+		shopPanel = UIController.Instance.GetPanel<UIShopPanel>();
 		driversPanel = UIController.Instance.GetPanel<UIDriversPanel>();
 		watchAdPanel = UIController.Instance.GetPanel<UIWatchAdPanel>();
 		incomePanel = UIController.Instance.GetPanel<UIIncomePanel>();
@@ -150,42 +150,36 @@ public class GameController : MonoBehaviour {
 		
 		mainPanel.Init(new UIMainPanel.Data {
 			onCoinsButton = () => {
-				mainPanel.ShowSettingsButton(false);
 				incomePanel.Show();
-				incomePanel.Init(new UIIncomePanel.Data {
-					onClose = () => mainPanel.ShowSettingsButton(true)
+				incomePanel.Init(new UIIncomePanel.Data());
+			},
+			onShopButton = () => {
+				shopPanel.Show();
+				shopPanel.Init(new UIShopPanel.Data {
+					addCoins = coins => {
+						PlayerPrefsManager.UserData.IncreaseCoins(coins, false);
+						mainPanel.CoinsPanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
+						mainPanel.CoinsPanel.PlayReceiveCoinsAnim();
+					}
 				});
 			},
-			onSettingsButton = settingsPanel.Show, 
 			onDriversButton = () => {
-				mainPanel.ShowSettingsButton(false);
 				driversPanel.Show();
 				driversPanel.Init(GetDriversPanelData());
 			},
 			onMultiplyCashButton = () => {
-				mainPanel.ShowSettingsButton(false);
 				watchAdPanel.Show();
-				watchAdPanel.Init(new UIWatchAdPanel.Data {
-					onClose = () => mainPanel.ShowSettingsButton(true)
-				});
+				watchAdPanel.Init(new UIWatchAdPanel.Data());
 			},
-			onDriveButton = OnDriveButton
+			onDriveButton = OnDriveButton,
+			onSettingsButton = settingsPanel.Show 
 		});
 		
 		mainPanel.FloorPanel.Init(PlayerPrefsManager.UserData.GetFlorReached(), floor => {
 			companyController.UpdateFloorLevel(floor);
 			companyController.UpdateFloorGraphic(floor);
 			cameraController.UpdateHeight(GetFloorHeight(Mathf.Min(PlayerPrefsManager.UserData.GetFlorReached(), floor)));
-		}, () => {
-			PlayerPrefsManager.UserData.StartUpgradeFloor();
-			mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
-			OnCoinsUpdate?.Invoke();
-		}, () => {
-			PlayerPrefsManager.UserData.UpgradeFloor();
-			companyController.UpgradeFloor(OnRoomTap);
-			companyController.UpdateVaultTables(PlayerPrefsManager.UserData.coins);
-			cameraController.UpdateHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
-		});
+		}, UpgradeFloorStart, UpgradeFloorComplete);
 		
 		settingsPanel.Init(new UISettingsPanel.Data {
 			volumes = PlayerPrefsManager.UserData.volumes,
@@ -227,9 +221,24 @@ public class GameController : MonoBehaviour {
 		});
 	}
 
+	private void UpgradeFloorStart() {
+		PlayerPrefsManager.UserData.StartUpgradeFloor();
+		mainPanel.CoinsPanel.ConsumeCoins(PlayerPrefsManager.UserData.coins);
+		OnCoinsUpdate?.Invoke();
+		if (PlayerPrefsManager.UserData.removeAdsPurchased) {
+			UpgradeFloorComplete();
+		}
+	}
+
+	private void UpgradeFloorComplete() {
+		PlayerPrefsManager.UserData.UpgradeFloor();
+		companyController.UpgradeFloor(OnRoomTap);
+		companyController.UpdateVaultTables(PlayerPrefsManager.UserData.coins);
+		cameraController.UpdateHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
+	}
+
 	private UIDriversPanel.Data GetDriversPanelData() {
 		return new UIDriversPanel.Data {
-			onClose = () => mainPanel.ShowSettingsButton(true),
 			drivers = PlayerPrefsManager.UserData.drivers,
 			onHire = HireFireDriver,
 			onFire = HireFireDriver
@@ -335,6 +344,7 @@ public class GameController : MonoBehaviour {
 		int coins = PlayerPrefsManager.UserData.coins;
 		mainPanel.CoinsPanel.UpdateCoins(coins, income);
 		companyController.UpdateVaultTables(coins);
+		mainPanel.UpdateBoostIncomeObjects();
 	}
 
 	private void Update() {
@@ -342,7 +352,6 @@ public class GameController : MonoBehaviour {
 			mainPanel.FloorPanel.UpdateVisibility(!visible);
 			if (!visible) {
 				cameraController.SetHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
-				// companyController.UpdateVaultTables(PlayerPrefsManager.UserData.coins);
 			}
 		});
 	}

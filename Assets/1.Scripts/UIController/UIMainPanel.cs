@@ -8,12 +8,16 @@ public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 	[Space]
 	[SerializeField] private RectTransform topContainer;
 	[SerializeField] private UICoins coinsPanel;
-	[SerializeField] private Button settingsButton;
 	
 	[Space]
+	[SerializeField] private Button shopButton;
 	[SerializeField] private Button driversButton;
 	[SerializeField] private Button multiplyCashButton;
 	[SerializeField] private Button driveButton;
+	[SerializeField] private Button settingsButton;
+
+	[Space]
+	[SerializeField] private GameObject[] boostIncomeObjects;
 	
 	[Space]
 	[SerializeField] private UIFloor floorPanel;
@@ -24,33 +28,40 @@ public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 	
 	protected override void OnInit() {
 		coinsPanel.GetComponent<Button>().onClick.AddListener(data.onCoinsButton);
-		settingsButton.onClick.AddListener(data.onSettingsButton);
+		shopButton.onClick.AddListener(data.onShopButton);
 		driversButton.onClick.AddListener(data.onDriversButton);
 		multiplyCashButton.onClick.AddListener(data.onMultiplyCashButton);
 		driveButton.onClick.AddListener(data.onDriveButton);
-	}
-
-	public void ShowSettingsButton(bool show) {
-		settingsButton.GetComponent<CanvasGroup>().DOFade(show ? 1f : 0f, UIController.defaultTime);
+		settingsButton.onClick.AddListener(data.onSettingsButton);
 	}
 
 	public void MoveToOtherPanel(Transform parent) {
 		coinsPanel.transform.SetParent(parent);
-		settingsButton.transform.SetParent(parent);
-		settingsButton.GetComponent<RectTransform>().SetAnchorPosY(-140f);
 	}
 
 	public void MoveBack() {
 		coinsPanel.transform.SetParent(topContainer);
-		settingsButton.transform.SetParent(topContainer);
-		settingsButton.GetComponent<RectTransform>().SetAnchorPosY(-40f);
+	}
+
+	public void UpdateBoostIncomeObjects() {
+		bool active = PlayerPrefsManager.UserData.InWatchAdBoostIncome();
+		if (boostIncomeObjects[0].activeSelf != active) {
+			for (int i = 0; i < boostIncomeObjects.Length; i++) {
+				boostIncomeObjects[i].SetActive(active);
+			}
+		}
+		bool removeAdsPurchased = PlayerPrefsManager.UserData.removeAdsPurchased;
+		if (multiplyCashButton.interactable == removeAdsPurchased) {
+			multiplyCashButton.interactable = !removeAdsPurchased;	
+		}
 	}
 
 	public new class Data : UIPanelBase.Data {
 		public UnityAction onCoinsButton;
-		public UnityAction onSettingsButton;
+		public UnityAction onShopButton;
 		public UnityAction onDriversButton;
 		public UnityAction onMultiplyCashButton;
 		public UnityAction onDriveButton;
+		public UnityAction onSettingsButton;
 	}
 }

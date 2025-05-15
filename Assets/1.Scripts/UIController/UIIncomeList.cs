@@ -165,7 +165,10 @@ public class UIIncomeList : OSA<BaseParamsWithPrefab, UIIncomeList.IncomeListIte
 				root.GetComponentAtPath("Vault/CoinsText", out TextMeshProUGUI coinsText);
 				root.GetComponentAtPath("Vault/TotalProfitText", out TextMeshProUGUI totalProfitText);
 				coinsText.text = $"{Utils.FormatInt(data.vaultListData.coins)} <size=50>/</size> {Utils.FormatInt(data.vaultListData.storage)}";
-				totalProfitText.text = $"Total Profit per turn: <color=#5DD900>{Utils.FormatInt(data.vaultListData.profitPerTurn)}</color>";
+				totalProfitText.text = $"Profit per turn: <color=#5DD900>{Utils.FormatInt(data.vaultListData.profitPerTurn)}</color>";
+				if (PlayerPrefsManager.UserData.InWatchAdBoostIncome()) {
+					totalProfitText.text += " <color=#5DD900>(x2)</color>";
+				}
 			} else if (data.type == IncomeListType.Top) {
 				root.GetComponentAtPath("Top/TitleText", out TextMeshProUGUI titleText);
 				titleText.text = $"{data.topListData.title}: <color=#5DD900>{Utils.FormatInt(data.topListData.profitPerTurn)}</color>";

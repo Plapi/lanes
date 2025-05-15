@@ -163,6 +163,6 @@ public class UIFloor : UIObject {
 	private static void ShowButtonAnim(RectTransform rectTransform) {
 		rectTransform.DOKill();
 		rectTransform.SetAnchorPosX(-35f);
-		rectTransform.DOAnchorPosX(-115f, UIController.defaultTime).SetEase(Ease.OutExpo);
+		rectTransform.DOAnchorPosX(-100f, UIController.defaultTime).SetEase(Ease.OutExpo);
 	}
 }

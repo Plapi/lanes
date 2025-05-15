@@ -21,6 +21,9 @@ public class UICoins : UIObject {
 	public void UpdateCoins(int coins, int income) {
 		coinsText.text = Utils.FormatInt(coins);
 		incomeText.text = $"+{Utils.FormatInt(income)}";
+		if (PlayerPrefsManager.UserData.InWatchAdBoostIncome()) {
+			incomeText.text += " (x2)";
+		}
 		UpdateLayout();
 		bool vaultIsFull = PlayerPrefsManager.UserData.VaultIsFull();
 		if (vaultIsFull != vaultFull.gameObject.activeSelf) {

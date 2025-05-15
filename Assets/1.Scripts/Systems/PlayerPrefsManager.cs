@@ -55,6 +55,8 @@ public class UserData {
 	
 	public WatchAdBoostIncome watchAdBoostIncome;
 	public SerializedDateTime lastCollectTime;
+
+	public bool removeAdsPurchased;
 	
 	// company
 	public FloorData[] floors;
@@ -136,6 +138,10 @@ public class UserData {
 		return true;
 	}
 
+	public bool InWatchAdBoostIncome() {
+		return removeAdsPurchased || watchAdBoostIncome != null && watchAdBoostIncome.endTime.Date >= DateTime.Now;
+	}
+
 	public bool TryGetCoinsIncome(out int income) {
 		List<RoomData> rooms = new();
 		for (int i = 0; i < floors.Length; i++) {
@@ -152,7 +158,7 @@ public class UserData {
 				income += GetDriver(parkingRoom.parkingSlots[i].driverId).design.income;
 			}
 		}
-		if (watchAdBoostIncome != null && watchAdBoostIncome.endTime.Date >= DateTime.Now) {
+		if (InWatchAdBoostIncome()) {
 			income *= 2;
 		}
 		return income > 0;
