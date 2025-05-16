@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 103739ed8029d42b5a4737753634cc34, type: 3}
+  m_Name: ParkingRoom_Expanding
+  m_EditorClassIdentifier: 
+  texts:
+  - "Hey, the parking lot\u2019s growing \u2013 more cars coming soon!"
+  - "Parking space is expanding \u2013 the fleet is getting bigger!"
+  - "More room for rides, the parking\u2019s off to a strong start!"
+  - "Looks like the parking\u2019s growing \u2013 good times ahead!"
+  - "The parking\u2019s expanding \u2013 the company\u2019s on the rise!"

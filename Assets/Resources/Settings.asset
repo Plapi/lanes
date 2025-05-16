@@ -65,111 +65,133 @@ MonoBehaviour:
       taxiIncome: 400
     drivers:
     - id: 0
+      characterId: 1_Character_BusinessMan_Shirt
       name: Clark
       hireCost: 1000
       income: 50
       stars: 0
     - id: 1
+      characterId: 0_Character_Jock
       name: Victor
       hireCost: 1500
       income: 60
       stars: 0
     - id: 2
+      characterId: 1_Character_BusinessWoman
       name: Nina
       hireCost: 2000
       income: 70
       stars: 0
     - id: 3
+      characterId: 1_Character_Female_Coat
       name: Stella
       hireCost: 2000
       income: 90
       stars: 1
     - id: 4
+      characterId: 0_Character_Hobo
       name: Dusty
       hireCost: 3000
       income: 110
       stars: 1
     - id: 5
+      characterId: 1_Character_Male_Hoodie
       name: Leo
       hireCost: 3500
       income: 120
       stars: 1
     - id: 6
+      characterId: 1_Character_Male_Jacket
       name: Derek
       hireCost: 4000
       income: 150
       stars: 1
     - id: 7
+      characterId: 0_Character_Biker
       name: Spike
       hireCost: 4500
       income: 180
       stars: 2
     - id: 8
+      characterId: 0_Character_FastFoodGuy
       name: Max
       hireCost: 5000
       income: 190
       stars: 2
     - id: 9
+      characterId: 0_Character_GamerGirl
       name: Pixel
       hireCost: 5500
       income: 210
       stars: 2
     - id: 10
+      characterId: 0_Character_Gangster
       name: Rico
       hireCost: 6000
       income: 220
       stars: 2
     - id: 11
+      characterId: 0_Character_Grandma
       name: Martha
       hireCost: 6500
       income: 260
       stars: 3
     - id: 12
+      characterId: 0_Character_Grandpa
       name: Walter
       hireCost: 7000
       income: 280
       stars: 3
     - id: 13
+      characterId: 0_Character_HipsterGirl
       name: Luna
       hireCost: 7500
       income: 290
       stars: 3
     - id: 14
+      characterId: 0_Character_HipsterGuy
       name: Jax
       hireCost: 8000
       income: 300
       stars: 3
     - id: 15
+      characterId: 1_Character_Female_Jacket
       name: Tina
       hireCost: 8500
       income: 320
       stars: 3
     - id: 16
+      characterId: 1_Character_BusinessMan_Suit
       name: Chad
       hireCost: 9000
       income: 340
       stars: 3
     - id: 17
+      characterId: 0_Character_Paramedic
       name: Blake
       hireCost: 9500
       income: 350
       stars: 3
     - id: 18
+      characterId: 0_Character_PunkGirl
       name: Roxy
       hireCost: 10000
       income: 400
       stars: 4
     - id: 19
+      characterId: 0_Character_PunkGuy
       name: Axel
       hireCost: 10500
       income: 410
       stars: 4
     - id: 20
+      characterId: 0_Character_SummerGirl
       name: Sunny
       hireCost: 11000
       income: 450
       stars: 5
     - id: 21
+      characterId: 0_Character_Tourist
       name: Hank
       hireCost: 11500
       income: 480

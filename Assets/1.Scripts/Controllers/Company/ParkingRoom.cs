@@ -15,7 +15,7 @@ public class ParkingRoom : Room {
 				parkingLots[i].SetCar();
 			}
 		}
-		TravelCar();
+		// TravelCar();
 	}
 
 	public void Deactivate() {

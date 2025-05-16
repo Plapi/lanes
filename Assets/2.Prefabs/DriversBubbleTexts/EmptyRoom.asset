@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 103739ed8029d42b5a4737753634cc34, type: 3}
+  m_Name: EmptyRoom
+  m_EditorClassIdentifier: 
+  texts:
+  - This room feels kinda empty right now!
+  - "Looks like nobody\u2019s using this space yet!"
+  - I bet this room will shine one day!
+  - Why is this room so quiet and bare?
+  - Needs some upgrades to come alive!
+  - Nothing going on in here... yet!
+  - One day, this room will be busy!
+  - So empty, I can hear my thoughts!

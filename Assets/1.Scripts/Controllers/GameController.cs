@@ -39,7 +39,7 @@ public class GameController : MonoBehaviour {
 		InitUI();
 		
 		cameraController.SetHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
-		companyController.Init(OnRoomTap);
+		companyController.Init(cameraController.Camera.transform, OnRoomTap);
 		rideController.Init(OnCompanyButton);
 		
 		TrackGenerator.Instance.OnStartSegmentSetActive += active => {
@@ -300,8 +300,10 @@ public class GameController : MonoBehaviour {
 		UpdateCoins(income);
 		
 		while (true) {
-			while (!PlayerPrefsManager.UserData.TryGetCoinsIncome(out income)) {
+			bool hasIncome = PlayerPrefsManager.UserData.TryGetCoinsIncome(out income);
+			while (!hasIncome) {
 				yield return new WaitForSeconds(2f);
+				hasIncome = PlayerPrefsManager.UserData.TryGetCoinsIncome(out income);
 				UpdateCoins(income);
 			}
 			
@@ -348,7 +350,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void Update() {
-		companyController.UpdateVisibility(cameraController.Camera.transform, visible => {
+		companyController.UpdateVisibility(visible => {
 			mainPanel.FloorPanel.UpdateVisibility(!visible);
 			if (!visible) {
 				cameraController.SetHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));

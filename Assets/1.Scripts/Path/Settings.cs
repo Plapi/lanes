@@ -61,6 +61,7 @@ public class ParkingRoomDesignData : RoomDesignData {
 [Serializable]
 public class DriverDesignData {
 	public string id;
+	public string characterId;
 	public string name;
 	public int hireCost;
 	public int fireCost => hireCost / 2;

@@ -8,11 +8,16 @@ public class CompanyController : MonoBehaviour {
 	[SerializeField] private GameObject roof;
 	[SerializeField] private Transform building;
 	[SerializeField] private ParkingRoom parkingRoom;
+	[SerializeField] private DriversController driversController;
 	[SerializeField] private List<Floor> floors;
+
+	private Transform cameraTransform;
 	
 	public ParkingRoom ParkingRoom => parkingRoom;
 
-	public void Init(Action<Room> onRoomTap) {
+	public void Init(Transform camera, Action<Room> onRoomTap) {
+		cameraTransform = camera;
+		
 		PlayerPrefsManager.UserData.parkingRoom.Init(Settings.Instance.company.parkingRoom);
 		for (int i = 0; i < PlayerPrefsManager.UserData.drivers.Length; i++) {
 			PlayerPrefsManager.UserData.drivers[i].design = Settings.Instance.company.drivers[i];
@@ -33,6 +38,8 @@ public class CompanyController : MonoBehaviour {
 			onRoomTap?.Invoke(parkingRoom);
 		});
 		parkingRoom.SetRoomGraphic();
+		
+		driversController.Init(cameraTransform);
 		
 		Activate();
 	}
@@ -76,17 +83,19 @@ public class CompanyController : MonoBehaviour {
 		startSegment.SetStartAndEndPosForRoadLanes();
 		startSegment.SpawnAICars();
 		ParkingRoom.Activate(startSegment);
+		driversController.SpawnDrivers();
 	}
 
 	public void Deactivate() {
 		startSegment.ClearAICars();
 		ParkingRoom.Deactivate();
+		driversController.ClearDrivers();
 	}
 	
-	public void UpdateVisibility(Transform camera, Action<bool> onChangeVisibility) {
-		Vector3 pos = new Vector3(building.position.x, building.position.y, camera.position.z);
-		Utils.GetIntersection(camera.position, camera.position + Vector3.right * 100f, pos, pos + Vector3.up * 100f, out Vector3 intersection);
-		float dist = Vector3.Distance(intersection, camera.position);
+	public void UpdateVisibility(Action<bool> onChangeVisibility) {
+		Vector3 pos = new Vector3(building.position.x, building.position.y, cameraTransform.position.z);
+		Utils.GetIntersection(cameraTransform.position, cameraTransform.position + Vector3.right * 100f, pos, pos + Vector3.up * 100f, out Vector3 intersection);
+		float dist = Vector3.Distance(intersection, cameraTransform.position);
 		bool roofActive = dist > 80f;
 		if (roof.activeSelf != roofActive) {
 			roof.SetActive(roofActive);

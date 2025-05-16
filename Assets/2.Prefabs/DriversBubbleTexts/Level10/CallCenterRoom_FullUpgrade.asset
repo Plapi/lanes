@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 103739ed8029d42b5a4737753634cc34, type: 3}
+  m_Name: CallCenterRoom_FullUpgrade
+  m_EditorClassIdentifier: 
+  texts:
+  - Wow, this call center is a tech powerhouse now!
+  - "Look at all these computers \u2013 pure efficiency!"
+  - "This room\u2019s packed with computers \u2013 impressive setup"
+  - "Everything\u2019s digital here, top-notch call center!"
+  - So many computers, this call center runs like a machine!
