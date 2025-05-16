@@ -18,31 +18,37 @@ public class Driver : Element {
 	[SerializeField] private float bubbleAudioDistance;
 	
 	private Animator animator;
+	private DriverData driverData;
 	private Action onTargetReached;
-	
 	private Transform bubbleLookAt;
-	
-	private void Start() {
+	private bool destinationSet;
+
+	public void Init(DriverData driverData, Transform bubbleLookAt) {
+		this.bubbleLookAt = bubbleLookAt;
+		this.driverData = driverData;
+		destinationSet = false;
+		SetDriver();
+		bubblePivot.parent.gameObject.SetActive(false);
+		bubblePivot.DOKill();
+	}
+
+	public DriverData GetDriverData() {
+		return driverData;
+	}
+
+	private void SetDriver() {
 		transform.GetChild(0).gameObject.SetActive(false);
 		transform.GetChild(1).gameObject.SetActive(false);
-		DriverDesignData[] drivers = Settings.Instance.company.drivers;
-		DriverDesignData randomDriver = drivers[UnityEngine.Random.Range(0, drivers.Length)];
-		string[] split = randomDriver.characterId.Split('_', 2);
+		string[] split = driverData.design.characterId.Split('_', 2);
 		animator = transform.GetChild(int.Parse(split[0])).GetComponent<Animator>();
 		animator.gameObject.SetActive(true);
 		HideAllCharacters(animator.transform, split[1]);
 	}
 
-	public void Init( Transform bubbleLookAt) {
-		this.bubbleLookAt = bubbleLookAt;
-		bubblePivot.parent.gameObject.SetActive(false);
-		bubblePivot.DOKill();
-	}
-
 	public void SetTargetPoint(DriverTargetPoint targetPoint, Action onTargetReached) {
 		this.targetPoint = targetPoint;
 		this.onTargetReached = onTargetReached;
-		agent.destination = targetPoint.transform.position;
+		destinationSet = false;
 	}
 	
 	private void Update() {
@@ -51,10 +57,16 @@ public class Driver : Element {
 			transform.SetAngleY(Quaternion.LookRotation(agent.velocity - Vector3.zero).eulerAngles.y);	
 		}
 		
-		if (targetPoint != null && AgentReachedTarget()) {
-			onTargetReached?.Invoke();
-			onTargetReached = null;
-			targetPoint = null;
+		if (agent.isOnNavMesh && targetPoint != null) {
+			if (!destinationSet) {
+				agent.destination = targetPoint.transform.position;
+				destinationSet = true;
+			}
+			if (AgentReachedTarget()) {
+				onTargetReached?.Invoke();
+				onTargetReached = null;
+				targetPoint = null;
+			}
 		}
 	}
 

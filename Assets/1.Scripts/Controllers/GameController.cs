@@ -129,6 +129,7 @@ public class GameController : MonoBehaviour {
 		}
 		PlayerPrefsManager.SaveUserData();
 		OnCoinsUpdate?.Invoke();
+		companyController.DriversController.OnHireFireDriver(driver);
 	}
 
 	private void OnCloseFromRoomPanel() {

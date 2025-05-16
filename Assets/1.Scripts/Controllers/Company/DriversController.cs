@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -18,19 +17,35 @@ public class DriversController : MonoBehaviour {
 	}
 	
 	public void SpawnDrivers() {
-		List<Transform> points = new();
-		foreach (Transform spawnPoint in spawnPoints) {
-			points.Add(spawnPoint);
+		DriverData[] driversData = SelectDrivers();
+		for (int i = driversData.Length - 1; i >= 0; i--) {
+			if (driversData[i].hired) {
+				TryCreateDriver(driversData[i]);
+			}
 		}
-		for (int i = 0; i < 8; i++) {
-			int randomIndex = Random.Range(0, points.Count);
-			drivers.Add((Driver)ObjectPoolManager.Get(Resources.Load<Element>("Company/Driver"), transform));
-			drivers[^1].name = $"Driver{drivers.Count - 1}";
-			drivers[^1].transform.position = points[randomIndex].position;
-			drivers[^1].gameObject.SetActive(true);
-			drivers[^1].Init(cameraTransform);
-			points.RemoveAt(randomIndex);
-			NavigateDriverToRandomPoint(drivers[^1]);
+	}
+
+	private void TryCreateDriver(DriverData driverData) {
+		if (drivers.Count >= 8) {
+			return;
+		}
+		Driver driver = (Driver)ObjectPoolManager.Get(Resources.Load<Element>("Company/Driver"), transform);
+		driver.name = $"Driver{drivers.Count}";
+		driver.transform.position = GetMostDistantSpawnPoint().position;
+		driver.gameObject.SetActive(true);
+		driver.Init(driverData, cameraTransform);
+		NavigateDriverToRandomPoint(driver);
+		drivers.Add(driver);
+	}
+	
+	public void OnHireFireDriver(DriverData driverData) {
+		if (driverData.hired) {
+			TryCreateDriver(driverData);
+		} else {
+			if (drivers.Find(d => d.GetDriverData().design.id == driverData.design.id) is { } driver) {
+				drivers.Remove(driver);
+				ObjectPoolManager.Release(driver);
+			}
 		}
 	}
 	
@@ -38,7 +53,7 @@ public class DriversController : MonoBehaviour {
 		List<DriverTargetPoint> list = new(driverTargetPoints);
 		list.RemoveAll(item => !item.IsAvailable);
 		if (list.Count == 0) {
-			this.Wait(2f, () => NavigateDriverToRandomPoint(driver));
+			driver.Wait(2f, () => NavigateDriverToRandomPoint(driver));
 			return;
 		}
 		
@@ -47,7 +62,7 @@ public class DriversController : MonoBehaviour {
 		
 		driver.SetTargetPoint(targetPoint, () => {
 			driver.ShowBubble(targetPoint.GetBubbleText());
-			this.Wait(5f, () => {
+			driver.Wait(5f, () => {
 				driver.HideBubble();
 				NavigateDriverToRandomPoint(driver);
 				targetPoint.IsAvailable = true;
@@ -64,5 +79,46 @@ public class DriversController : MonoBehaviour {
 			driverTargetPoints[i].IsAvailable = true;
 		}
 		StopAllCoroutines();
+	}
+
+	private static DriverData[] SelectDrivers() {
+		List<DriverData> selectedDrivers = new();
+		DriverData[] drivers = PlayerPrefsManager.UserData.drivers;
+		for (int i = drivers.Length - 1; i >= 0; i--) {
+			if (drivers[i].hired && PlayerPrefsManager.UserData.TryGetParkingSlotIndex(drivers[i], out _)) {
+				selectedDrivers.Add(drivers[i]);
+			}
+		}
+		for (int i = drivers.Length - 1; i >= 0; i--) {
+			if (drivers[i].hired) {
+				selectedDrivers.Add(drivers[i]);	
+			}
+		}
+		return selectedDrivers.ToArray();
+	}
+	
+	private Transform GetMostDistantSpawnPoint() {
+		if (drivers.Count == 0) {
+			return spawnPoints.GetChild(Random.Range(0, spawnPoints.childCount));
+		}
+		Transform bestSpawnPoint = null;
+		float maxMinDistance = -1f;
+		foreach (Transform spawnPoint in spawnPoints) {
+			float minDistanceToCharacters = float.MaxValue;
+			foreach (Driver driver in drivers) {
+				if (!driver.gameObject.activeSelf) {
+					continue;
+				}
+				float dist = Vector3.Distance(spawnPoint.position, driver.transform.position);
+				if (dist < minDistanceToCharacters) {
+					minDistanceToCharacters = dist;
+				}
+			}
+			if (minDistanceToCharacters > maxMinDistance) {
+				maxMinDistance = minDistanceToCharacters;
+				bestSpawnPoint = spawnPoint;
+			}
+		}
+		return bestSpawnPoint;
 	}
 }

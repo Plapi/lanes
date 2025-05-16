@@ -14,6 +14,7 @@ public class CompanyController : MonoBehaviour {
 	private Transform cameraTransform;
 	
 	public ParkingRoom ParkingRoom => parkingRoom;
+	public DriversController DriversController => driversController;
 
 	public void Init(Transform camera, Action<Room> onRoomTap) {
 		cameraTransform = camera;
