@@ -11,7 +11,7 @@ public class ParkingRoom : Room {
 	public void Activate(Segment segment) {
 		for (int i = 0; i < parkingLots.Length; i++) {
 			parkingLots[i].Init(segment.RoadLanes[^1]);
-			if (RoomData.parkingSlots[i].taxiPurchased && RoomData.parkingSlots[i].HasDriver) {
+			if (RoomData.parkingSlots[i].taxiPurchased) {
 				parkingLots[i].SetCar();
 			}
 		}
@@ -52,32 +52,6 @@ public class ParkingRoom : Room {
 
 	public void ExitCar(int index, Action onComplete) {
 		parkingLots[index].ExitCar(onComplete);
-	}
-
-	private bool TryGetRandomParkingLot(out Parking parking) {
-		List<Parking> parkingLotsWithTaxi = new();
-		List<ParkingSlotData> parkingSlotsData = new();
-		for (int i = 0; i < RoomData.parkingSlots.Length; i++) {
-			if (RoomData.parkingSlots[i].taxiPurchased) {
-				parkingLotsWithTaxi.Add(parkingLots[i]);
-				parkingSlotsData.Add(RoomData.parkingSlots[i]);
-			}
-		}
-		parking = null;
-		int randomIndex = 0;
-		do {
-			if (parking != null) {
-				parkingLotsWithTaxi.RemoveAt(randomIndex);
-				parkingSlotsData.RemoveAt(randomIndex);
-				parking = null;
-			}
-			if (parkingLotsWithTaxi.Count == 0) {
-				break;
-			}
-			randomIndex = UnityEngine.Random.Range(0, parkingLotsWithTaxi.Count);
-			parking = parkingLotsWithTaxi[randomIndex];
-		} while (parking.HasCar() && !parkingSlotsData[randomIndex].HasDriver);
-		return parking != null;
 	}
 }
 

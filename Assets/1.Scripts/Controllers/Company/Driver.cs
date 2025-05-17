@@ -24,12 +24,14 @@ public class Driver : Element {
 	private bool destinationSet;
 
 	public bool AvailableForExit;
+	public bool AvailableForRandomPoint;
 
 	public void Init(DriverData driverData, Transform bubbleLookAt) {
 		this.bubbleLookAt = bubbleLookAt;
 		this.driverData = driverData;
 		destinationSet = false;
 		AvailableForExit = true;
+		AvailableForRandomPoint = true;
 		SetDriver();
 		bubblePivot.parent.gameObject.SetActive(false);
 		bubblePivot.DOKill();

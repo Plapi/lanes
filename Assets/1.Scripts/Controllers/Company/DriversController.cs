@@ -20,17 +20,12 @@ public class DriversController : MonoBehaviour {
 	
 	public void SpawnDrivers() {
 		DriverData[] driversData = SelectDrivers();
-		for (int i = driversData.Length - 1; i >= 0; i--) {
-			if (driversData[i].hired) {
-				TryCreateDriver(driversData[i]);
-			}
+		for (int i = 0; i < driversData.Length; i++) {
+			TryCreateDriver(driversData[i]);
 		}
 	}
 
 	private void TryCreateDriver(DriverData driverData) {
-		if (drivers.Count >= 8) {
-			return;
-		}
 		Driver driver = (Driver)ObjectPoolManager.Get(Resources.Load<Element>("Company/Driver"), transform);
 		driver.name = $"Driver{drivers.Count}";
 		driver.transform.position = GetMostDistantSpawnPoint().position;
@@ -52,7 +47,7 @@ public class DriversController : MonoBehaviour {
 	}
 	
 	private void NavigateDriverToRandomPoint(Driver driver) {
-		if (!drivers.Contains(driver)) {
+		if (!driver.AvailableForRandomPoint || !drivers.Contains(driver)) {
 			return;
 		}
 		
@@ -103,9 +98,10 @@ public class DriversController : MonoBehaviour {
 	}
 	
 	public void NavigateDriverToParkingSlot(Driver driver, int parkingSlotIndex, Action onComplete) {
-		drivers.Remove(driver);
+		driver.AvailableForRandomPoint = false;
 		driver.SetTargetPoint(taxiTargetPointsParent.GetChild(parkingSlotIndex), () => {
-			ObjectPoolManager.Release(driver);	
+			drivers.Remove(driver);
+			ObjectPoolManager.Release(driver);
 			onComplete();
 		});
 	}
@@ -130,7 +126,7 @@ public class DriversController : MonoBehaviour {
 			}
 		}
 		for (int i = drivers.Length - 1; i >= 0; i--) {
-			if (drivers[i].hired) {
+			if (!selectedDrivers.Contains(drivers[i]) && drivers[i].hired) {
 				selectedDrivers.Add(drivers[i]);	
 			}
 		}
