@@ -9,7 +9,7 @@ public class Driver : Element {
 	private static readonly int animatorSpeedId = Animator.StringToHash("Speed");
 
 	[SerializeField] private NavMeshAgent agent;
-	[SerializeField] private DriverTargetPoint targetPoint;
+	[SerializeField] private Transform targetPoint;
 	
 	[Space]
 	[SerializeField] private Transform bubblePivot;
@@ -23,10 +23,13 @@ public class Driver : Element {
 	private Transform bubbleLookAt;
 	private bool destinationSet;
 
+	public bool AvailableForExit;
+
 	public void Init(DriverData driverData, Transform bubbleLookAt) {
 		this.bubbleLookAt = bubbleLookAt;
 		this.driverData = driverData;
 		destinationSet = false;
+		AvailableForExit = true;
 		SetDriver();
 		bubblePivot.parent.gameObject.SetActive(false);
 		bubblePivot.DOKill();
@@ -45,7 +48,7 @@ public class Driver : Element {
 		HideAllCharacters(animator.transform, split[1]);
 	}
 
-	public void SetTargetPoint(DriverTargetPoint targetPoint, Action onTargetReached) {
+	public void SetTargetPoint(Transform targetPoint, Action onTargetReached) {
 		this.targetPoint = targetPoint;
 		this.onTargetReached = onTargetReached;
 		destinationSet = false;

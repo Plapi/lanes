@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -6,14 +7,15 @@ public class DriversController : MonoBehaviour {
 	
 	[SerializeField] private Transform spawnPoints;
 	[SerializeField] private List<Driver> drivers;
-	[SerializeField] private Transform targetPoints;
+	[SerializeField] private Transform defaultTargetPointsParent;
+	[SerializeField] private Transform taxiTargetPointsParent;
 	
 	private Transform cameraTransform;
-	private DriverTargetPoint[] driverTargetPoints;
+	private DriverTargetPoint[] defaultTargetPoints;
 	
 	public void Init(Transform cameraTransform) {
 		this.cameraTransform = cameraTransform;
-		driverTargetPoints = targetPoints.GetComponentsInChildren<DriverTargetPoint>();
+		defaultTargetPoints = defaultTargetPointsParent.GetComponentsInChildren<DriverTargetPoint>();
 	}
 	
 	public void SpawnDrivers() {
@@ -34,8 +36,8 @@ public class DriversController : MonoBehaviour {
 		driver.transform.position = GetMostDistantSpawnPoint().position;
 		driver.gameObject.SetActive(true);
 		driver.Init(driverData, cameraTransform);
-		NavigateDriverToRandomPoint(driver);
 		drivers.Add(driver);
+		NavigateDriverToRandomPoint(driver);
 	}
 	
 	public void OnHireFireDriver(DriverData driverData) {
@@ -50,7 +52,11 @@ public class DriversController : MonoBehaviour {
 	}
 	
 	private void NavigateDriverToRandomPoint(Driver driver) {
-		List<DriverTargetPoint> list = new(driverTargetPoints);
+		if (!drivers.Contains(driver)) {
+			return;
+		}
+		
+		List<DriverTargetPoint> list = new(defaultTargetPoints);
 		list.RemoveAll(item => !item.IsAvailable);
 		if (list.Count == 0) {
 			driver.Wait(2f, () => NavigateDriverToRandomPoint(driver));
@@ -60,13 +66,47 @@ public class DriversController : MonoBehaviour {
 		DriverTargetPoint targetPoint = list[Random.Range(0, list.Count)];
 		targetPoint.IsAvailable = false;
 		
-		driver.SetTargetPoint(targetPoint, () => {
+		driver.SetTargetPoint(targetPoint.transform, () => {
+			driver.AvailableForExit = false;
 			driver.ShowBubble(targetPoint.GetBubbleText());
 			driver.Wait(5f, () => {
 				driver.HideBubble();
 				NavigateDriverToRandomPoint(driver);
 				targetPoint.IsAvailable = true;
+				driver.AvailableForExit = true;
 			});
+		});
+	}
+	
+	public void DriverReached(DriverData driverData, int parkingSlotIndex) {
+		TryCreateDriver(driverData);
+		drivers[^1].AvailableForExit = false;
+		drivers[^1].transform.position = taxiTargetPointsParent.GetChild(parkingSlotIndex).position;
+	}
+
+	public bool TryGetDriverForExit(out Driver driver, out int parkingSlotIndex) {
+		driver = null;
+		parkingSlotIndex = -1;
+		List<(Driver, int)> list = new();
+		for (int i = 0; i < drivers.Count; i++) {
+			if (drivers[i].AvailableForExit && PlayerPrefsManager.UserData.TryGetParkingSlotIndex(drivers[i].GetDriverData(), out int index)) {
+				list.Add((drivers[i], index));
+			}
+		}
+		if (list.Count == 0) {
+			return false;
+		}
+		int randomDriverIndex = Random.Range(0, list.Count);
+		driver = list[randomDriverIndex].Item1;
+		parkingSlotIndex = list[randomDriverIndex].Item2;
+		return true;
+	}
+	
+	public void NavigateDriverToParkingSlot(Driver driver, int parkingSlotIndex, Action onComplete) {
+		drivers.Remove(driver);
+		driver.SetTargetPoint(taxiTargetPointsParent.GetChild(parkingSlotIndex), () => {
+			ObjectPoolManager.Release(driver);	
+			onComplete();
 		});
 	}
 
@@ -75,8 +115,8 @@ public class DriversController : MonoBehaviour {
 			ObjectPoolManager.Release(drivers[i]);
 		}
 		drivers.Clear();
-		for (int i = 0; i < driverTargetPoints.Length; i++) {
-			driverTargetPoints[i].IsAvailable = true;
+		for (int i = 0; i < defaultTargetPoints.Length; i++) {
+			defaultTargetPoints[i].IsAvailable = true;
 		}
 		StopAllCoroutines();
 	}

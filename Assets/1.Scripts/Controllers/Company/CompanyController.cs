@@ -39,7 +39,7 @@ public class CompanyController : MonoBehaviour {
 			onRoomTap?.Invoke(parkingRoom);
 		});
 		parkingRoom.SetRoomGraphic();
-		
+
 		driversController.Init(cameraTransform);
 		
 		Activate();
@@ -85,12 +85,38 @@ public class CompanyController : MonoBehaviour {
 		startSegment.SpawnAICars();
 		ParkingRoom.Activate(startSegment);
 		driversController.SpawnDrivers();
+		DriversLoop();
 	}
 
 	public void Deactivate() {
 		startSegment.ClearAICars();
 		ParkingRoom.Deactivate();
 		driversController.ClearDrivers();
+		StopAllCoroutines();
+	}
+	
+	private void DriversLoop() {
+		bool hasDriverForExit = driversController.TryGetDriverForExit(out Driver driver, out int parkingSlotIndex0);
+		bool hasParkingForEnter = parkingRoom.TryGetParkingForEnter(out int parkingSlotIndex1);
+		
+		if (!hasDriverForExit && !hasParkingForEnter) {
+			this.Wait(2f, DriversLoop);
+			return;
+		}
+		
+		if (!hasParkingForEnter || Utils.CoinFlip() && hasDriverForExit) {
+			driversController.NavigateDriverToParkingSlot(driver, parkingSlotIndex0, () => {
+				parkingRoom.ExitCar(parkingSlotIndex0, DriversLoop);
+			});
+		} else {
+			parkingRoom.EnterCar(parkingSlotIndex1, () => {
+				ParkingSlotData[] parkingSlots = PlayerPrefsManager.UserData.parkingRoom.parkingSlots;
+				if (parkingSlots[parkingSlotIndex1].HasDriver) {
+					driversController.DriverReached(PlayerPrefsManager.UserData.GetDriver(parkingSlots[parkingSlotIndex1].driverId), parkingSlotIndex1);
+				}
+				DriversLoop();
+			});
+		}
 	}
 	
 	public void UpdateVisibility(Action<bool> onChangeVisibility) {

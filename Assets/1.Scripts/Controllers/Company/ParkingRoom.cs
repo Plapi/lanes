@@ -11,11 +11,10 @@ public class ParkingRoom : Room {
 	public void Activate(Segment segment) {
 		for (int i = 0; i < parkingLots.Length; i++) {
 			parkingLots[i].Init(segment.RoadLanes[^1]);
-			if (RoomData.parkingSlots[i].taxiPurchased && (!RoomData.parkingSlots[i].HasDriver || Utils.CoinFlip())) {
+			if (RoomData.parkingSlots[i].taxiPurchased && RoomData.parkingSlots[i].HasDriver) {
 				parkingLots[i].SetCar();
 			}
 		}
-		// TravelCar();
 	}
 
 	public void Deactivate() {
@@ -31,17 +30,28 @@ public class ParkingRoom : Room {
 			}
 		}
 	}
+	
+	public bool TryGetParkingForEnter(out int parkingSlotIndex) {
+		parkingSlotIndex = -1;
+		List<int> eligibleParkingLots = new();
+		for (int i = 0; i < parkingLots.Length; i++) {
+			if (RoomData.parkingSlots[i].taxiPurchased && !parkingLots[i].HasCar()) {
+				eligibleParkingLots.Add(i);
+			}
+		}
+		if (eligibleParkingLots.Count == 0) {
+			return false;
+		}
+		parkingSlotIndex = eligibleParkingLots[UnityEngine.Random.Range(0, eligibleParkingLots.Count)];
+		return true;
+	}
 
-	private void TravelCar() {
-		if (!TryGetRandomParkingLot(out Parking parking)) {
-			this.Wait(2f, TravelCar);
-			return;
-		}
-		if (parking.HasCar()) {
-			parking.ExitCar(TravelCar);
-		} else {
-			parking.EnterCar(TravelCar);
-		}
+	public void EnterCar(int index, Action onComplete) {
+		parkingLots[index].EnterCar(onComplete);
+	}
+
+	public void ExitCar(int index, Action onComplete) {
+		parkingLots[index].ExitCar(onComplete);
 	}
 
 	private bool TryGetRandomParkingLot(out Parking parking) {
