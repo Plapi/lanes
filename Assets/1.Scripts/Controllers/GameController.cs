@@ -347,6 +347,7 @@ public class GameController : MonoBehaviour {
 		int coins = PlayerPrefsManager.UserData.coins;
 		mainPanel.CoinsPanel.UpdateCoins(coins, income);
 		companyController.UpdateVaultTables(coins);
+		companyController.UpdateUpgradeObjects();
 		mainPanel.UpdateBoostIncomeObjects();
 	}
 

@@ -79,6 +79,13 @@ public class CompanyController : MonoBehaviour {
 		}
 	}
 
+	public void UpdateUpgradeObjects() {
+		for (int i = 0; i < floors.Count; i++) {
+			floors[i].UpdateUpgradeObjects();
+		}
+		parkingRoom.UpdateUpgradeObject();
+	}
+
 	public void Activate() {
 		startSegment.Init(Segment.GetSegmentData(new SegmentInputData { length = 200 }));
 		startSegment.SetStartAndEndPosForRoadLanes();
@@ -137,6 +144,10 @@ public class CompanyController : MonoBehaviour {
 			}
 			HapticFeedback.VibrateHaptic(HapticFeedback.Type.Light);
 		}
+		for (int i = 0; i < floors.Count; i++) {
+			floors[i].UpdateUITextScales(cameraTransform);
+		}
+		parkingRoom.UpdateUITextScale(cameraTransform);
 	}
 
 	private void SetRoofHeight() {

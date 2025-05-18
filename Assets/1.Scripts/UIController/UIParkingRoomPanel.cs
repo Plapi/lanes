@@ -39,8 +39,7 @@ public class UIParkingRoomPanel : UIPanel<UIParkingRoomPanel.Data> {
 		} else {
 			levelSlider.value = levelUpgradeSlider.value = 1f;
 		}
-
-		taxiText.text = $"{data.roomData.GetTotalTaxiCount()}/{data.roomData.level}";
+		
 		GameController.Instance.EndOfFrame(() => {
 			HorizontalLayoutGroup horizontalLayoutGroup = taxiText.transform.parent.GetComponent<HorizontalLayoutGroup>();
 			horizontalLayoutGroup.enabled = false;
@@ -66,6 +65,8 @@ public class UIParkingRoomPanel : UIPanel<UIParkingRoomPanel.Data> {
 	}
 	
 	private void UpdateUpgradeButton() {
+		taxiText.text = $"{data.roomData.GetTotalTaxiCount()}/{data.roomData.level}";
+		
 		if (!upgradeButton.gameObject.activeSelf || data.roomData.MaxLevelReached) {
 			return;
 		}

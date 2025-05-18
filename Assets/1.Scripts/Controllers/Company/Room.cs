@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using TMPro;
 
 public class Room : MonoBehaviour {
 
@@ -8,6 +9,11 @@ public class Room : MonoBehaviour {
 	[SerializeField] private TapableObj tapable;
 	[SerializeField] private Vector3 cameraZoom;
 	[SerializeField] private GameObject upgradeParticles;
+	
+	[Space]
+	[SerializeField] private CanvasGroup canvasGroup;
+	[SerializeField] private GameObject upgradeObject;
+	[SerializeField] private TextMeshProUGUI text;
 
 	private int currentLevel = -1;
 	
@@ -56,6 +62,28 @@ public class Room : MonoBehaviour {
 	
 	public Vector3 GetCameraZoom() {
 		return cameraZoom;
+	}
+
+	public void UpdateUpgradeObject() {
+		int coins = PlayerPrefsManager.UserData.coins;
+		bool canUpgrade = !RoomData.MaxLevelReached && coins >= RoomData.UpgradeCost;
+		upgradeObject.SetActive(canUpgrade);
+	}
+
+	public void UpdateUITextScale(Transform cameraTransform) {
+		float y = cameraTransform.position.y;
+		bool active = y <= 30f;
+		if (text.transform.parent.gameObject.activeSelf != active) {
+			text.transform.parent.gameObject.SetActive(active);
+		}
+		if (active) {
+			text.fontSize = Mathf.Lerp(60f, 100f, Mathf.InverseLerp(10f, 30f, y));
+			
+			Utils.GetIntersection(cameraTransform.position, cameraTransform.position + Vector3.right * 100f,
+				text.transform.position, text.transform.position + Vector3.up * 100f, out Vector3 intersection);
+			float dist = Vector3.Distance(intersection, cameraTransform.position);
+			canvasGroup.alpha = Mathf.Lerp(0.5f, 1f, Mathf.InverseLerp(10f, 30f, dist));
+		}
 	}
 }
 
