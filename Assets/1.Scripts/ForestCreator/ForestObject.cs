@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
 
-public class Tree : MonoBehaviour {
+public class ForestObject : MonoBehaviour {
 
 	[SerializeField] private float radius;
 	[SerializeField] private bool drawGizmos = true;

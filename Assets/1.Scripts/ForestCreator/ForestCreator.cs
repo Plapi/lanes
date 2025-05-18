@@ -2,92 +2,56 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Serialization;
 
 public class ForestCreator : MonoBehaviour {
 
-	[SerializeField] private Tree[] trees;
+	[SerializeField] private ForestObject[] forestObjects;
 	[SerializeField] private Vector3 min;
 	[SerializeField] private Vector3 max;
 
-	[SerializeField] private int treesCount;
-	[SerializeField] private List<Tree> instantiatedTrees = new();
+	[SerializeField] private int forestObjectsCount;
+	[SerializeField] private List<ForestObject> instantiatedForestObjects = new();
 
 	public void CreateForest() {
 		ClearForest();
 
-		for (int i = 0; i < treesCount; i++) {
-			Tree tree = Instantiate(trees[Random.Range(0, trees.Length)], transform);
-			tree.transform.SetLocalAngleY(Random.Range(0, 360f));
-			tree.name = tree.name.Replace("(Clone)", string.Empty);
+		for (int i = 0; i < forestObjectsCount; i++) {
+			ForestObject forestObject = Instantiate(forestObjects[Random.Range(0, forestObjects.Length)], transform);
+			forestObject.transform.SetLocalAngleY(Random.Range(0, 360f));
+			forestObject.name = forestObject.name.Replace("(Clone)", string.Empty);
 
 			List<Vector3> possiblePositions = new List<Vector3>();
 
-			for (float x = min.x + tree.Radius / 2f; x <= max.x - tree.Radius / 2f; x += 0.1f) {
-				for (float z = min.z + tree.Radius / 2f; z <= max.z - tree.Radius / 2f; z += 0.1f) {
+			for (float x = min.x + forestObject.Radius / 2f; x <= max.x - forestObject.Radius / 2f; x += 0.1f) {
+				for (float z = min.z + forestObject.Radius / 2f; z <= max.z - forestObject.Radius / 2f; z += 0.1f) {
 					Vector3 position = new Vector3(x, 0f, z);
-					if (IsPossiblePosition(tree, position)) {
+					if (IsPossiblePosition(forestObject, position)) {
 						possiblePositions.Add(position);
 					}
 				}
 			}
 
 			if (possiblePositions.Count == 0) {
-				Debug.LogError($"No possible position found for {tree.name} at {i}");
-				DestroyImmediate(tree.gameObject);
+				Debug.LogError($"No possible position found for {forestObject.name} at {i}");
+				DestroyImmediate(forestObject.gameObject);
 				return;
 			}
 
-			tree.transform.localPosition = possiblePositions[Random.Range(0, possiblePositions.Count)];
-			instantiatedTrees.Add(tree);
+			forestObject.transform.localPosition = possiblePositions[Random.Range(0, possiblePositions.Count)];
+			instantiatedForestObjects.Add(forestObject);
 		}
-	}
-
-	public void CreateMeshLod() {
-		/*if (!TryGetComponent(out MeshLODCreator meshLODCreator)) {
-			meshLODCreator = gameObject.AddComponent<MeshLODCreator>();
-		}
-
-		string folderPaths = $"Assets/EnvLODS/Forests/{m_name}";
-		int fIndex = 0;
-		while (AssetDatabase.IsValidFolder($"{folderPaths}/Forest{fIndex}")) {
-			fIndex++;
-		}
-		string guid = AssetDatabase.CreateFolder(folderPaths, $"Forest{fIndex}");
-		string folderPath = AssetDatabase.GUIDToAssetPath(guid);
-
-		LODGroup lodGroup = meshLODCreator.Create()[0];
-		LOD[] lods = lodGroup.GetLODs();
-
-		for (int i = 0; i < lods.Length; i++) {
-			Renderer[] rends = lods[i].renderers;
-			for (int k = 0; k < rends.Length; k++) {
-				MeshFilter meshFilter = rends[k].GetComponent<MeshFilter>();
-				string meshPath = $"{folderPath}/mesh{i}{k}.mesh";
-				AssetDatabase.CreateAsset(meshFilter.sharedMesh, meshPath);
-				meshFilter.sharedMesh = (Mesh)AssetDatabase.LoadAssetAtPath(meshPath, typeof(Mesh));
-			}
-		}
-
-		List<(Vector3, float)> treesData = new List<(Vector3, float)>(m_instantiatedTrees.Count);
-		m_instantiatedTrees.ForEach(tree => {
-			treesData.Add((tree.transform.localPosition, tree.radius));
-		});
-		lodGroup.gameObject.AddComponent<ForestLOD>().Init(treesData);
-
-		GameObject obj = lodGroup.gameObject;
-		PrefabUtility.SaveAsPrefabAsset(lodGroup.gameObject, $"{folderPath}/Forest{fIndex}.prefab").GetComponent<LODGroup>();
-		DestroyImmediate(obj);*/
 	}
 
 	public void ClearForest() {
-		instantiatedTrees.ForEach(tree => DestroyImmediate(tree.gameObject));
-		instantiatedTrees.Clear();
+		instantiatedForestObjects.ForEach(item => DestroyImmediate(item.gameObject));
+		instantiatedForestObjects.Clear();
 	}
 
-	private bool IsPossiblePosition(Tree tree, Vector3 position) {
-		foreach (Tree instantiatedTree in instantiatedTrees) {
-			float distance = Vector3.Distance(position, instantiatedTree.transform.localPosition);
-			float minDistance = tree.Radius + instantiatedTree.Radius;
+	private bool IsPossiblePosition(ForestObject forestObject, Vector3 position) {
+		foreach (ForestObject obj in instantiatedForestObjects) {
+			float distance = Vector3.Distance(position, obj.transform.localPosition);
+			float minDistance = forestObject.Radius + obj.Radius;
 			if (distance < minDistance) {
 				return false;
 			}
@@ -110,9 +74,6 @@ public class ForestCreatorEditor : Editor {
 		base.OnInspectorGUI();
 		if (GUILayout.Button("Create Forest")) {
 			((ForestCreator)target).CreateForest();
-		}
-		if (GUILayout.Button("Create Mesh LOD")) {
-			((ForestCreator)target).CreateMeshLod();
 		}
 		if (GUILayout.Button("Clear Forest")) {
 			((ForestCreator)target).ClearForest();

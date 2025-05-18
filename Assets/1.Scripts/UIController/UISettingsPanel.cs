@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 
@@ -43,6 +44,23 @@ public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 		};
 		
 		aboutButton.onClick.AddListener(data.onAbout);
+	}
+	
+	protected override void ShowAnim(Action onComplete) {
+		gameObject.SetActive(true);
+		RectTransform contentRect = content.GetComponent<RectTransform>();
+		contentRect.SetAnchorPosY(-900f);
+		contentRect.DOAnchorPosY(-70f, UIController.defaultTime).SetEase(Ease.OutQuad).OnComplete(() => {
+			onComplete();
+		}).SetUpdate(true);
+	}
+
+	protected override void CloseAnim(bool anim, Action onComplete) {
+		RectTransform contentRect = content.GetComponent<RectTransform>();
+		contentRect.DOAnchorPosY(-900f, UIController.defaultTime).SetEase(Ease.InQuad).OnComplete(() => {
+			gameObject.SetActive(false);
+		}).SetUpdate(true);
+		onComplete();
 	}
 	
 	public new class Data: UIPanelBase.Data {
