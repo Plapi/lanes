@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class GameController : MonoBehaviour {
 
@@ -10,6 +11,10 @@ public class GameController : MonoBehaviour {
 	[SerializeField] private CompanyController companyController;
 	[SerializeField] private RideController rideController;
 	[SerializeField] private GameObject leftEnvBuildings;
+	
+	[Space]
+	[SerializeField] private TapableObj garageTapable;
+	[SerializeField] private TextMeshProUGUI garageText;
 	
 	private UIMainPanel mainPanel;
 	private UIRoomPanel roomPanel;
@@ -175,6 +180,7 @@ public class GameController : MonoBehaviour {
 			onDriveButton = OnDriveButton,
 			onSettingsButton = settingsPanel.Show 
 		});
+		garageTapable.SetOnTap(OnDriveButton);
 		
 		mainPanel.FloorPanel.Init(PlayerPrefsManager.UserData.GetFlorReached(), floor => {
 			companyController.UpdateFloorLevel(floor);
@@ -366,9 +372,26 @@ public class GameController : MonoBehaviour {
 				cameraController.SetHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
 			}
 		});
+		UpdateGarageUITextScale(cameraController.Camera.transform);
 	}
 
 	private static float GetFloorHeight(int level) {
 		return Settings.Instance.company.floorHeight * level;
+	}
+	
+	private void UpdateGarageUITextScale(Transform cameraTransform) {
+		float y = cameraTransform.position.y;
+		bool active = y <= 50f;
+		if (garageText.transform.parent.gameObject.activeSelf != active) {
+			garageText.transform.parent.gameObject.SetActive(active);
+		}
+		if (active) {
+			garageText.fontSize = Mathf.Lerp(60f, 120f, Mathf.InverseLerp(10f, 50f, y));
+			
+			Utils.GetIntersection(cameraTransform.position, cameraTransform.position + Vector3.right * 100f,
+				garageText.transform.position, garageText.transform.position + Vector3.up * 100f, out Vector3 intersection);
+			float dist = Vector3.Distance(intersection, cameraTransform.position);
+			garageText.alpha = Mathf.Lerp(0.5f, 1f, Mathf.InverseLerp(10f, 15f, dist));
+		}
 	}
 }
