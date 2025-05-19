@@ -210,6 +210,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		bool distanceBest = totalDistance > PlayerPrefsManager.UserData.distanceBest;
 		float health = userCar.GetCurrentHealth();
 		int stars = health < 0.25f ? 1 : health < 0.5f ? 2 : 3;
+		coinsEarned = selectedMission.coins;
 		Time.timeScale = 0f;
 		missionResultsPanel.Init(new UIMissionResultsPanel.Data {
 			item = selectedMission,
@@ -230,7 +231,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 				PlayerPrefsManager.UserData.distanceBest = totalDistance;
 			}
 		}
-		PlayerPrefsManager.UserData.completedMissions.Add(new CompletedMission {
+		PlayerPrefsManager.UserData.completedMissions.Insert(0, new CompletedMission {
 			person = currentPerson,
 			stars = stars
 		});
@@ -239,7 +240,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 
 	private void AddCoins(int coins) {
 		int prevCoins = PlayerPrefsManager.UserData.coins;
-		PlayerPrefsManager.UserData.IncreaseCoins(coins);
+		PlayerPrefsManager.UserData.IncreaseCoins(coins, false);
 		garagePanel.PlayCoinsAnim(prevCoins, PlayerPrefsManager.UserData.coins + coinsEarned);
 	}
 
@@ -256,8 +257,14 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			onCloseButton = () => {
 				onClose?.Invoke();
 			},
-			onLeft = () => selectCarController.UpdateSelection(-1),
-			onRight = () => selectCarController.UpdateSelection(1),
+			onLeft = () => {
+				selectCarController.UpdateSelection(-1);
+				GenerateTakeMissionsItems();
+			},
+			onRight = () => {
+				selectCarController.UpdateSelection(1);
+				GenerateTakeMissionsItems();
+			},
 			onEndless = StartDriving,
 			onTakeMission = ShowTakeMissionPanel,
 			onBuy = selectCarController.BuyCar
@@ -379,11 +386,12 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		for (int i = 0; i < Settings.Instance.personNames.Length; i++) {
 			indexes.Add(i);
 		}
-		
+
+		int coinsMultiplier = 500 * PlayerPrefsManager.UserData.floors.Length * Mathf.Max(1, selectCarController.GetCarSelection());
 		for (int i = 0; i < count; i++) {
 			int randomIndex = indexes[Random.Range(0, indexes.Count)];
 			int intersections = Random.Range(1, 8);
-			int coins = intersections * 500 * PlayerPrefsManager.UserData.floors.Length;
+			int coins = intersections * coinsMultiplier;
 			missionsList.Add(new UIMissionsList.ItemData {
 				person = new CurrentPerson {
 					group = randomIndex <= 8 ? 0 : 1,
@@ -478,8 +486,12 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			
 			garagePanel.Show();
 			if (coinsEarned > 0) {
-				UIController.Instance.ActivateTouchBlocker(1f);
+				GameController.Instance.PauseUpdateCoins = true;
+				UIController.Instance.ActivateTouchBlocker(2f);
 				this.WaitForFrames(1, () => AddCoins(coinsEarned));
+				this.Wait(2f, () => {
+					GameController.Instance.PauseUpdateCoins = false;
+				});
 			}
 			UIController.Instance.FadeOutFromBlack();
 			Time.timeScale = 1f;

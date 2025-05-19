@@ -70,6 +70,10 @@ public class SelectCarController : MonoBehaviour {
 		UpdateSelection(0);
 	}
 
+	public int GetCarSelection() {
+		return selection;
+	}
+
 	public void UpdateSelection(int add) {
 		templatesUserCar[selection].gameObject.SetActive(false);
 		templatesUserCar[selection].transform.SetPositionAndRotation(userCars[selection].transform.position, userCars[selection].transform.rotation);

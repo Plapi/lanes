@@ -320,12 +320,16 @@ public class GameController : MonoBehaviour {
 
 			PlayerPrefsManager.UserData.lastCollectTime = new SerializedDateTime(DateTime.Now);
 			PlayerPrefsManager.SaveUserData();
-
+			
 			while (now < endTime) {
 				yield return null;
 				yield return new WaitUntil(() => mainPanel.CoinsPanel.gameObject.activeSelf && mainPanel.CoinsPanel.gameObject.activeInHierarchy);
 				now = DateTime.Now;
 				mainPanel.CoinsPanel.UpdateProgress(Mathf.Min(1f, (float)(now - startTime).TotalSeconds / Settings.Instance.company.incomeTurnDuration));
+			}
+
+			while (PauseUpdateCoins) {
+				yield return null;
 			}
 			
 			if (PlayerPrefsManager.UserData.TryGetTotalIncomeFromLastCollect(out income, out int seconds)) {
@@ -343,7 +347,11 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	public bool PauseUpdateCoins;
 	private void UpdateCoins(int income) {
+		if (PauseUpdateCoins) {
+			return;
+		}
 		int coins = PlayerPrefsManager.UserData.coins;
 		mainPanel.CoinsPanel.UpdateCoins(coins, income);
 		companyController.UpdateVaultTables(coins);
