@@ -207,7 +207,7 @@ public class UITopPanelEditor : Editor {
 		
 		GUILayout.Space(10f);
 		if (GUILayout.Button("Show Persons")) {
-			rideTopPanel.ShowPerson(Random.Range(1, 6), Settings.Instance.personSprites[0]);
+			// rideTopPanel.ShowPerson(Random.Range(1, 6), Settings.Instance.personSprites[0]);
 		}
 		if (GUILayout.Button("Hide Persons Success")) {
 			rideTopPanel.HidePerson(Random.Range(50, 500));

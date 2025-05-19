@@ -23,7 +23,7 @@ public class UINavigationItem : UIObject {
 			GenerateDir dir = (GenerateDir)data.index;
 			arrowDirImage.sprite = dir == GenerateDir.Forward ? forwardArrowSprite : dir == GenerateDir.Left ? leftArrowSprite : rightArrowSprite;
 		} else {
-			personImage.sprite = Settings.Instance.personSprites[data.index];
+			personImage.sprite = RideController.GetPersonSprite(((PersonData)data).group, data.index);
 			PersonData personData = (PersonData)data;
 			UpdateCurrentPersonState(personData.state);
 		}
@@ -50,6 +50,7 @@ public class UINavigationItem : UIObject {
 	
 	public class PersonData : Data {
 		
+		public int group;
 		public State state;
 		
 		public enum State {

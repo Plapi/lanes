@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using DG.Tweening;
 using TMPro;
-using UnityEngine.PlayerLoop;
 using Random = UnityEngine.Random;
 
 #if UNITY_EDITOR
@@ -112,9 +111,9 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         onComplete();
     }
 
-    private static void UpdatePersons(List<int> persons, Transform container) {
+    private static void UpdatePersons(List<RideController.CurrentPerson> persons, Transform container) {
 
-        List<int> distinctPersons = new();
+        List<RideController.CurrentPerson> distinctPersons = new();
         List<int> personCounts = new();
         for (int i = 0; i < persons.Count; i++) {
             int index = distinctPersons.FindIndex(p => p == persons[i]);
@@ -134,7 +133,7 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
             container.GetChild(i).gameObject.SetActive(i < distinctPersons.Count);
         }
         for (int i = 0; i < distinctPersons.Count; i++) {
-            container.GetChild(i).GetComponent<Image>().sprite = Settings.Instance.personSprites[distinctPersons[i]];
+            container.GetChild(i).GetComponent<Image>().sprite = distinctPersons[i].GetSprite();
             TextMeshProUGUI text = container.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
             text.gameObject.SetActive(personCounts[i] > 1);
             if (personCounts[i] > 1) {
@@ -145,7 +144,7 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
 
     public new class Data: UIPanelBase.Data {
         public int distance;
-        public List<int> persons;
+        public List<RideController.CurrentPerson> persons;
         public int coins;
         public bool distanceBest;
         public bool personBest;
@@ -166,7 +165,7 @@ public class UIResultsPanelEditor : Editor {
         if (GUILayout.Button("Show With Coins")) {
             resultsPanel.Init(new UIResultsPanel.Data {
                 distance = Random.Range(1000, 10000),
-                persons = new List<int> { 2, 0, 5, 5, 2},
+                // persons = new List<int> { 2, 0, 5, 5, 2},
                 coins = Random.Range(200, 2000),
                 distanceBest = true,
                 personBest = true
@@ -176,7 +175,7 @@ public class UIResultsPanelEditor : Editor {
         if (GUILayout.Button("Show Without Coins")) {
             resultsPanel.Init(new UIResultsPanel.Data {
                 distance = Random.Range(100, 1000),
-                persons = new List<int>(),
+                // persons = new List<int>(),
                 coins = 0,
                 distanceBest = false,
                 personBest = false

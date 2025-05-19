@@ -10,7 +10,7 @@ public class Settings : ScriptableObjectSingleton<Settings> {
 	public AICar[] aiCarPrefabs;
 	
 	[Space]
-	public Sprite[] personSprites;
+	public string[] personNames;
 
 	[Space]
 	public CompanyData company;

@@ -23,16 +23,35 @@ MonoBehaviour:
   - {fileID: 6611868935804653055, guid: 0f990babbd3fc40bab4046ef52321dfd, type: 3}
   - {fileID: 8765369849170367193, guid: b0000e638d78e468095e3558909178fa, type: 3}
   - {fileID: 7220623832387453876, guid: cbb5fe180cee24cc39f45a974a5ad724, type: 3}
-  personSprites:
-  - {fileID: 21300000, guid: 6f330aed76ba2470c8ad8c015742cb30, type: 3}
-  - {fileID: 21300000, guid: 56824dfd7b9f24306b0e0a25cac8cdfe, type: 3}
-  - {fileID: 21300000, guid: 8c731864fcf12473bb27e29897a9af14, type: 3}
-  - {fileID: 21300000, guid: 461a5954728034489ad7037fedc3c89d, type: 3}
-  - {fileID: 21300000, guid: 31082dd9ff00c486585a7c84ef3ab5a1, type: 3}
-  - {fileID: 21300000, guid: b27a39147892c4fa784774077cb7f89f, type: 3}
-  - {fileID: 21300000, guid: 47dbfa009a2794dfeaa4388a2f0cb980, type: 3}
-  - {fileID: 21300000, guid: 95a7560fae6624681a7669bb5e21ba77, type: 3}
-  - {fileID: 21300000, guid: 924b1f22941f248e3aeb1cf8b67527df, type: 3}
+  personNames:
+  - Victor
+  - Edward
+  - Clara
+  - Sophie
+  - Maya
+  - Iris
+  - Liam
+  - Jake
+  - Logan
+  - Axel
+  - Chad
+  - Blake
+  - Lexi
+  - Rico
+  - Ethel
+  - George
+  - Zoe
+  - Finn
+  - Dusty
+  - Frankie
+  - Troy
+  - Nina
+  - Roxy
+  - Zane
+  - Buck
+  - Morris
+  - Luna
+  - Barry
   company:
     incomeTurnDuration: 10
     maxFloors: 8

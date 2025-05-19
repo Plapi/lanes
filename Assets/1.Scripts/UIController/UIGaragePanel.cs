@@ -26,7 +26,8 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 	[SerializeField] private UIChangeColor changeColor;
 	
 	[Space]
-	[SerializeField] private Button goButton;
+	[SerializeField] private Button endlessButton;
+	[SerializeField] private Button takeMissionButton;
 	[SerializeField] private Button buyButton;
 	[SerializeField] private TextMeshProUGUI buyPriceText;
 	
@@ -39,7 +40,8 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 		closeButton.onClick.AddListener(data.onCloseButton);
 		leftButton.onClick.AddListener(data.onLeft);
 		rightButton.onClick.AddListener(data.onRight);
-		goButton.onClick.AddListener(data.onGo);
+		endlessButton.onClick.AddListener(data.onEndless);
+		takeMissionButton.onClick.AddListener(data.onTakeMission);
 		buyButton.onClick.AddListener(data.onBuy);
 	}
 
@@ -67,7 +69,8 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 
 	public void UpdateBottom(int price) {
 		bool showBuy = price > 0;
-		goButton.gameObject.SetActive(!showBuy);
+		endlessButton.gameObject.SetActive(!showBuy);
+		takeMissionButton.gameObject.SetActive(!showBuy);
 		buyButton.gameObject.SetActive(showBuy);
 		lockObj.SetActive(showBuy);
 		if (showBuy) {
@@ -125,7 +128,8 @@ public class UIGaragePanel : UIPanel<UIGaragePanel.Data> {
 		public UnityAction onCloseButton;
 		public UnityAction onLeft;
 		public UnityAction onRight;
-		public UnityAction onGo;
+		public UnityAction onEndless;
+		public UnityAction onTakeMission;
 		public UnityAction onBuy;
 	}
 }

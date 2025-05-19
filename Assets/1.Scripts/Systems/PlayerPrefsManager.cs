@@ -52,6 +52,7 @@ public class UserData {
 	public int personsBest = -1;
 	public float[] volumes = { 1f, 0.3f, 0.4f };
 	public bool hapticFeedback = true;
+	public List<CompletedMission> completedMissions = new();
 	
 	public WatchAdBoostIncome watchAdBoostIncome;
 	public SerializedDateTime lastCollectTime;

@@ -100,6 +100,10 @@ public class UserCar : Car {
 		}
 	}
 
+	public float GetCurrentHealth() {
+		return currentHealth;
+	}
+
 	private void SetTargetPos(float horizontalInput) {
 		if (currentSegment == null) {
 			targetPos.x = Mathf.Lerp(transform.position.x - 4f, transform.position.x + 4f, horizontalInput);

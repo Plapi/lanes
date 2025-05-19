@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -30,20 +31,32 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 	private UIGaragePanel garagePanel;
 	private UIPausePanel pausePanel;
 	private UIResultsPanel resultsPanel;
+	private UIMissionResultsPanel missionResultsPanel;
+	private UITakeMissionPanel takeMissionPanel;
 	
 	private PosAndRot initCameraPosAndRot;
 	private PosAndRot initUserCarPosAndRot;
 
 	private int totalDistance;
 	private int personPickupSegments;
-	private readonly List<int> personsDropped = new();
+	private readonly List<CurrentPerson> personsDropped = new();
 	private int coinsEarned;
 
 	private readonly List<GenerateDir> generatedDirs = new();
 	private int currentGeneratedDirsIndex;
 
-	private int currentPersonIndex = -1;
+	private CurrentPerson currentPerson;
+	
+	private List<UIMissionsList.ItemData> missionsList;
+	private UIMissionsList.ItemData selectedMission;
 
+	private List<int> personPickupSegmentsList;
+
+	protected override void Awake() {
+		base.Awake();
+		personPickupSegmentsList = new List<int> { 1, Random.Range(1, 3), Random.Range(2, 4) };
+	}
+	
 	public void Init(Action onClose) {
 		initCameraPosAndRot = new PosAndRot(camera.transform); 
 		if (personsEnabled) { 
@@ -61,6 +74,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		garagePanel.Show();
 		trackGenerator.Init(GenerateDir.Forward);
 		rotateObjController.enabled = true;
+		GenerateTakeMissionsItems();
 	}
 
 	public void Deactivate() {
@@ -71,7 +85,6 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 
 	private void InitPersonPickupController() {
 		int startDistance = 0;
-		List<int> personPickupSegmentsList = new() { 1, Random.Range(1, 3), Random.Range(2, 4) };
 		personPickupController.OnPickup = () => {
 			if (personPickupSegmentsList.Count > 0) {
 				personPickupSegments = personPickupSegmentsList[0];
@@ -79,7 +92,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			} else {
 				personPickupSegments = Random.Range(1, 6);	
 			}
-			rideTopPanel.ShowPerson(personPickupSegments, Settings.Instance.personSprites[currentPersonIndex]);
+			rideTopPanel.ShowPerson(personPickupSegments, currentPerson.GetSprite());
 			startDistance = totalDistance;
 			
 			rideTopPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Checkmark);
@@ -87,28 +100,51 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 				rideTopPanel.Navigation.NextItem(new UINavigationItem.DirData { index = (int)GetNextGeneratedDir() });
 			} else {
 				rideTopPanel.Navigation.NextItem(new UINavigationItem.PersonData {
-					index = currentPersonIndex,
+					group = currentPerson.group,
+					index = currentPerson.index,
 					state = UINavigationItem.PersonData.State.DropOff
 				});
 			}
 		};
 		personPickupController.OnNotPickup = () => {
 			rideTopPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Missed);
-			GenerateNewPerson();
+			if (selectedMission != null) {
+				rideTopPanel.Navigation.NextItem(new UINavigationItem.PersonData {
+					group = currentPerson.group,
+					index = currentPerson.index,
+				});
+			} else {
+				GenerateNewPerson();
+			}
 		};
 		personPickupController.OnDrop = () => {
-			personsDropped.Add(currentPersonIndex);
+			personsDropped.Add(currentPerson);
 			float distance = totalDistance - startDistance + Vector3.Distance(trackGenerator.GetNextSegment(generatedDirs[0]).transform.position, userCar.transform.position);
 			int coins = Mathf.RoundToInt(userCar.CoinsMultiplier * Mathf.Lerp(50, 500, Mathf.InverseLerp(100f, 2500f, distance)));
 			rideTopPanel.HidePerson(coins);
 			coinsEarned += coins;
 			rideTopPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Checkmark);
-			GenerateNewPerson();
+			if (selectedMission != null) {
+				userCar.SetSoundEnabled(false);
+				ShowMissionResultsPanel();
+			} else {
+				GenerateNewPerson();
+			}
 		};
 		personPickupController.OnDropMissed = () => {
-			rideTopPanel.HidePerson(-1);
-			rideTopPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Missed);
-			GenerateNewPerson();
+			if (selectedMission != null) {
+				rideTopPanel.HideDistance();
+				rideTopPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Missed);
+				rideTopPanel.Navigation.NextItem(new UINavigationItem.PersonData {
+					group = currentPerson.group,
+					index = currentPerson.index,
+					state = UINavigationItem.PersonData.State.DropOff
+				});
+			} else {
+				rideTopPanel.HidePerson(-1);
+				rideTopPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Missed);
+				GenerateNewPerson();
+			}
 		};
 		personPickupController.OnUpdateDistance = distance => {
 			rideTopPanel.ShowDistance(distance);
@@ -117,7 +153,10 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 
 	private void GenerateNewPerson() {
 		SetRandomCurrentPersonIndex();
-		rideTopPanel.Navigation.NextItem(new UINavigationItem.PersonData { index = currentPersonIndex });
+		rideTopPanel.Navigation.NextItem(new UINavigationItem.PersonData {
+			group = currentPerson.group,
+			index = currentPerson.index,
+		});
 	}
 
 	private IEnumerator OnUserCarEnd() {
@@ -167,6 +206,37 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		AnalyticsSystem.RecordRaceEndEvent(PlayerPrefsManager.UserData.carSelection, totalDistance, personsDropped.Count, coinsEarned);
 	}
 
+	private void ShowMissionResultsPanel() {
+		bool distanceBest = totalDistance > PlayerPrefsManager.UserData.distanceBest;
+		float health = userCar.GetCurrentHealth();
+		int stars = health < 0.25f ? 1 : health < 0.5f ? 2 : 3;
+		Time.timeScale = 0f;
+		missionResultsPanel.Init(new UIMissionResultsPanel.Data {
+			item = selectedMission,
+			stars = stars,
+			distance = totalDistance,
+			distanceBest = distanceBest,
+			onAdCollect = () => {
+				AdsController.Instance.ShowAd(success => {
+					coinsEarned = success ? coinsEarned * 2 : coinsEarned;
+					Restart();
+				});
+			},
+			onCollect = Restart
+		});
+		missionResultsPanel.Show();
+		if (distanceBest) {
+			if (distanceBest) {
+				PlayerPrefsManager.UserData.distanceBest = totalDistance;
+			}
+		}
+		PlayerPrefsManager.UserData.completedMissions.Add(new CompletedMission {
+			person = currentPerson,
+			stars = stars
+		});
+		PlayerPrefs.Save();
+	}
+
 	private void AddCoins(int coins) {
 		int prevCoins = PlayerPrefsManager.UserData.coins;
 		PlayerPrefsManager.UserData.IncreaseCoins(coins);
@@ -178,6 +248,8 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		garagePanel = UIController.Instance.GetPanel<UIGaragePanel>();
 		pausePanel = UIController.Instance.GetPanel<UIPausePanel>();
 		resultsPanel = UIController.Instance.GetPanel<UIResultsPanel>();
+		missionResultsPanel = UIController.Instance.GetPanel<UIMissionResultsPanel>();
+		takeMissionPanel = UIController.Instance.GetPanel<UITakeMissionPanel>();
 		
 		garagePanel.gameObject.SetActive(true);
 		garagePanel.Init(new UIGaragePanel.Data {
@@ -186,7 +258,8 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			},
 			onLeft = () => selectCarController.UpdateSelection(-1),
 			onRight = () => selectCarController.UpdateSelection(1),
-			onGo = Go,
+			onEndless = StartDriving,
+			onTakeMission = ShowTakeMissionPanel,
 			onBuy = selectCarController.BuyCar
 		});
 		garagePanel.gameObject.SetActive(false);
@@ -220,7 +293,21 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		});
 	}
 
-	private void Go() {
+	private void SetUserCarOnHealthUpdate() {
+		userCar.OnHealthUpdate = healthProgress => {
+			if (!canControlUserCar) {
+				return;
+			}
+			AudioSystem.Play(onLoseHealthClips[Random.Range(0, onLoseHealthClips.Length)]);
+			HapticFeedback.VibrateHaptic(HapticFeedback.Type.Medium);
+			rideTopPanel.UpdateHealthSlider(healthProgress);
+			if (selectedMission == null && healthProgress < Mathf.Epsilon) {
+				StartCoroutine(OnUserCarEnd());	
+			}
+		};
+	}
+
+	private void StartDriving() {
 		garagePanel.Close();
 
 		userCar = selectCarController.GetUserCarAndGo();
@@ -241,7 +328,8 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			
 			if (personsEnabled && personPickupController.State == PickupState.Pickup && personPickupSegments == 2) {
 				rideTopPanel.Navigation.NextItem(new UINavigationItem.PersonData {
-					index = currentPersonIndex,
+					group = currentPerson.group,
+					index = currentPerson.index,
 					state = UINavigationItem.PersonData.State.DropOff
 				});
 			} else {
@@ -250,7 +338,11 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			
 			if (personsEnabled) {
 				if (personPickupController.State == PickupState.None) {
-					SetPickUp(trackGenerator.GetNextSegment(generatedDirs[0]));
+					if (selectedMission != null) {
+						SetDropOff(trackGenerator.GetNextSegment(generatedDirs[0]));
+					} else {
+						SetPickUp(trackGenerator.GetNextSegment(generatedDirs[0]));	
+					}
 				} else if (personPickupController.State == PickupState.Pickup) {
 					personPickupSegments--;
 					if (personPickupSegments == 0) {
@@ -259,17 +351,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 				}
 			}
 		};
-		userCar.OnHealthUpdate = healthProgress => {
-			if (!canControlUserCar) {
-				return;
-			}
-			AudioSystem.Play(onLoseHealthClips[Random.Range(0, onLoseHealthClips.Length)]);
-			HapticFeedback.VibrateHaptic(HapticFeedback.Type.Medium);
-			rideTopPanel.UpdateHealthSlider(healthProgress);
-			if (healthProgress < Mathf.Epsilon) {
-				StartCoroutine(OnUserCarEnd());	
-			}
-		};
+		SetUserCarOnHealthUpdate();
 		
 		personsDropped.Clear();
 		coinsEarned = 0;
@@ -279,6 +361,49 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		});
 		
 		trackGenerator.SpawnAICars();
+	}
+
+	private void StartMission(UIMissionsList.ItemData missionItem) {
+		currentPerson = missionItem.person;
+		selectedMission = missionItem;
+		personPickupSegmentsList.Insert(0, missionItem.intersections);
+		takeMissionPanel.Close();
+		StartDriving();
+	}
+
+	private void GenerateTakeMissionsItems() {
+		missionsList = new List<UIMissionsList.ItemData>();
+		
+		int count = Random.Range(5, 7);
+		List<int> indexes = new();
+		for (int i = 0; i < Settings.Instance.personNames.Length; i++) {
+			indexes.Add(i);
+		}
+		
+		for (int i = 0; i < count; i++) {
+			int randomIndex = indexes[Random.Range(0, indexes.Count)];
+			int intersections = Random.Range(1, 8);
+			int coins = intersections * 500 * PlayerPrefsManager.UserData.floors.Length;
+			missionsList.Add(new UIMissionsList.ItemData {
+				person = new CurrentPerson {
+					group = randomIndex <= 8 ? 0 : 1,
+					index = randomIndex <= 8 ? randomIndex : randomIndex - 9
+				},
+				intersections = intersections,
+				coins = coins,
+				onSelect = StartMission
+			});
+			indexes.Remove(randomIndex);
+		}
+
+		missionsList = missionsList.OrderBy(item => item.coins).ToList();
+	}
+	
+	private void ShowTakeMissionPanel() {
+		takeMissionPanel.Show();
+		takeMissionPanel.Init(new UITakeMissionPanel.Data {
+			itemsData = missionsList
+		});
 	}
 
 	private void InitUserCar(Action onCanControlCar) {
@@ -300,10 +425,15 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		currentGeneratedDirsIndex = personsEnabled ? 0 : 1;
 		SetNextGenerateDir();
 		if (personsEnabled) {
-			SetRandomCurrentPersonIndex();
+			if (selectedMission == null) {
+				SetRandomCurrentPersonIndex();	
+			}
 			SetPickUp(trackGenerator.GetNextSegment(generatedDirs[0]));
 			rideTopPanel.Navigation.Init(new UINavigationItem.DirData { index = (int)generatedDirs[0] },
-				new UINavigationItem.PersonData { index = currentPersonIndex });
+				new UINavigationItem.PersonData {
+					group = currentPerson.group,
+					index = currentPerson.index
+				});
 		} else {
 			rideTopPanel.Navigation.Init(new UINavigationItem.DirData { index = (int)generatedDirs[0] },
 				new UINavigationItem.DirData { index = (int)generatedDirs[1] });
@@ -319,6 +449,9 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			rideTopPanel.Close(false);
 			if (resultsPanel.gameObject.activeSelf) {
 				resultsPanel.Close(false);	
+			}
+			if (missionResultsPanel.gameObject.activeSelf) {
+				missionResultsPanel.Close(false);
 			}
 			rideTopPanel.ResetItems();
 			
@@ -339,7 +472,10 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			skyline.transform.position = Vector3.zero;
 			
 			selectCarController.ReInit();
-					
+
+			selectedMission = null;
+			GenerateTakeMissionsItems();
+			
 			garagePanel.Show();
 			if (coinsEarned > 0) {
 				UIController.Instance.ActivateTouchBlocker(1f);
@@ -363,17 +499,23 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 	}
 
 	private void SetRandomCurrentPersonIndex() {
-		List<Sprite> list = new(Settings.Instance.personSprites);
-		if (currentPersonIndex != -1) {
-			list.RemoveAt(currentPersonIndex);
+		if (Utils.CoinFlip()) {
+			currentPerson = new CurrentPerson {
+				group = 0,
+				index = Random.Range(0, 9)
+			};
+		} else {
+			currentPerson = new CurrentPerson {
+				group = 1,
+				index = Random.Range(0, 19)
+			};
 		}
-		currentPersonIndex = Random.Range(0, list.Count);
 	}
 
 	private void SetPickUp(Segment nextSegment) {
 		Vector3 pos = nextSegment.transform.position + nextSegment.transform.forward * nextSegment.Length / 2f +
 		              nextSegment.transform.right * (nextSegment.Width - 3.5f); 
-		personPickupController.SetPickUp(pos, nextSegment.transform, userCar, currentPersonIndex);
+		personPickupController.SetPickUp(pos, nextSegment.transform, userCar, currentPerson.group, currentPerson.index);
 	}
 
 	private void SetDropOff(Segment nextSegment) {
@@ -388,4 +530,24 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			skyline.transform.position = userCar.transform.position;
 		}
 	}
+	
+	public static Sprite GetPersonSprite(int group, int index) {
+		return Resources.Load<Sprite>($"Persons/{group}/Person{index}");
+	}
+	
+	[Serializable]
+	public class CurrentPerson {
+		public int group;
+		public int index;
+		
+		public Sprite GetSprite() {
+			return GetPersonSprite(group, index);
+		}
+	}
+}
+
+[Serializable]
+public class CompletedMission {
+	public RideController.CurrentPerson person;
+	public int stars;
 }

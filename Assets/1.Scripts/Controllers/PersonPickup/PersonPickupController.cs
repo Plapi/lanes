@@ -16,8 +16,8 @@ public class PersonPickupController : MonoBehaviour {
 	public Action OnDropMissed;
 	public Action<int> OnUpdateDistance;
 	
-	public void SetPickUp(Vector3 pos, Transform segment, UserCar userCar, int personIndex) {
-		person.SetWaving(personIndex);
+	public void SetPickUp(Vector3 pos, Transform segment, UserCar userCar, int group, int personIndex) {
+		person.SetWaving(group, personIndex);
 		person.transform.position = pos;
 		startPin.transform.position = pos - segment.transform.right * 3.5f;
 		startPin.transform.forward = segment.transform.forward;
@@ -31,6 +31,7 @@ public class PersonPickupController : MonoBehaviour {
 		endPin.transform.position = pos - segment.transform.right * 3.5f;
 		endPin.transform.forward = segment.transform.forward;
 		endPin.gameObject.SetActive(true);
+		State = PickupState.Pickup;
 	}
 
 	private void Update() {
