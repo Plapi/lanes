@@ -234,6 +234,6 @@ MonoBehaviour:
   - id: com.plapamaru.quicklanedriver.gold4
     value: 10000000
     productType: 0
-  testMode: 1
-  enableAdds: 0
-  enableAnalytics: 0
+  testMode: 0
+  enableAdds: 1
+  enableAnalytics: 1

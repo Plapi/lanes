@@ -18,6 +18,8 @@ public class AdsController : MonoBehaviourSingleton<AdsController>, IUnityAdsIni
 	private Action onCompleteInit;
 	private Action<bool> onCompleteShowAd;
 
+	private string analyticsSource;
+
 	public bool WasInitSuccessful { get; private set; }
 
 	protected override void Awake() {
@@ -61,13 +63,16 @@ public class AdsController : MonoBehaviourSingleton<AdsController>, IUnityAdsIni
 		return status == Status.AdLoaded;
 	}
 	
-	public void ShowAd(Action<bool> onComplete) {
+	public void ShowAd(Action<bool> onComplete, string source) {
+		AnalyticsSystem.RecordWatchAdStartEvent(source);
 		if (Application.isEditor) {
+			AnalyticsSystem.RecordWatchAdCompleteEvent(source);
 			onComplete?.Invoke(true);
 			return;
 		}
 		if (CanShowAd()) {
 			onCompleteShowAd = onComplete;
+			analyticsSource = source;
 			Advertisement.Show(addUnitId, this);
 		} else {
 			onComplete?.Invoke(false);
@@ -98,6 +103,7 @@ public class AdsController : MonoBehaviourSingleton<AdsController>, IUnityAdsIni
 		onCompleteShowAd?.Invoke(showCompletionState == UnityAdsShowCompletionState.COMPLETED);
 		onCompleteShowAd = null;
 		status = Status.InitializedSuccess;
+		AnalyticsSystem.RecordWatchAdCompleteEvent(analyticsSource);
 		this.Wait(1f, LoadAd);
 	}
 	

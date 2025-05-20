@@ -195,7 +195,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 				AdsController.Instance.ShowAd(success => {
 					coinsEarned = success ? coinsEarned * 2 : coinsEarned;
 					Restart();
-				});
+				}, "drive_endless");
 			},
 			onCollect = Restart
 		});
@@ -209,7 +209,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			}
 			PlayerPrefs.Save();
 		}
-		AnalyticsSystem.RecordRaceEndEvent(PlayerPrefsManager.UserData.carSelection, totalDistance, personsDropped.Count, coinsEarned);
+		AnalyticsSystem.RecordDriveEndlessStartEvent(PlayerPrefsManager.UserData.carSelection);
 	}
 
 	private void ShowMissionResultsPanel() {
@@ -227,7 +227,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 				AdsController.Instance.ShowAd(success => {
 					coinsEarned = success ? coinsEarned * 2 : coinsEarned;
 					Restart();
-				});
+				}, "drive_mission");
 			},
 			onCollect = Restart
 		});

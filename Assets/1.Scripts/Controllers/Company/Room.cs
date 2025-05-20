@@ -139,4 +139,13 @@ public class ParkingRoomData : RoomData {
 		}
 		return count;
 	}
+
+	public int GetParkingSlotIndex(ParkingSlotData parkingSlot) {
+		for (int i = 0; i < parkingSlots.Length; i++) {
+			if (parkingSlots[i] == parkingSlot) {
+				return i;
+			}
+		}
+		return -1;
+	}
 }

@@ -133,7 +133,7 @@ public class SelectCarController : MonoBehaviour {
 		userCars[selection].gameObject.SetActive(true);
 		rotateObjController.enabled = false;
 		
-		AnalyticsSystem.RecordRaceStartEvent(selection);
+		AnalyticsSystem.RecordDriveEndlessStartEvent(selection);
 		
 		return userCars[selection];
 	}

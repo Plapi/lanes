@@ -11,6 +11,7 @@ public class InAppPurchasingController : MonoBehaviourSingleton<InAppPurchasingC
 	private State state;
 	private Action<ProductCollection> onInitComplete;
 	private Action<bool> onPurchaseComplete;
+	private InAppPurchaseProduct startedProduct;
 
 	private async void Start() {
 		try {
@@ -54,11 +55,14 @@ public class InAppPurchasingController : MonoBehaviourSingleton<InAppPurchasingC
 	public void Purchase(InAppPurchaseProduct product, Action<bool> onComplete) {
 		onPurchaseComplete = onComplete;
 		storeController.InitiatePurchase(product.id);
+		AnalyticsSystem.RecordBuyProductStartEvent(product.id, product.value.ToString());
+		startedProduct = product;
 	}
 
 	public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs purchaseEvent) {
 		onPurchaseComplete?.Invoke(true);
 		onPurchaseComplete = null;
+		AnalyticsSystem.RecordBuyProductCompleteEvent(startedProduct.id, startedProduct.value.ToString());
 		return PurchaseProcessingResult.Complete;
 	}
 

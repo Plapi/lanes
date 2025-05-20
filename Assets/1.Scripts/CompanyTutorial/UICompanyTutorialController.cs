@@ -27,6 +27,8 @@ public class UICompanyTutorialController : UIObject {
 		}
 		gameObject.SetActive(true);
 		tutorialCharacter.SetActive(true);
+		
+		AnalyticsSystem.RecordCompanyTutorialEvent(0);
 	}
 
 	private void ShowNextSpeechBubble() {
@@ -48,6 +50,7 @@ public class UICompanyTutorialController : UIObject {
 			});	
 			return;
 		}
+		AnalyticsSystem.RecordCompanyTutorialEvent(tutorialIndex);
 		
 		step = tutorialSteps[tutorialIndex];
 		

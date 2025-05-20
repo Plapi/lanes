@@ -146,6 +146,7 @@ public class GameController : MonoBehaviour {
 		UpdateCoins(income);
 		mainPanel.CoinsPanel.PlayConsumeCoinsAnim();
 		OnCoinsUpdate?.Invoke();
+		AnalyticsSystem.RecordRoomUpgradeEvent(room.RoomData.Design.name, room.RoomData.level);
 	}
 
 	private void BuyTaxi(ParkingSlotData parkingSlotData) {
@@ -155,6 +156,7 @@ public class GameController : MonoBehaviour {
 		PlayerPrefsManager.SaveUserData();
 		companyController.ParkingRoom.SetCar(parkingSlotData);
 		OnCoinsUpdate?.Invoke();
+		AnalyticsSystem.RecordBuyTaxiEvent(PlayerPrefsManager.UserData.parkingRoom.GetParkingSlotIndex(parkingSlotData));
 	}
 	
 	private void OnAssignDriver(ParkingSlotData parkingSlotData) {
@@ -172,6 +174,7 @@ public class GameController : MonoBehaviour {
 		PlayerPrefsManager.SaveUserData();
 		PlayerPrefsManager.UserData.TryGetCoinsIncome(out int income);
 		UpdateCoins(income);
+		AnalyticsSystem.RecordAssignDriverEvent(driver.design.id, PlayerPrefsManager.UserData.parkingRoom.GetParkingSlotIndex(parkingSlotData));
 	}
 
 	private void HireFireDriver(DriverData driver) {
@@ -180,11 +183,13 @@ public class GameController : MonoBehaviour {
 		mainPanel.CoinsPanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
 		if (driver.hired) {
 			mainPanel.CoinsPanel.PlayConsumeCoinsAnim();
+			AnalyticsSystem.RecordHireDriverEvent(driver.design.id);
 		} else {
 			mainPanel.CoinsPanel.PlayReceiveCoinsAnim();
 			if (PlayerPrefsManager.UserData.TryGetParkingSlotIndex(driver, out int index)) {
 				PlayerPrefsManager.UserData.parkingRoom.parkingSlots[index].driverId = null;
 			}
+			AnalyticsSystem.RecordFireDriverEvent(driver.design.id);
 		}
 		PlayerPrefsManager.SaveUserData();
 		OnCoinsUpdate?.Invoke();
@@ -291,6 +296,7 @@ public class GameController : MonoBehaviour {
 		if (PlayerPrefsManager.UserData.removeAdsPurchased) {
 			UpgradeFloorComplete();
 		}
+		AnalyticsSystem.RecordUpgradeFloorStartEvent(PlayerPrefsManager.UserData.floors.Length);
 	}
 
 	private void UpgradeFloorComplete() {
@@ -298,6 +304,7 @@ public class GameController : MonoBehaviour {
 		companyController.UpgradeFloor(OnRoomTap);
 		companyController.UpdateVaultTables(PlayerPrefsManager.UserData.coins);
 		cameraController.UpdateHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
+		AnalyticsSystem.RecordUpgradeFloorCompleteEvent(PlayerPrefsManager.UserData.floors.Length);
 	}
 
 	private UIDriversPanel.Data GetDriversPanelData() {
@@ -356,7 +363,7 @@ public class GameController : MonoBehaviour {
 							mainPanel.CoinsPanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
 							mainPanel.CoinsPanel.PlayReceiveCoinsAnim();
 						}
-					});
+					}, "welcome");
 				}
 			});
 		});

@@ -58,7 +58,7 @@ public class DrivingTutorialController : MonoBehaviour {
 
 	private IEnumerator Tutorial() {
 
-		AnalyticsSystem.RecordTutorialEvent(0);
+		AnalyticsSystem.RecordDriveTutorialEvent(0);
 		
 		yield return new WaitForSeconds(2f);
 		
@@ -71,7 +71,7 @@ public class DrivingTutorialController : MonoBehaviour {
 			advance = true;
 		});
 		yield return new WaitUntil(() => advance);
-		AnalyticsSystem.RecordTutorialEvent(1);
+		AnalyticsSystem.RecordDriveTutorialEvent(1);
 		
 		ShowNextSpeechBubble();
 		
@@ -90,7 +90,7 @@ public class DrivingTutorialController : MonoBehaviour {
 		topTutorialArrow.SetActive(false);
 		AudioSystem.Play(successClip);
 		
-		AnalyticsSystem.RecordTutorialEvent(2);
+		AnalyticsSystem.RecordDriveTutorialEvent(2);
 
 		ShowNextSpeechBubble();
 		yield return new WaitForSeconds(1f);
@@ -105,7 +105,7 @@ public class DrivingTutorialController : MonoBehaviour {
 		rightTutorialArrow.SetActive(false);
 		AudioSystem.Play(successClip);
 		
-		AnalyticsSystem.RecordTutorialEvent(3);
+		AnalyticsSystem.RecordDriveTutorialEvent(3);
 		
 		ShowNextSpeechBubble();
 		yield return new WaitForSeconds(1f);
@@ -114,7 +114,7 @@ public class DrivingTutorialController : MonoBehaviour {
 		tutorialButton.interactable = true;
 		yield return new WaitUntil(() => advance);
 		
-		AnalyticsSystem.RecordTutorialEvent(4);
+		AnalyticsSystem.RecordDriveTutorialEvent(4);
 		
 		UIController.Instance.FadeInToBlack(() => {
 			PlayerPrefsManager.UserData.drivingTutorialIsDone = true;

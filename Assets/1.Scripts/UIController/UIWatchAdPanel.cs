@@ -40,7 +40,7 @@ public class UIWatchAdPanel : UIPanel<UIWatchAdPanel.Data> {
 					PlayerPrefsManager.UserData.watchAdBoostIncome = watchAdBoostIncome;
 					PlayerPrefsManager.SaveUserData();
 				}
-			});
+			}, "double");
 		});
 	}
 

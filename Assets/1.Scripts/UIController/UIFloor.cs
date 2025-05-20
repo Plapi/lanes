@@ -76,7 +76,7 @@ public class UIFloor : UIObject {
 					if (success) {
 						UpgradeComplete();
 					}
-				});	
+				}, "floor");	
 			}
 		});
 	}
