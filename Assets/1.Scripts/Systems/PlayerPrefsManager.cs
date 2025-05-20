@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public static class PlayerPrefsManager {
 
@@ -46,8 +47,8 @@ public static class PlayerPrefsManager {
 [Serializable]
 public class UserData {
 	
-	public bool isTutorialDone;
 	public bool companyTutorialIsDone;
+	public bool drivingTutorialIsDone;
 	public int coins;
 	public List<int> unlockedCars = new() { 0 };
 	public List<int> carColors = new() { 7, 4, 0, 0, 9, 1 };

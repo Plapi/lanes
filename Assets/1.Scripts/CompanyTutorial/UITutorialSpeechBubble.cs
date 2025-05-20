@@ -6,6 +6,10 @@ public class UITutorialSpeechBubble : UIObject {
 
 	[SerializeField] private GameObject arrow;
 	
+	public void Show() {
+		Show(arrow.activeSelf);
+	}
+	
 	public void Show(bool arrowIsActive) {
 		gameObject.SetActive(true);
 		arrow.SetActive(arrowIsActive);

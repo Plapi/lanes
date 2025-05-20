@@ -17,6 +17,9 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 	[SerializeField] private GameObject smoke;
 	
 	[Space]
+	[SerializeField] private UIDrivingInput drivingInput;
+	
+	[Space]
 	[SerializeField] private PersonPickupController personPickupController;
 	[SerializeField] private bool personsEnabled;
 	
@@ -126,6 +129,8 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			rideTopPanel.Navigation.UpdateCurrentPersonState(UINavigationItem.PersonData.State.Checkmark);
 			if (selectedMission != null) {
 				userCar.SetSoundEnabled(false);
+				canControlUserCar = false;
+				drivingInput.gameObject.SetActive(false);
 				ShowMissionResultsPanel();
 			} else {
 				GenerateNewPerson();
@@ -165,6 +170,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		smoke.gameObject.SetActive(true);
 		userCar.UpdateCar(0f, 0.5f);
 		canControlUserCar = false;
+		drivingInput.gameObject.SetActive(false);
 		
 		float time = 4f;
 		while (time > 0f && !Input.GetMouseButtonDown(0)) {
@@ -427,6 +433,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 				inputManager.ResetValues();	
 			}
 			canControlUserCar = true;
+			drivingInput.gameObject.SetActive(true);
 			onCanControlCar();
 		});
 
@@ -464,6 +471,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			rideTopPanel.ResetItems();
 			
 			canControlUserCar = false;
+			drivingInput.gameObject.SetActive(false);
 			userCar.ResetCar();
 			userCar.gameObject.SetActive(false);
 			userCar.transform.SetPosAndRot(initUserCarPosAndRot);

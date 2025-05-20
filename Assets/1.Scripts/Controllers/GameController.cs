@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
 public class GameController : MonoBehaviour {
@@ -31,6 +32,8 @@ public class GameController : MonoBehaviour {
 	private UISettingsPanel settingsPanel;
 
 	public Action OnCoinsUpdate;
+
+	public static bool GoToDrive;
 
 	private void Awake() {
 		Instance = this;
@@ -73,12 +76,17 @@ public class GameController : MonoBehaviour {
 				PlayerPrefsManager.SaveUserData();
 			});	
 		}
+
+		if (GoToDrive) {
+			GoToDrive = false;
+			OnDriveButton();
+		}
 	}
 
 	private void OnTutorialStep(TutorialStep step) {
 		cameraController.Zoom(step.cameraZoom);
 		if (step.index == 5) {
-			PlayerPrefsManager.UserData.IncreaseCoins(13000);
+			PlayerPrefsManager.UserData.IncreaseCoins(14000);
 			mainPanel.ShowTopForTutorial();
 			UpdateCoins(0);
 			mainPanel.CoinsPanel.PlayReceiveCoinsAnim();
@@ -302,6 +310,10 @@ public class GameController : MonoBehaviour {
 	
 	private void OnDriveButton() {
 		UIController.Instance.FadeInToBlack(() => {
+			if (!PlayerPrefsManager.UserData.drivingTutorialIsDone) {
+				SceneManager.LoadScene("DrivingTutorial");
+				return;
+			}
 			leftEnvBuildings.gameObject.SetActive(true);
 			cameraController.gameObject.SetActive(false);
 			TrackGenerator.Instance.SetSpawnAICarDistance(90, 110, 20, 40);
