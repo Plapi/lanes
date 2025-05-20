@@ -8,8 +8,11 @@ public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 	[Space]
 	[SerializeField] private RectTransform topContainer;
 	[SerializeField] private UICoins coinsPanel;
+	[SerializeField] private GameObject tutorialArrow;
+	[SerializeField] private GameObject tutorialTap;
 	
 	[Space]
+	[SerializeField] private RectTransform bottomContainer;
 	[SerializeField] private Button shopButton;
 	[SerializeField] private Button driversButton;
 	[SerializeField] private Button multiplyCashButton;
@@ -41,6 +44,34 @@ public class UIMainPanel : UIPanel<UIMainPanel.Data> {
 
 	public void MoveBack() {
 		coinsPanel.transform.SetParent(topContainer);
+	}
+
+	public void HideForTutorial() {
+		topContainer.gameObject.SetActive(false);
+		bottomContainer.gameObject.SetActive(false);
+	}
+	
+	public void ShowAfterTutorial() {
+		bottomContainer.gameObject.SetActive(true);
+		bottomContainer.SetAnchorPosY(-200f);
+		bottomContainer.DOAnchorPosY(0f, 0.5f).SetEase(Ease.OutExpo);
+	}
+
+	public void ShowTopForTutorial() {
+		topContainer.gameObject.SetActive(true);
+		tutorialArrow.SetActive(true);
+	}
+
+	public void HideTutorialArrow() {
+		tutorialArrow.SetActive(false);
+	}
+
+	public void ShowTutorialTap() {
+		tutorialTap.SetActive(true);
+	}
+
+	public void HideTutorialTap() {
+		tutorialTap.SetActive(false);
 	}
 
 	public void UpdateBoostIncomeObjects() {

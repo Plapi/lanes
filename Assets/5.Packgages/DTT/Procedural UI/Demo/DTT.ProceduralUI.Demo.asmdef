@@ -1,0 +1,15 @@
+{
+    "name": "DTT.ProceduralUI.Demo",
+    "references": [
+        "GUID:016eaa710b675c144b35d3c84b68dcf5"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

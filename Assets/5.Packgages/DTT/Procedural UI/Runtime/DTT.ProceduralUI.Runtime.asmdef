@@ -1,0 +1,16 @@
+{
+    "name": "DTT.ProceduralUI.Runtime",
+    "rootNamespace": "DTT.UI.ProceduralUI",
+    "references": [
+        "GUID:c195b8c5dcfc7974295bc840de5d5936"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

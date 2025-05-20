@@ -1,0 +1,15 @@
+{
+    "title": "Procedural UI: get started quickly",
+    "text": "[To get started, add 'rounded image' to any UI element:][i][Then, use the editor to easily adjust the corners, borders, UI effects and more.][Want to dive deeper? Take a look at our documentation:][l]",
+    "links": [
+        {
+            "text": "Open documentation",
+            "url": "Documentation.pdf",
+            "inline": false
+        }
+    ],
+    "imageUrls": [
+        "addcomponent.png"
+    ]
+}
+

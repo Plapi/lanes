@@ -24,6 +24,9 @@ public static class PlayerPrefsManager {
 	}
 
 	public static void SaveUserData() {
+		if (!UserData.companyTutorialIsDone) {
+			return;
+		}
 		string json = JsonUtility.ToJson(UserData);
 		PlayerPrefs.SetString(userDataKey, json);
 		PlayerPrefs.Save();
@@ -44,7 +47,8 @@ public static class PlayerPrefsManager {
 public class UserData {
 	
 	public bool isTutorialDone;
-	public int coins = 500;
+	public bool companyTutorialIsDone;
+	public int coins;
 	public List<int> unlockedCars = new() { 0 };
 	public List<int> carColors = new() { 7, 4, 0, 0, 9, 1 };
 	public int carSelection;

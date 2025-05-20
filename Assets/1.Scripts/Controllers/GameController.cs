@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class GameController : MonoBehaviour {
 
@@ -10,6 +11,9 @@ public class GameController : MonoBehaviour {
 	[SerializeField] private CameraController cameraController;
 	[SerializeField] private CompanyController companyController;
 	[SerializeField] private RideController rideController;
+	[SerializeField] private UICompanyTutorialController companyTutorialController;
+	
+	[Space]
 	[SerializeField] private GameObject leftEnvBuildings;
 	
 	[Space]
@@ -59,11 +63,49 @@ public class GameController : MonoBehaviour {
 			PlayerPrefsManager.UserData.IncreaseCoins(income);
 		}
 		StartCoroutine(CoinsMechanic());
+
+		if (!PlayerPrefsManager.UserData.companyTutorialIsDone) {
+			mainPanel.HideForTutorial();
+			companyTutorialController.Init(OnTutorialStep, () => {
+				mainPanel.ShowAfterTutorial();
+				companyTutorialController.gameObject.SetActive(false);
+				PlayerPrefsManager.UserData.companyTutorialIsDone = true;
+				PlayerPrefsManager.SaveUserData();
+			});	
+		}
+	}
+
+	private void OnTutorialStep(TutorialStep step) {
+		cameraController.Zoom(step.cameraZoom);
+		if (step.index == 5) {
+			PlayerPrefsManager.UserData.IncreaseCoins(13000);
+			mainPanel.ShowTopForTutorial();
+			UpdateCoins(0);
+			mainPanel.CoinsPanel.PlayReceiveCoinsAnim();
+		} else if (step.index == 6) {
+			mainPanel.HideTutorialArrow();
+			mainPanel.ShowTutorialTap();
+		} else if (step.index == 7) {
+			mainPanel.HideTutorialTap();
+			OnRoomTap(companyController.ParkingRoom);
+		} else if (step.index == 8) {
+			BuyTaxi(PlayerPrefsManager.UserData.parkingRoom.parkingSlots[0]);
+		} else if (step.index == 9) {
+			OnAssignDriver(PlayerPrefsManager.UserData.parkingRoom.parkingSlots[0]);
+		} else if (step.index == 10) {
+			HireFireDriver(PlayerPrefsManager.UserData.drivers[0]);
+		} else if (step.index == 11) {
+			SetDriverOnTaxi(PlayerPrefsManager.UserData.drivers[0], PlayerPrefsManager.UserData.parkingRoom.parkingSlots[0]);
+			driversPanel.Close();
+			parkingRoomPanel.Close();
+		}
 	}
 
 	private void OnRoomTap(Room room) {
 		cameraController.SetEnabled(false);
-		cameraController.Zoom(room.GetCameraZoom());
+		if (PlayerPrefsManager.UserData.companyTutorialIsDone) {
+			cameraController.Zoom(room.GetCameraZoom());	
+		}
 		if (room is ParkingRoom) {
 			parkingRoomPanel.Show();
 			parkingRoomPanel.Init(new UIParkingRoomPanel.Data {
@@ -82,7 +124,7 @@ public class GameController : MonoBehaviour {
 			});
 		}
 	}
-
+	
 	private void UpgradeRoom(Room room) {
 		PlayerPrefsManager.UserData.coins -= room.RoomData.UpgradeCost;
 		room.RoomData.level++;
@@ -106,18 +148,22 @@ public class GameController : MonoBehaviour {
 		companyController.ParkingRoom.SetCar(parkingSlotData);
 		OnCoinsUpdate?.Invoke();
 	}
-
+	
 	private void OnAssignDriver(ParkingSlotData parkingSlotData) {
 		driversPanel.Show();
 		UIDriversPanel.Data data = GetDriversPanelData();
 		data.onSelect = driver => {
-			driversPanel.Close();
-			parkingSlotData.driverId = driver.design.id;
-			PlayerPrefsManager.SaveUserData();
-			PlayerPrefsManager.UserData.TryGetCoinsIncome(out int income);
-			UpdateCoins(income);
+			SetDriverOnTaxi(driver, parkingSlotData);
 		};
 		driversPanel.Init(data);
+	}
+
+	private void SetDriverOnTaxi(DriverData driver, ParkingSlotData parkingSlotData) {
+		driversPanel.Close();
+		parkingSlotData.driverId = driver.design.id;
+		PlayerPrefsManager.SaveUserData();
+		PlayerPrefsManager.UserData.TryGetCoinsIncome(out int income);
+		UpdateCoins(income);
 	}
 
 	private void HireFireDriver(DriverData driver) {
@@ -139,7 +185,9 @@ public class GameController : MonoBehaviour {
 
 	private void OnCloseFromRoomPanel() {
 		cameraController.SetEnabled(true);
-		cameraController.ZoomBack();
+		if (PlayerPrefsManager.UserData.companyTutorialIsDone) {
+			cameraController.ZoomBack();
+		}
 	}
 
 	private void InitUI() {
@@ -367,6 +415,9 @@ public class GameController : MonoBehaviour {
 
 	private void Update() {
 		companyController.UpdateVisibility(visible => {
+			if (!PlayerPrefsManager.UserData.companyTutorialIsDone) {
+				return;
+			}
 			mainPanel.FloorPanel.UpdateVisibility(!visible);
 			if (!visible) {
 				cameraController.SetHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));

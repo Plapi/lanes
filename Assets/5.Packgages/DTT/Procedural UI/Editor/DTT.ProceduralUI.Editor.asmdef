@@ -1,0 +1,22 @@
+{
+    "name": "DTT.ProceduralUI.Editor",
+    "rootNamespace": "DTT.UI.ProceduralUI.Editor",
+    "references": [
+        "GUID:343deaaf83e0cee4ca978e7df0b80d21",
+        "GUID:c6a12e1e013355540ab606f758b6c505",
+        "GUID:016eaa710b675c144b35d3c84b68dcf5",
+        "GUID:b5e078f64d95bba4a8ba03b5b4940114",
+        "GUID:1711cb30f577ba1498364a78a6873853"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

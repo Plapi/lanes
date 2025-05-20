@@ -1,0 +1,34 @@
+{
+    "name": "DTT.ProceduralUI.Tests.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:016eaa710b675c144b35d3c84b68dcf5",
+        "GUID:8cd99ad64d54db84685816ac23042f54",
+        "GUID:c195b8c5dcfc7974295bc840de5d5936",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:c6a12e1e013355540ab606f758b6c505",
+        "GUID:b5e078f64d95bba4a8ba03b5b4940114"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.test-framework",
+            "expression": "0.0.0",
+            "define": "TEST_FRAMEWORK"
+        }
+    ],
+    "noEngineReferences": false
+}

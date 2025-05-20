@@ -26,6 +26,10 @@ public class UIParkingRoomPanel : UIPanel<UIParkingRoomPanel.Data> {
 	[Space]
 	[SerializeField] private AudioClip upgradeClip;
 	[SerializeField] private UIParticle upgradeParticle;
+
+	[Space]
+	[SerializeField] private GameObject tutorialObj;
+	[SerializeField] private Button tutorialBuyTaxiButton;
 	
 	protected override void OnInit() {
 		levelText.text = data.roomData.level.ToString();
