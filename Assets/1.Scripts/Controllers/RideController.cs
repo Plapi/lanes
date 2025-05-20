@@ -247,7 +247,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 	private void AddCoins(int coins) {
 		int prevCoins = PlayerPrefsManager.UserData.coins;
 		PlayerPrefsManager.UserData.IncreaseCoins(coins, false);
-		garagePanel.PlayCoinsAnim(prevCoins, PlayerPrefsManager.UserData.coins + coinsEarned);
+		garagePanel.PlayCoinsAnim(prevCoins, PlayerPrefsManager.UserData.coins);
 	}
 
 	private void InitUI(Action onClose) {
