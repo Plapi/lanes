@@ -17,13 +17,13 @@ public class DriversScreenshotTaker : MonoBehaviour {
 			for (int i = 0; i < characters.Length; i++) {
 				for (int j = 0; j < characters[i].transform.childCount - 1; j++) {
 					Transform child = characters[i].transform.GetChild(j);
-					// child.gameObject.SetActive(true);
-					//
-					// string path = $"{Application.dataPath.Replace("Assets", string.Empty)}{UnityEditor.AssetDatabase.GetAssetPath(objFolder)}/Person{driverIndex}.png";
-					// File.WriteAllBytes(path, TakeScreenshot());
-					//
-					// driverIndex++;
-					// child.gameObject.SetActive(false);
+					child.gameObject.SetActive(true);
+					
+					string path = $"{Application.dataPath.Replace("Assets", string.Empty)}{UnityEditor.AssetDatabase.GetAssetPath(objFolder)}/Person{driverIndex}.png";
+					File.WriteAllBytes(path, TakeScreenshot());
+					
+					driverIndex++;
+					child.gameObject.SetActive(false);
 
 					s += child.name.Replace("Character_", string.Empty) + "\n";
 				}
