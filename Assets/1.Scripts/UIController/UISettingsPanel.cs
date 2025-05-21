@@ -5,13 +5,31 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using UnityEngine.Serialization;
 
 public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 
 	[SerializeField] private Slider[] sliders;
 	[SerializeField] private Slider hapticSlider;
 	[SerializeField] private Button aboutButton;
-	
+
+	[SerializeField] private Button[] cheatAddCoinsButton;
+
+	private void Awake() {
+		for (int i = 0; i < cheatAddCoinsButton.Length; i++) {
+			int index = i;
+			cheatAddCoinsButton[i].onClick.AddListener(() => {
+				cheatAddCoinsButton[index].gameObject.SetActive(false);
+				if (index == cheatAddCoinsButton.Length - 1) {
+					PlayerPrefsManager.UserData.IncreaseCoins(1000000, false);
+					cheatAddCoinsButton[0].gameObject.SetActive(true);
+				} else {
+					cheatAddCoinsButton[index + 1].gameObject.SetActive(true);
+				}
+			});
+		}
+	}
+
 	protected override void OnInit() {
 
 		for (int i = 0; i < sliders.Length; i++) {

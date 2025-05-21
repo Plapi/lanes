@@ -22,7 +22,7 @@ public class UIIncomeList : OSA<BaseParamsWithPrefab, UIIncomeList.IncomeListIte
 			vaultListData = new VaultListData {
 				coins = PlayerPrefsManager.UserData.coins,
 				profitPerTurn = profitPerTurn,
-				storage = PlayerPrefsManager.UserData.CalculateCapacity()
+				storage = PlayerPrefsManager.UserData.CalculateVaultCapacity()
 			}
 		});
 		sizes.Add(320f);
@@ -106,7 +106,7 @@ public class UIIncomeList : OSA<BaseParamsWithPrefab, UIIncomeList.IncomeListIte
 			vaultListData = new VaultListData {
 				coins = PlayerPrefsManager.UserData.coins,
 				profitPerTurn = profitPerTurn,
-				storage = PlayerPrefsManager.UserData.CalculateCapacity()
+				storage = PlayerPrefsManager.UserData.CalculateVaultCapacity()
 			}
 		};
 	}

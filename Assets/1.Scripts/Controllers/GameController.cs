@@ -74,6 +74,7 @@ public class GameController : MonoBehaviour {
 				companyTutorialController.gameObject.SetActive(false);
 				PlayerPrefsManager.UserData.companyTutorialIsDone = true;
 				PlayerPrefsManager.SaveUserData();
+				NotificationSystem.RequestPermissionNotification();
 			});	
 		}
 
@@ -462,6 +463,16 @@ public class GameController : MonoBehaviour {
 				garageText.transform.position, garageText.transform.position + Vector3.up * 100f, out Vector3 intersection);
 			float dist = Vector3.Distance(intersection, cameraTransform.position);
 			garageText.alpha = Mathf.Lerp(0.5f, 1f, Mathf.InverseLerp(10f, 15f, dist));
+		}
+	}
+
+	private void OnApplicationPause(bool pause) {
+		if (pause) {
+			if (PlayerPrefsManager.UserData.TryGetFullVaultDateTime(out DateTime dateTime)) {
+				NotificationSystem.ScheduleVaultStorageNotification(dateTime);
+			}
+		} else {
+			NotificationSystem.CancelAllNotifications();
 		}
 	}
 }

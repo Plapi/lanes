@@ -52,7 +52,7 @@ public class DebugWindow : EditorWindow {
 		
 		if (GUILayout.Button("Add Full Coins")) {
 			PlayerPrefsManager.UserData.coins = 0;
-			PlayerPrefsManager.UserData.IncreaseCoins(PlayerPrefsManager.UserData.CalculateCapacity());
+			PlayerPrefsManager.UserData.IncreaseCoins(PlayerPrefsManager.UserData.CalculateVaultCapacity());
 		}
 
 		if (GUILayout.Button("Clear Coins")) {

@@ -92,7 +92,7 @@ public class UserData {
 		PlayerPrefsManager.SaveUserData();
 	}
 
-	public int CalculateCapacity() {
+	public int CalculateVaultCapacity() {
 		int capacity = 0;
 		for (int i = 0; i < floors.Length; i++) {
 			capacity += floors[i].vaultRoom.Capacity;
@@ -102,7 +102,7 @@ public class UserData {
 	
 	public void IncreaseCoins(int amount, bool useVaultCapacity = true) {
 		if (useVaultCapacity) {
-			amount = Mathf.Min(amount, CalculateCapacity() - coins);
+			amount = Mathf.Min(amount, CalculateVaultCapacity() - coins);
 		}
 		if (amount > 0) {
 			coins += amount;	
@@ -111,7 +111,7 @@ public class UserData {
 	}
 
 	public bool VaultIsFull() {
-		return coins >= CalculateCapacity();
+		return coins >= CalculateVaultCapacity();
 	}
 
 	public static UserData GetDefault() {
@@ -140,8 +140,20 @@ public class UserData {
 		}
 		seconds = Mathf.RoundToInt((float)(DateTime.Now - lastCollectTime.Date).TotalSeconds);
 		int totalTurns = seconds / Settings.Instance.company.incomeTurnDuration;
-		income = Mathf.Min(income * totalTurns, CalculateCapacity() - coins);
+		income = Mathf.Min(income * totalTurns, CalculateVaultCapacity() - coins);
 		return true;
+	}
+
+	public bool TryGetFullVaultDateTime(out DateTime dateTime) {
+		dateTime = DateTime.MinValue;
+		if (!VaultIsFull() && TryGetCoinsIncome(out int income)) {
+			int capacity = CalculateVaultCapacity();
+			int freeStorage = capacity - coins;
+			int turns = freeStorage / income;
+			dateTime = DateTime.Now.AddSeconds(turns * Settings.Instance.company.incomeTurnDuration);
+			return true;
+		}
+		return false;
 	}
 
 	public bool InWatchAdBoostIncome() {
@@ -199,7 +211,7 @@ public class UserData {
 		}
 		ReachParkingRoomToMax();
 		PlayerPrefsManager.UserData.coins = 0;
-		IncreaseCoins(CalculateCapacity());
+		IncreaseCoins(CalculateVaultCapacity());
 		PlayerPrefsManager.SaveUserData();
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
@@ -218,7 +230,7 @@ public class UserData {
 		}
 		ReachParkingRoomToMax();
 		PlayerPrefsManager.UserData.coins = 0;
-		IncreaseCoins(CalculateCapacity());
+		IncreaseCoins(CalculateVaultCapacity());
 		PlayerPrefsManager.SaveUserData();
 #if UNITY_EDITOR
 		UnityEditor.EditorApplication.isPlaying = false;
