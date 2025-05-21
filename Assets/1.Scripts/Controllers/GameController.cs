@@ -20,6 +20,9 @@ public class GameController : MonoBehaviour {
 	[Space]
 	[SerializeField] private TapableObj garageTapable;
 	[SerializeField] private TextMeshProUGUI garageText;
+
+	[Space]
+	[SerializeField] private AudioClip floorUpgradeCompleteSound;
 	
 	private UIMainPanel mainPanel;
 	private UIRoomPanel roomPanel;
@@ -305,6 +308,7 @@ public class GameController : MonoBehaviour {
 		companyController.UpgradeFloor(OnRoomTap);
 		companyController.UpdateVaultTables(PlayerPrefsManager.UserData.coins);
 		cameraController.UpdateHeight(GetFloorHeight(PlayerPrefsManager.UserData.GetFlorReached()));
+		AudioSystem.Play(floorUpgradeCompleteSound);
 		AnalyticsSystem.RecordUpgradeFloorCompleteEvent(PlayerPrefsManager.UserData.floors.Length);
 	}
 

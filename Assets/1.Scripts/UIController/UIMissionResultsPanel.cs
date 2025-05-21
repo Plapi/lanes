@@ -96,10 +96,11 @@ public class UIMissionResultsPanel : UIPanel<UIMissionResultsPanel.Data> {
         
         yield return Utils.WaitForRealTime(0.2f);
 
-        List<RectTransform> collectRects = new() {
-	        adCollectButton.GetComponent<RectTransform>(),
-	        collectButton.GetComponent<RectTransform>()
-        };
+        List<RectTransform> collectRects = new();
+        if (AdsController.HasInstance() && AdsController.Instance.CanShowAd()) {
+	        collectRects.Add(adCollectButton.GetComponent<RectTransform>());
+        }
+        collectRects.Add(collectButton.GetComponent<RectTransform>());
         AudioSystem.Play(collectsClip);
         
         for (int i = 0; i < collectRects.Count; i++) {

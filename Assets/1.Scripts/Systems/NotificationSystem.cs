@@ -21,7 +21,7 @@ public static class NotificationSystem {
 		if (!HasAuthorization()) {
 			return;
 		}
-		Debug.LogError("ScheduleVaultStorageNotification " + fireTime);
+		
 		AndroidNotificationChannel channel = new() {
 			Id = "default_channel",
 			Name = "Default Channel",

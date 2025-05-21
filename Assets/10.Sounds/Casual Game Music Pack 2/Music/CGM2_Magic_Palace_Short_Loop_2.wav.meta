@@ -1,0 +1,29 @@
+fileFormatVersion: 2
+guid: 10b85408f0c8448959c0f11d3c5fa214
+timeCreated: 1494401136
+licenseType: Store
+AudioImporter:
+  serializedVersion: 6
+  defaultSettings:
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 44100
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  normalize: 1
+  preloadAudioData: 1
+  loadInBackground: 0
+  3D: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 90123
+  packageName: Casual Game Music Pack 2
+  packageVersion: 1.0
+  assetPath: Assets/Casual Game Music Pack 2/Music/CGM2_Magic_Palace_Short_Loop_2.wav
+  uploadId: 179209

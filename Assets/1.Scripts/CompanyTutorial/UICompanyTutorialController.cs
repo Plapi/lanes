@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class UICompanyTutorialController : UIObject {
 
@@ -8,6 +10,7 @@ public class UICompanyTutorialController : UIObject {
 	[SerializeField] private GameObject tutorialCharacter;
 	
 	[SerializeField] private Button button;
+	[SerializeField] private RectTransform characterRect;
 	[SerializeField] private UITutorialSpeechBubble[] speechBubbles;
 	[SerializeField] private TutorialStep[] tutorialSteps;
 	[SerializeField] private RectTransform tutorialObj;
@@ -29,6 +32,19 @@ public class UICompanyTutorialController : UIObject {
 		tutorialCharacter.SetActive(true);
 		
 		AnalyticsSystem.RecordCompanyTutorialEvent(0);
+		
+		characterRect.gameObject.SetActive(false);
+		speechBubbles[0].gameObject.SetActive(false);
+		StartCoroutine(PlayInitShowAnim());
+	}
+
+	private IEnumerator PlayInitShowAnim() {
+		yield return new WaitForSeconds(1f);
+		characterRect.gameObject.SetActive(true);
+		characterRect.SetAnchorPosX(-340f);
+		characterRect.DOAnchorPosX(-65f, 0.25f).SetEase(Ease.OutExpo);
+		yield return new WaitForSeconds(0.5f);
+		speechBubbles[0].Show();
 	}
 
 	private void ShowNextSpeechBubble() {

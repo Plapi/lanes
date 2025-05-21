@@ -45,7 +45,6 @@ public class DrivingTutorialController : MonoBehaviour {
 		};
 
 		UIController.Instance.Init();
-		tutorialButton.interactable = false;
 		
 		StartCoroutine(Tutorial());
 	}
@@ -65,9 +64,9 @@ public class DrivingTutorialController : MonoBehaviour {
 		userCar.GetComponent<AudioSource>().enabled = true;
 
 		bool advance = false;
-		tutorialButton.interactable = true;
+		tutorialButton.gameObject.SetActive(true);
 		tutorialButton.onClick.AddListener(() => {
-			tutorialButton.interactable = false;
+			tutorialButton.gameObject.SetActive(false);
 			advance = true;
 		});
 		yield return new WaitUntil(() => advance);
@@ -111,8 +110,9 @@ public class DrivingTutorialController : MonoBehaviour {
 		yield return new WaitForSeconds(1f);
 		
 		advance = false;
-		tutorialButton.interactable = true;
+		tutorialButton.gameObject.SetActive(true);
 		yield return new WaitUntil(() => advance);
+		tutorialButton.gameObject.SetActive(false);
 		
 		AnalyticsSystem.RecordDriveTutorialEvent(4);
 		

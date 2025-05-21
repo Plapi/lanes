@@ -29,9 +29,6 @@ public class UIFloor : UIObject {
 	[Space]
 	[SerializeField] private Color floorNormalColor;
 	[SerializeField] private Color floorDisableColor;
-	
-	[Space]
-	[SerializeField] private AudioClip floorUpgradeCompleteAudioClip;
 
 	private int currentFloor;
 	private Timer timer;
@@ -143,7 +140,6 @@ public class UIFloor : UIObject {
 	private void UpgradeComplete() {
 		onUpgradeComplete?.Invoke();
 		UpdateFloor();
-		AudioSystem.Play(floorUpgradeCompleteAudioClip);
 	}
 
 	public void UpdateVisibility(bool visible) {
