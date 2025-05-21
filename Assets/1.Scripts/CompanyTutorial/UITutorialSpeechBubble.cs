@@ -1,10 +1,21 @@
-using System;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Events;
 using DG.Tweening;
 
 public class UITutorialSpeechBubble : UIObject {
 
 	[SerializeField] private GameObject arrow;
+	[SerializeField] private Button audioButton;
+
+	public void Init(UnityAction onAudioButton) {
+		audioButton.onClick.AddListener(onAudioButton);
+	}
+
+	public void SetAudioButton(bool voiceTutorialDisable) {
+		audioButton.transform.GetChild(0).gameObject.SetActive(!voiceTutorialDisable);
+		audioButton.transform.GetChild(1).gameObject.SetActive(voiceTutorialDisable);
+	}
 	
 	public void Show() {
 		Show(arrow.activeSelf);

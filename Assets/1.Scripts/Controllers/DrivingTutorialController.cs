@@ -23,6 +23,9 @@ public class DrivingTutorialController : MonoBehaviour {
 	[SerializeField] private GameObject bottomTutorialArrow;
 	[SerializeField] private GameObject topTutorialArrow;
 	
+	[Space]
+	[SerializeField] private AudioSource audioSource;
+	
 	private void Start() {
 		DontDestroyOnLoad(ObjectPoolManager.Instance);
 		AudioSystem.Init(this, PlayerPrefsManager.UserData.volumes);
@@ -46,6 +49,18 @@ public class DrivingTutorialController : MonoBehaviour {
 
 		UIController.Instance.Init();
 		
+		for (int i = 0; i < speechBubbles.Count; i++) {
+			speechBubbles[i].Init(() => {
+				PlayerPrefsManager.UserData.voiceTutorialDisable = !PlayerPrefsManager.UserData.voiceTutorialDisable;
+				if (PlayerPrefsManager.UserData.voiceTutorialDisable) {
+					audioSource.Pause();
+				} else {
+					audioSource.Play();
+				}
+				speechBubbles[0].SetAudioButton(PlayerPrefsManager.UserData.voiceTutorialDisable);
+			});
+		}
+		
 		StartCoroutine(Tutorial());
 	}
 
@@ -59,7 +74,11 @@ public class DrivingTutorialController : MonoBehaviour {
 
 		AnalyticsSystem.RecordDriveTutorialEvent(0);
 		
-		yield return new WaitForSeconds(2f);
+		yield return new WaitForSeconds(0.5f);
+		
+		PlayAudioVoice(0);
+		
+		yield return new WaitForSeconds(1f);
 		
 		userCar.GetComponent<AudioSource>().enabled = true;
 
@@ -73,6 +92,7 @@ public class DrivingTutorialController : MonoBehaviour {
 		AnalyticsSystem.RecordDriveTutorialEvent(1);
 		
 		ShowNextSpeechBubble();
+		PlayAudioVoice(1);
 		
 		yield return new WaitForSeconds(2f);
 		
@@ -92,6 +112,7 @@ public class DrivingTutorialController : MonoBehaviour {
 		AnalyticsSystem.RecordDriveTutorialEvent(2);
 
 		ShowNextSpeechBubble();
+		PlayAudioVoice(2);
 		yield return new WaitForSeconds(1f);
 		
 		leftTutorialArrow.SetActive(true);
@@ -107,6 +128,7 @@ public class DrivingTutorialController : MonoBehaviour {
 		AnalyticsSystem.RecordDriveTutorialEvent(3);
 		
 		ShowNextSpeechBubble();
+		PlayAudioVoice(3);
 		yield return new WaitForSeconds(1f);
 		
 		advance = false;
@@ -126,5 +148,12 @@ public class DrivingTutorialController : MonoBehaviour {
 
 	private void Update() {
 		userCar.UpdateCar(inputManager.VerticalInput, inputManager.HorizontalInput);
+	}
+	
+	private void PlayAudioVoice(int voiceIndex) {
+		audioSource.clip = Resources.Load<AudioClip>($"Voices/DrivingTutorial/{voiceIndex}");
+		if (!PlayerPrefsManager.UserData.voiceTutorialDisable) {
+			audioSource.Play();	
+		}
 	}
 }

@@ -49,13 +49,14 @@ public class UserData {
 	
 	public bool companyTutorialIsDone;
 	public bool drivingTutorialIsDone;
+	public bool voiceTutorialDisable;
 	public int coins;
 	public List<int> unlockedCars = new() { 0 };
 	public List<int> carColors = new() { 7, 4, 0, 0, 9, 1 };
 	public int carSelection;
 	public int distanceBest = -1;
 	public int personsBest = -1;
-	public float[] volumes = { 1f, 0.3f, 0.4f };
+	public float[] volumes = { 1f, 0.2f, 0.4f };
 	public bool hapticFeedback = true;
 	public List<CompletedMission> completedMissions = new();
 	

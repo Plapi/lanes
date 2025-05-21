@@ -16,6 +16,9 @@ public class UICompanyTutorialController : UIObject {
 	[SerializeField] private RectTransform tutorialObj;
 	[SerializeField] private AudioClip tutorialCompleteSound;
 	
+	[Space]
+	[SerializeField] private AudioSource audioSource;
+	
 	private int tutorialIndex;
 	private Action<TutorialStep> onTutorialStep;
 	private Action onTutorialComplete;
@@ -36,6 +39,18 @@ public class UICompanyTutorialController : UIObject {
 		characterRect.gameObject.SetActive(false);
 		speechBubbles[0].gameObject.SetActive(false);
 		StartCoroutine(PlayInitShowAnim());
+
+		for (int i = 0; i < speechBubbles.Length; i++) {
+			speechBubbles[i].Init(() => {
+				PlayerPrefsManager.UserData.voiceTutorialDisable = !PlayerPrefsManager.UserData.voiceTutorialDisable;
+				if (PlayerPrefsManager.UserData.voiceTutorialDisable) {
+					audioSource.Pause();
+				} else {
+					audioSource.Play();
+				}
+				speechBubbles[tutorialIndex].SetAudioButton(PlayerPrefsManager.UserData.voiceTutorialDisable);
+			});
+		}
 	}
 
 	private IEnumerator PlayInitShowAnim() {
@@ -45,6 +60,7 @@ public class UICompanyTutorialController : UIObject {
 		characterRect.DOAnchorPosX(-65f, 0.25f).SetEase(Ease.OutExpo);
 		yield return new WaitForSeconds(0.5f);
 		speechBubbles[0].Show();
+		PlayCurrentAudioVoice();
 	}
 
 	private void ShowNextSpeechBubble() {
@@ -71,6 +87,8 @@ public class UICompanyTutorialController : UIObject {
 		step = tutorialSteps[tutorialIndex];
 		
 		speechBubbles[tutorialIndex].Show(step.arrowIsActive);
+		speechBubbles[tutorialIndex].SetAudioButton(PlayerPrefsManager.UserData.voiceTutorialDisable);
+		PlayCurrentAudioVoice();
 		tutorialObj.SetAnchorPosY(step.anchorPosY);
 		onTutorialStep?.Invoke(step);
 
@@ -81,6 +99,13 @@ public class UICompanyTutorialController : UIObject {
 			}
 		} else {
 			this.Wait(0.3f, () => button.interactable = true);	
+		}
+	}
+	
+	private void PlayCurrentAudioVoice() {
+		audioSource.clip = Resources.Load<AudioClip>($"Voices/CompanyTutorial/{tutorialIndex}");
+		if (!PlayerPrefsManager.UserData.voiceTutorialDisable) {
+			audioSource.Play();	
 		}
 	}
 }

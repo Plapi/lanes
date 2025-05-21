@@ -53,7 +53,7 @@ MonoBehaviour:
   - Luna
   - Barry
   company:
-    incomeTurnDuration: 10
+    incomeTurnDuration: 25
     maxFloors: 8
     floorUpgradeCost: 100000
     floorUpgradeDurationMinutes: 60
