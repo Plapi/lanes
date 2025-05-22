@@ -43,11 +43,11 @@ public static class AnalyticsSystem {
 	}
 
 	public static void RecordBuyProductStartEvent(string productId, string value) {
-		RecordEvent(new BuyProductStartEvent("BuyProduct", productId, value));
+		RecordEvent(new BuyProductStartEvent("BuyProductStart", productId, value));
 	}
 	
 	public static void RecordBuyProductCompleteEvent(string productId, string value) {
-		RecordEvent(new BuyProductCompleteEvent("BuyProduct", productId, value));
+		RecordEvent(new BuyProductCompleteEvent("BuyProductComplete", productId, value));
 	}
 
 	public static void RecordDriveTutorialEvent(int stepId) {
