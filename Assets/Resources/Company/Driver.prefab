@@ -866,7 +866,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1638868166120915211}
-  - component: {fileID: 2287807369504095665}
   - component: {fileID: 70656562048750025}
   m_Layer: 0
   m_Name: Character1
@@ -900,19 +899,6 @@ Transform:
   - {fileID: 7784153416396947794}
   m_Father: {fileID: 5104959637599951785}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2287807369504095665
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 949455173167454448}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28d34ed2cf57742379c601e82124f95f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 70656562048750025}
 --- !u!95 &70656562048750025
 Animator:
   serializedVersion: 7
@@ -1499,6 +1485,8 @@ MonoBehaviour:
   bubbleText: {fileID: 4169870350879427038}
   bubbleAudio: {fileID: -4927128428166011525}
   bubbleAudioDistance: 22
+  AvailableForExit: 0
+  AvailableForRandomPoint: 0
 --- !u!195 &1171606089807574901
 NavMeshAgent:
   m_ObjectHideFlags: 0

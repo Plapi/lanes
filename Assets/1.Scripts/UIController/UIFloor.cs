@@ -66,15 +66,9 @@ public class UIFloor : UIObject {
 		
 		skipTimeButton.onClick.RemoveAllListeners();
 		skipTimeButton.onClick.AddListener(() => {
-			if (Application.isEditor) {
-				UpgradeComplete();
-			} else {
-				AdsController.Instance.ShowAd(success => {
-					if (success) {
-						UpgradeComplete();
-					}
-				}, "floor");	
-			}
+			UIController.Instance.GetPanel<UISkipTimerPanel>().Init(new UISkipTimerPanel.Data {
+				onWatchAd = UpgradeComplete
+			}).Show();
 		});
 	}
 

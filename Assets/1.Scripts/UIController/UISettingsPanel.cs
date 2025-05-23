@@ -21,6 +21,7 @@ public class UISettingsPanel : UIPanel<UISettingsPanel.Data> {
 			cheatAddCoinsButton[i].onClick.AddListener(() => {
 				cheatAddCoinsButton[index].gameObject.SetActive(false);
 				if (index == cheatAddCoinsButton.Length - 1) {
+					PlayerPrefsManager.UserData.removeAdsPurchased = true;
 					PlayerPrefsManager.UserData.IncreaseCoins(1000000, false);
 					cheatAddCoinsButton[0].gameObject.SetActive(true);
 				} else {
