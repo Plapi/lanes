@@ -89,16 +89,16 @@ public class AdCreatorTake0 : MonoBehaviour {
 			yield return new WaitForSeconds(Mathf.Max(transPoints[i].moveDuration, transPoints[i].rotateDuration) + transPoints[i].exitDelay);
 		}
 	}
+}
 	
-	[Serializable]
-	private class TransPoint {
-		public Transform target;
-		public float moveDuration;
-		public float rotateDuration;
-		public float exitDelay;
-		public Ease moveEase;
-		public Ease rotateEase;
-		public Action onMoveStart;
-		public Action onMoveComplete;
-	}
+[Serializable]
+public class TransPoint {
+	public Transform target;
+	public float moveDuration;
+	public float rotateDuration;
+	public float exitDelay;
+	public Ease moveEase;
+	public Ease rotateEase;
+	public Action onMoveStart;
+	public Action onMoveComplete;
 }
