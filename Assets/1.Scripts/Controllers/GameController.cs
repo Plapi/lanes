@@ -471,6 +471,9 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void OnApplicationPause(bool pause) {
+		if (Application.isEditor) {
+			return;
+		}
 		if (pause) {
 			if (PlayerPrefsManager.UserData.TryGetFullVaultDateTime(out DateTime dateTime)) {
 				NotificationSystem.ScheduleVaultStorageNotification(dateTime);

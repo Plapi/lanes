@@ -3,36 +3,65 @@ using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 
-public class AdCreator : MonoBehaviour {
+public class AdCreatorTake0 : MonoBehaviour {
 	
 	private static readonly int animatorSpeedId = Animator.StringToHash("Speed");
 	private static readonly int animatorThinkingId = Animator.StringToHash("Thinking");
 
 	[SerializeField] private new Transform camera;
 	[SerializeField] private Animator mainCharacter;
-
+	
 	[Space] 
 	[SerializeField] private TransPoint[] cameraPoints;
-	[SerializeField] private TransPoint[] mainCharacterPoints;
 	
 	[Space]
 	[SerializeField] private UITutorialSpeechBubble[] mainCharacterSpeechBubbles;
+
 	
+	private float mainCharacterRotationY;
+
+	private void Awake() {
+		PlayerPrefsManager.UserData.companyTutorialIsDone = true;
+		PlayerPrefsManager.UserData.drivingTutorialIsDone = true;
+		FindObjectsByType<CameraController>(FindObjectsSortMode.None)[0].gameObject.SetActive(false);
+		mainCharacterRotationY = mainCharacter.transform.localEulerAngles.y;
+		mainCharacterSpeechBubbles[0].gameObject.SetActive(true);
+		mainCharacterSpeechBubbles[0].gameObject.SetActive(false);
+	}
+
+	private IEnumerator MainCharacterTrans() {
+		mainCharacter.SetFloat(animatorSpeedId, 1f);
+
+		yield return new WaitForSeconds(5f);
+		
+		mainCharacter.SetTrigger(animatorThinkingId);
+		
+		yield return new WaitForSeconds(0.5f);
+		mainCharacterSpeechBubbles[0].Show();
+		camera.GetComponent<AudioSource>().Play();
+
+		yield return new WaitForSeconds(3f);
+		mainCharacterSpeechBubbles[0].Hide();
+		
+		float time = 0f;
+		float initRotationY = mainCharacterRotationY;
+		DOTween.To(() => time, x => time = x, 1f, 1.5f)
+			.SetEase(Ease.Linear)
+			.SetDelay(1f)
+			.OnUpdate(() => {
+				mainCharacterRotationY = Mathf.Lerp(initRotationY, 90f, time);
+			});
+		
+		yield return new WaitForSeconds(1.5f);
+		
+		UIController.Instance.FadeInToBlack();
+	}
+
 	private IEnumerator Start() {
 
-		mainCharacter.SetFloat(animatorSpeedId, 2f);
-		StartCoroutine(ExecuteTransPoint(mainCharacter.transform, mainCharacterPoints));
-
-		mainCharacterPoints[0].onMoveComplete = () => {
-			mainCharacter.SetFloat(animatorSpeedId, 0f);
-			mainCharacter.SetTrigger(animatorThinkingId);
-			mainCharacterSpeechBubbles[0].Show();
-		};
-		mainCharacterPoints[1].onMoveStart = () => {
-			mainCharacter.SetFloat(animatorSpeedId, 2f);
-		};
+		StartCoroutine(MainCharacterTrans());
 					
-		yield return new WaitForSeconds(1.5f);
+		yield return new WaitForSeconds(2f);
 		
 		StartCoroutine(ExecuteTransPoint(camera, cameraPoints));
 
@@ -40,7 +69,11 @@ public class AdCreator : MonoBehaviour {
 			mainCharacterSpeechBubbles[0].Hide();
 		};
 	}
-	
+
+	private void LateUpdate() {
+		mainCharacter.transform.SetLocalAngleY(mainCharacterRotationY);
+	}
+
 	private static IEnumerator ExecuteTransPoint(Transform obj, TransPoint[] transPoints) {
 		for (int i = 0; i < transPoints.Length; i++) {
 			if (transPoints[i].moveDuration > 0f) {
