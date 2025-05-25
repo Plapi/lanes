@@ -63,6 +63,7 @@ public class InAppPurchasingController : MonoBehaviourSingleton<InAppPurchasingC
 		onPurchaseComplete?.Invoke(true);
 		onPurchaseComplete = null;
 		AnalyticsSystem.RecordBuyProductCompleteEvent(startedProduct.id, startedProduct.value.ToString());
+		TenjinSystem.PurchaseEvent(purchaseEvent);
 		return PurchaseProcessingResult.Complete;
 	}
 

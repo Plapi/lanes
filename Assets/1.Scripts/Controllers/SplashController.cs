@@ -14,6 +14,7 @@ public class SplashController : MonoBehaviour {
 				AdsController.Instance.LoadAd();
 			});
 		}
+		TenjinSystem.Connect();
 		SceneManager.LoadSceneAsync("Company");
 	}
 }

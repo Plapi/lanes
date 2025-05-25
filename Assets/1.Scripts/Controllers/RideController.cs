@@ -209,7 +209,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			}
 			PlayerPrefs.Save();
 		}
-		AnalyticsSystem.RecordDriveEndlessStartEvent(PlayerPrefsManager.UserData.carSelection);
+		AnalyticsSystem.RecordDriveEndlessEndEvent(PlayerPrefsManager.UserData.carSelection, totalDistance, personsDropped.Count, coinsEarned);
 	}
 
 	private void ShowMissionResultsPanel() {
@@ -242,6 +242,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			stars = stars
 		});
 		PlayerPrefs.Save();
+		AnalyticsSystem.RecordDriveMissionEndEvent(PlayerPrefsManager.UserData.carSelection, coinsEarned, stars);
 	}
 
 	private void AddCoins(int coins) {
@@ -326,6 +327,12 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 		userCar = selectCarController.GetUserCarAndGo();
 		initUserCarPosAndRot = new PosAndRot(userCar.transform);
 		totalDistance = 0;
+
+		if (selectedMission == null) {
+			AnalyticsSystem.RecordDriveEndlessStartEvent(selectCarController.GetCarSelection());	
+		} else {
+			AnalyticsSystem.RecordDriveMissionStartEvent(selectCarController.GetCarSelection(), selectedMission.coins);
+		}
 		
 		userCar.OnRequireNewSegments = () => {
 			trackGenerator.Generate(generatedDirs[0], generatedDirs[1]);

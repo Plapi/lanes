@@ -5,6 +5,9 @@
     <!-- Required for Android versions below API 31 -->
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
     <application>
         <meta-data android:name="unity.ads" android:value="true"/>
         <!--Used when Application Entry is set to Activity, otherwise remove this activity block-->

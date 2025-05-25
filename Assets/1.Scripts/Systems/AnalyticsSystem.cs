@@ -4,6 +4,7 @@ public static class AnalyticsSystem {
 
 	public static void RecordCompanyTutorialEvent(int stepId) {
 		RecordEvent(new CompanyTutorialEvent("CompanyTutorial", stepId));
+		TenjinSystem.SendEvent("CompanyTutorial", stepId.ToString());
 	}
 
 	public static void RecordRoomUpgradeEvent(string roomName, int roomLevel) {
@@ -52,6 +53,7 @@ public static class AnalyticsSystem {
 
 	public static void RecordDriveTutorialEvent(int stepId) {
 		RecordEvent(new DriveTutorialEvent("DriveTutorialEvent", stepId));
+		TenjinSystem.SendEvent("DriveTutorialEvent", stepId.ToString());
 	}
 
 	public static void RecordBuyCarEvent(int carId) {
@@ -62,15 +64,15 @@ public static class AnalyticsSystem {
 		RecordEvent(new DriveEndlessStartEvent("DriveEndlessStartEvent", carId));
 	}
 
-	public static void RecordDriveEndlessEndEvent(string carId, int distance, int persons, int coins) {
+	public static void RecordDriveEndlessEndEvent(int carId, int distance, int persons, int coins) {
 		RecordEvent(new DriveEndlessEndEvent("DriveEndlessEndEvent", carId, distance, persons, coins));
 	}
 
-	public static void RecordDriveMissionStartEvent(string carId, int coins) {
+	public static void RecordDriveMissionStartEvent(int carId, int coins) {
 		RecordEvent(new DriveMissionStartEvent("DriveMissionStart", carId, coins));
 	}
 
-	public static void RecordDriveMissionEndEvent(string carId, int coins, int stars) {
+	public static void RecordDriveMissionEndEvent(int carId, int coins, int stars) {
 		RecordEvent(new DriveMissionEndEvent("DriveMissionEnd", carId, coins, stars));
 	}
 
@@ -86,8 +88,6 @@ public static class AnalyticsSystem {
 		RecordEvent("ClickMail");
 	}
 
-	// Internals
-
 	private static void RecordEvent(Event ev) {
 		if (Settings.Instance.enableAnalytics) {
 			AnalyticsService.Instance.RecordEvent(ev);	
@@ -99,8 +99,6 @@ public static class AnalyticsSystem {
 			AnalyticsService.Instance.RecordEvent(eventName);	
 		}
 	}
-
-	// Event classes
 
 	private class CompanyTutorialEvent : Event {
 		public CompanyTutorialEvent(string name, int stepId) : base(name) {
@@ -197,7 +195,7 @@ public static class AnalyticsSystem {
 	}
 
 	private class DriveEndlessEndEvent : Event {
-		public DriveEndlessEndEvent(string name, string carId, int distance, int persons, int coins) : base(name) {
+		public DriveEndlessEndEvent(string name, int carId, int distance, int persons, int coins) : base(name) {
 			SetParameter("carId", carId);
 			SetParameter("distance", distance);
 			SetParameter("persons", persons);
@@ -206,14 +204,14 @@ public static class AnalyticsSystem {
 	}
 
 	private class DriveMissionStartEvent : Event {
-		public DriveMissionStartEvent(string name, string carId, int coins) : base(name) {
+		public DriveMissionStartEvent(string name, int carId, int coins) : base(name) {
 			SetParameter("carId", carId);
 			SetParameter("coins", coins);
 		}
 	}
 
 	private class DriveMissionEndEvent : Event {
-		public DriveMissionEndEvent(string name, string carId, int coins, int stars) : base(name) {
+		public DriveMissionEndEvent(string name, int carId, int coins, int stars) : base(name) {
 			SetParameter("carId", carId);
 			SetParameter("coins", coins);
 			SetParameter("stars", stars);

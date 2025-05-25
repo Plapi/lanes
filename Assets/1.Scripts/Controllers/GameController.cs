@@ -480,6 +480,7 @@ public class GameController : MonoBehaviour {
 			}
 		} else {
 			NotificationSystem.CancelAllNotifications();
+			TenjinSystem.Connect();
 		}
 	}
 }
