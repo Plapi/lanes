@@ -27,6 +27,8 @@ public class AdCreatorTake2 : MonoBehaviour {
 	[SerializeField] private RectTransform installRect;
 	[SerializeField] private RectTransform logoRect;
 	
+	[SerializeField] private AudioClip endAudioClip;
+	
 	private void Awake() {
 		FindObjectsByType<CameraController>(FindObjectsSortMode.None)[0].gameObject.SetActive(false);
 		PlayerPrefsManager.UserData.floors = new FloorData[] { new() };
@@ -105,7 +107,12 @@ public class AdCreatorTake2 : MonoBehaviour {
 		installRect.SetAnchorPosY(-150f);
 		installRect.DOAnchorPosY(80f, 0.3f).SetEase(Ease.OutExpo);
 		
-		yield return new WaitForSeconds(2f);
+		yield return new WaitForSeconds(1f);
+		
+		audioSource.clip = endAudioClip;
+		audioSource.Play();
+		
+		yield return new WaitForSeconds(1f);
 		
 		logoRect.gameObject.SetActive(true);
 		logoRect.SetAnchorPosY(300f);

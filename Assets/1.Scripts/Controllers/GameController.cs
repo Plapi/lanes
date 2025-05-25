@@ -328,7 +328,7 @@ public class GameController : MonoBehaviour {
 			}
 			leftEnvBuildings.gameObject.SetActive(true);
 			cameraController.gameObject.SetActive(false);
-			TrackGenerator.Instance.SetSpawnAICarDistance(90, 110, 20, 40);
+			// TrackGenerator.Instance.SetSpawnAICarDistance(90, 110, 20, 40);
 			mainPanel.MoveToOtherPanel(UIController.Instance.GetPanel<UIGaragePanel>().TopContainer);
 			mainPanel.Close();
 			companyController.Deactivate();
