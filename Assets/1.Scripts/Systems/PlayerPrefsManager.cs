@@ -205,7 +205,7 @@ public class UserData {
 	}
 
 	public bool CanShowInterstitialAd() {
-		return lastInterstitialAdShown == null || (DateTime.Now - lastInterstitialAdShown.Date).TotalMinutes > 5;
+		return !removeAdsPurchased && (lastInterstitialAdShown == null || (DateTime.Now - lastInterstitialAdShown.Date).TotalMinutes > 5);
 	}
 
 	public void InterstitialAdShown() {

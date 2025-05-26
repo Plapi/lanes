@@ -152,7 +152,7 @@ public class GameController : MonoBehaviour {
 		OnCoinsUpdate?.Invoke();
 		AnalyticsSystem.RecordRoomUpgradeEvent(room.RoomData.Design.name, room.RoomData.level);
 		
-		if (room.RoomData.level % 3 == 0) {
+		if (room.RoomData.level % 3 == 0 && PlayerPrefsManager.UserData.CanShowInterstitialAd()) {
 			AdsController.Instance.ShowAd(AdsController.AdType.Interstitial_Android);
 			PlayerPrefsManager.UserData.InterstitialAdShown();
 		}
