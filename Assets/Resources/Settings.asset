@@ -235,5 +235,5 @@ MonoBehaviour:
     value: 10000000
     productType: 0
   testMode: 0
-  enableAdds: 0
-  enableAnalytics: 0
+  enableAdds: 1
+  enableAnalytics: 1

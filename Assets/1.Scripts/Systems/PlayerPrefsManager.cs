@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public static class PlayerPrefsManager {
 
@@ -71,6 +70,8 @@ public class UserData {
 	public bool inFloorUpgradeTime;
 	public ParkingRoomData parkingRoom = new();
 	public DriverData[] drivers;
+	
+	public SerializedDateTime lastInterstitialAdShown;
 
 	public int GetFlorReached() {
 		return floors.Length - 1;
@@ -201,6 +202,15 @@ public class UserData {
 			}
 		}
 		return false;
+	}
+
+	public bool CanShowInterstitialAd() {
+		return lastInterstitialAdShown == null || (DateTime.Now - lastInterstitialAdShown.Date).TotalMinutes > 5;
+	}
+
+	public void InterstitialAdShown() {
+		lastInterstitialAdShown = new SerializedDateTime(DateTime.Now);
+		PlayerPrefsManager.SaveUserData();
 	}
 
 	public void ReachToMaxFirstFloor() {

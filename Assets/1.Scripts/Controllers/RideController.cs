@@ -192,7 +192,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			distanceBest = distanceBest,
 			personBest = personBest,
 			onAdCollect = () => {
-				AdsController.Instance.ShowAd(success => {
+				AdsController.Instance.ShowAd(AdsController.AdType.Rewarded_Android, success => {
 					coinsEarned = success ? coinsEarned * 2 : coinsEarned;
 					Restart();
 				}, "drive_endless");
@@ -224,7 +224,7 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			distance = totalDistance,
 			distanceBest = distanceBest,
 			onAdCollect = () => {
-				AdsController.Instance.ShowAd(success => {
+				AdsController.Instance.ShowAd(AdsController.AdType.Rewarded_Android, success => {
 					coinsEarned = success ? coinsEarned * 2 : coinsEarned;
 					Restart();
 				}, "drive_mission");

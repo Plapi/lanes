@@ -10,9 +10,7 @@ public class SplashController : MonoBehaviour {
 			AnalyticsService.Instance.StartDataCollection();	
 		}
 		if (Settings.Instance.enableAdds) {
-			AdsController.Instance.Init(() => {
-				AdsController.Instance.LoadAd();
-			});
+			AdsController.Instance.Init();
 		}
 		TenjinSystem.Connect();
 		SceneManager.LoadSceneAsync("Company");

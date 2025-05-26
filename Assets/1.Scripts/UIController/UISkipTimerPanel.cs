@@ -13,7 +13,7 @@ public class UISkipTimerPanel : UIPanel<UISkipTimerPanel.Data> {
 				Close();
 				data.onWatchAd();
 			} else {
-				AdsController.Instance.ShowAd(success => {
+				AdsController.Instance.ShowAd(AdsController.AdType.Rewarded_Android, success => {
 					if (success) {
 						Close();
 						data.onWatchAd();

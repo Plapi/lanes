@@ -24,7 +24,7 @@ public class UIWatchAdPanel : UIPanel<UIWatchAdPanel.Data> {
 		
 		watchButton.onClick.RemoveAllListeners();
 		watchButton.onClick.AddListener(() => {
-			AdsController.Instance.ShowAd(success => {
+			AdsController.Instance.ShowAd(AdsController.AdType.Rewarded_Android, success => {
 				if (success) {
 					const int minutes = 15;
 					DateTime now = DateTime.Now;

@@ -151,6 +151,11 @@ public class GameController : MonoBehaviour {
 		mainPanel.CoinsPanel.PlayConsumeCoinsAnim();
 		OnCoinsUpdate?.Invoke();
 		AnalyticsSystem.RecordRoomUpgradeEvent(room.RoomData.Design.name, room.RoomData.level);
+		
+		if (room.RoomData.level % 3 == 0) {
+			AdsController.Instance.ShowAd(AdsController.AdType.Interstitial_Android);
+			PlayerPrefsManager.UserData.InterstitialAdShown();
+		}
 	}
 
 	private void BuyTaxi(ParkingSlotData parkingSlotData) {
@@ -362,7 +367,7 @@ public class GameController : MonoBehaviour {
 				income = income,
 				seconds = seconds,
 				onWatchAd = () => {
-					AdsController.Instance.ShowAd(success => {
+					AdsController.Instance.ShowAd(AdsController.AdType.Rewarded_Android, success => {
 						if (success) {
 							PlayerPrefsManager.UserData.IncreaseCoins(income, false);
 							mainPanel.CoinsPanel.UpdateCoins(PlayerPrefsManager.UserData.coins);
