@@ -344,6 +344,10 @@ public class GameController : MonoBehaviour {
 
 	private void OnCompanyButton() {
 		UIController.Instance.FadeInToBlack(() => {
+			if (PlayerPrefsManager.UserData.CanShowInterstitialAd()) {
+				AdsController.Instance.ShowAd(AdsController.AdType.Interstitial_Android);
+				PlayerPrefsManager.UserData.InterstitialAdShown();
+			}
 			leftEnvBuildings.gameObject.SetActive(false);
 			cameraController.gameObject.SetActive(true);
 			TrackGenerator.Instance.SetSpawnAICarDistance(40, 80, 40, 80);

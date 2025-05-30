@@ -44,12 +44,14 @@ public class UserCar : Car {
 	private bool passIntersection;
 
 	private GenerateDir generateDir;
+	private float initMaxSpeed;
 	
 	public MaterialAndColorPreset MaterialAndColorPreset => materialAndColorPreset;
 	
 	private void Start() {
 		currentHealth = maxHealth;
 		realisticEngineSound.carMaxSpeed = MaxSpeed;
+		initMaxSpeed = MaxSpeed;
 	}
 	
 	public override void DisableCar() {
@@ -188,6 +190,9 @@ public class UserCar : Car {
 		if (verticalInput > 0.9f) {
 			accelerationInput = 0.5f;
 			brakeInput = 0f;
+		} else if (verticalInput < 0f) {
+			accelerationInput = verticalInput;
+			brakeInput = 0f;
 		} else if (verticalInput < 0.1f) {
 			accelerationInput = 0f;
 			brakeInput = 1f;
@@ -199,7 +204,8 @@ public class UserCar : Car {
 			}
 		}
 		
-		avc.ProvideInputs(GetSteering(), accelerationInput, brakeInput);
+		avc.MaxSpeed = accelerationInput < 0f ? 60f : initMaxSpeed;
+		avc.ProvideInputs(accelerationInput < 0f ? 0f : GetSteering(), accelerationInput, brakeInput);
 		
 		if (realisticEngineSound.gameObject.activeSelf) {
 			realisticEngineSound.gasPedalPressing = verticalInput > 0.1f;
@@ -256,10 +262,10 @@ public class UserCar : Car {
 		
 		AudioSource startAudioSource = AudioSystem.Play(startSound, MixerType.CarEngine, () => {
 			float prevMaxSpeed = avc.MaxSpeed;
-			avc.MaxSpeed = 60;
+			avc.MaxSpeed = initMaxSpeed = 60;
 			EnableCar();
 			StartCoroutine(TransitStartPoints(() => {
-				avc.MaxSpeed = prevMaxSpeed;
+				avc.MaxSpeed = initMaxSpeed = prevMaxSpeed;
 				onComplete();
 			}));
 			

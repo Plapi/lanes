@@ -93,7 +93,7 @@ public class UIResultsPanel : UIPanel<UIResultsPanel.Data> {
         yield return Utils.WaitForRealTime(0.2f);
 
         List<RectTransform> collectRects = new();
-        if (data.coins > 0 && AdsController.HasInstance() && AdsController.Instance.CanShowAd()) {
+        if (data.coins > 0 && !PlayerPrefsManager.UserData.removeAdsPurchased && AdsController.HasInstance() && AdsController.Instance.CanShowAd()) {
             collectRects.Add(adCollectButton.GetComponent<RectTransform>());
         }
         collectRects.Add(collectButton.GetComponent<RectTransform>());

@@ -501,6 +501,9 @@ public class RideController : MonoBehaviourSingleton<RideController> {
 			
 			garagePanel.Show();
 			if (coinsEarned > 0) {
+				if (PlayerPrefsManager.UserData.removeAdsPurchased) {
+					coinsEarned *= 2;
+				}
 				GameController.Instance.PauseUpdateCoins = true;
 				UIController.Instance.ActivateTouchBlocker(2f);
 				this.WaitForFrames(1, () => AddCoins(coinsEarned));

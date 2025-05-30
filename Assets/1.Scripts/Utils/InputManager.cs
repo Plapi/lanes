@@ -7,6 +7,7 @@ public class InputManager : MonoBehaviour {
 
 	[SerializeField] private float verticalMinY;
 	[SerializeField] private float verticalMaxY;
+	[SerializeField] private bool reversEnabled;
 	[SerializeField] private bool debug;
 
 	public float VerticalInput { get; private set; }
@@ -36,7 +37,7 @@ public class InputManager : MonoBehaviour {
 			if (y > 0.7f) {
 				return;
 			}
-			VerticalInput = Mathf.InverseLerp(verticalMinY, verticalMaxY, y);
+			VerticalInput = !reversEnabled || y >= verticalMinY ? Mathf.InverseLerp(verticalMinY, verticalMaxY, y) : -0.5f;
 			HorizontalInput = Input.mousePosition.x / Screen.width;
 		} else {
 			HorizontalInput = 0.5f;

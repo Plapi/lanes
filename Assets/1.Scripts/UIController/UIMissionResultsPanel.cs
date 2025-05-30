@@ -97,7 +97,7 @@ public class UIMissionResultsPanel : UIPanel<UIMissionResultsPanel.Data> {
         yield return Utils.WaitForRealTime(0.2f);
 
         List<RectTransform> collectRects = new();
-        if (AdsController.HasInstance() && AdsController.Instance.CanShowAd()) {
+        if (!PlayerPrefsManager.UserData.removeAdsPurchased && AdsController.HasInstance() && AdsController.Instance.CanShowAd()) {
 	        collectRects.Add(adCollectButton.GetComponent<RectTransform>());
         }
         collectRects.Add(collectButton.GetComponent<RectTransform>());
